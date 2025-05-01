@@ -1,18 +1,19 @@
 <?php
 
 class Config {
-    private static $data = [];
+    public static $data = [];
 
-    public static function load(string $file): void {
-        if (!file_exists($file)) {
-            throw new Exception("Config file not found: $file");
-        }
+    public static function load(): void {
 
-        self::$data = parse_ini_file($file, true);
+        self::$data = require './backend/config/sys_config.php';
     }
 
     public static function get(string $table, string $key): mixed {
-        return self::$data[$section][$key] ?? null;
+        return self::$data[$table][$key] ?? null;
+    }
+
+    public static function getAll(): array {
+        return self::$data;
     }
 }
 ?>
