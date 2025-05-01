@@ -24,16 +24,23 @@ class Responder {
             'message' => $message
         ], $status);
     }
+    public static function bad_request(string $message = 'Bad Request'): void {
+        self::error($message, 400);
+    }
 
     public static function unauthorized(string $message = 'Unauthorized'): void {
         self::error($message, 401);
     }
+    
+    public static function forbidden(string $message = 'Forbidden'): void {
+        self::error($message, 403);
+    }
 
-    public static function notFound(string $message = 'Not Found'): void {
+    public static function not_found(string $message = 'Not Found'): void {
         self::error($message, 404);
     }
 
-    public static function serverError(string $message = 'Internal Server Error'): void {
+    public static function server_error(string $message = 'Internal Server Error'): void {
         self::error($message, 500);
     }
 }
