@@ -47,6 +47,14 @@ class User
     return null;
   }
 
+  public static function exists(string $email): bool
+  {
+    $db = Database::db();
+    $stmt = $db->prepare("SELECT 1 FROM users WHERE email = :email LIMIT 1");
+    $stmt->execute([':email' => $email]);
+    return (bool) $stmt->fetchColumn();
+  }
+
   public function post(): Result
   {
 
