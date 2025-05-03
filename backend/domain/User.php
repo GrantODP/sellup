@@ -11,12 +11,13 @@ class User
   public string $contact;
   public string $password;
 
-  public function __construct(string $name, string $email, string $contact, string $password)
+  public function __construct(array $data)
   {
-    $this->name = $name;
-    $this->email = $email;
-    $this->contact = $contact;
-    $this->password = $password;
+    $this->id = $data['user_id'];
+    $this->name = $data['name'];
+    $this->email = $data['email'];
+    $this->contact = $data['contact'];
+    $this->password = $data['password'];
   }
 
   public static function get_by_id(string $user_id): ?User
@@ -25,19 +26,13 @@ class User
       Database::connect();
 
       $db = Database::db();
-      $stmt = $db->prepare("SELECT * FROM users WHERE user_id = :userid");
+      $stmt = $db->prepare("SELECT * FROM users WHERE user_id = :userid LIMIT 1");
       $stmt->bindValue(':userid', $user_id);
       $stmt->execute();
 
       $row = $stmt->fetch(PDO::FETCH_ASSOC);
       if ($row) {
-        $user =  new User(
-          $row['name'],
-          $row['email'],
-          $row['contact'],
-          $row['password']
-        );
-        $user->id = $row['user_id'];
+        $user =  new User($row);
         return  $user;
       }
     } catch (PDOException $e) {
@@ -53,19 +48,13 @@ class User
       Database::connect();
 
       $db = Database::db();
-      $stmt = $db->prepare("SELECT 1 FROM users WHERE email = :email LIMIT 1");
+      $stmt = $db->prepare("SELECT * FROM users WHERE email = :email LIMIT 1");
       $stmt->bindValue(':email', $email);
       $stmt->execute();
 
       $row = $stmt->fetch(PDO::FETCH_ASSOC);
       if ($row) {
-        $user =  new User(
-          $row['name'],
-          $row['email'],
-          $row['contact'],
-          $row['password']
-        );
-        $user->id = $row['user_id'];
+        $user =  new User($row);
         return  $user;
       }
     } catch (PDOException $e) {
@@ -76,7 +65,7 @@ class User
   }
 
 
-  public function create(): Result
+  public static function  create($data): Result
   {
 
     try {
@@ -85,10 +74,10 @@ class User
       $db = Database::db();
       $stmt = $db->prepare("INSERT INTO users (name, email, contact, password) VALUES (:name, :email, :contact, :password)");
       $stmt->execute([
-        ':name' => $this->name,
-        ':email' => $this->email,
-        ':contact' => $this->contact,
-        ':password' => $this->password,
+        ':name' => $data['name'],
+        ':email' => $data['email'],
+        ':contact' => $data['contact'],
+        ':password' => $data['password'],
       ]);
     } catch (PDOException $e) {
       return Result::Err("Error: " . $e->getMessage());
