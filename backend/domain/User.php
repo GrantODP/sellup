@@ -47,7 +47,7 @@ class User
     return null;
   }
 
-  public function get_by_email(string $email = ""): ?User
+  public static function get_by_email(string $email = ""): ?User
   {
     try {
       Database::connect();
