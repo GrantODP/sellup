@@ -4,14 +4,55 @@
 require_once './backend/db/Database.php';
 require_once './backend/core/Result.php';
 
+enum TokenStatus: string
+{
+  case Expired = 'expired: login in again';
+  case Valid = 'valid';
+  case Invalid = 'invalid: not logged in';
+  case Unknown = 'Unknown token';
+  case Missing = 'No token authorization"';
+}
+
 class Token
+{
+  public array $token;
+  public TokenStatus $status;
+
+  public function __construct(array $token, TokenStatus $status)
+  {
+    $this->token = $token;
+    $this->status = $status;
+  }
+
+  public function is_valid(): bool
+  {
+    return $this->status == TokenStatus::Valid;
+  }
+
+  public function user_id(): string
+  {
+    return $this->token['user_id'];
+  }
+
+  public function expire_time(): int
+  {
+    return $this->token['expire_at'];
+  }
+
+
+  public function message(): string
+  {
+    return $this->status->value;
+  }
+}
+
+class Tokener
 {
   private static $length = 16;
   public static $expire_duration = 1800;
   // Generate a secure random token
   public static function generate(): string
   {
-    $db = Database::db();
     do {
       $token = bin2hex(random_bytes(self::$length / 2)); // 16-character token
     } while (self::exists($token));
