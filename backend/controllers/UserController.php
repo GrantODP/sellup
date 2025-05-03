@@ -1,6 +1,8 @@
 <?php
 require_once './backend/domain/User.php';
-require_once './backend/core/Token.php';
+require_once './backend/core/Token.php';;
+require_once './backend/core/Authorizer.php';;
+require_once './backend/util/Util.php';
 
 class UserContoller
 {
@@ -9,9 +11,8 @@ class UserContoller
   public static function post()
   {
 
-    $input = file_get_contents(('php://input'));
 
-    $data = json_decode($input, true);
+    $data = get_input_json();
 
 
     $name = $data['name'] ?? null;
@@ -47,10 +48,7 @@ class UserContoller
   // /login
   public static function login()
   {
-    $input = file_get_contents(('php://input'));
-
-    $data = json_decode($input, true);
-
+    $data = get_input_json();
     if ($data === null) {
       Responder::bad_request("invalid login submited");
       return;
@@ -60,81 +58,60 @@ class UserContoller
     $email = $data['email'] ?? '';
     $password = $data['password'] ?? '';
 
-    //todo: add validation replace login to return a token and not a user
+    //todo: add password validation
 
     $user = User::get_by_email($email);
+
     if ($user === null) {
       Responder::bad_request("user not found");
-    } else {
-      $token = Token::gen_user_token($user->id);
-
-      if ($token->isOk()) {
-
-        $data = [];
-        $data['token'] = $token->unwrap();
-        Responder::success(json_encode($data));
-        return;
-      } else {
-        Responder::server_error('Unable to generate auth token');
-      }
     }
+
+    $token = Tokener::gen_user_token($user->id);
+
+    if (!$token->isOk()) {
+      Responder::server_error('Unable to generate auth token');
+      return;
+    }
+
+    $data = [];
+    $data['token'] = $token->unwrap();
+    Responder::success(json_encode($data));
   }
 
   // //users/user
   public static function get_user()
   {
-    $headers = getallheaders();
-    $auth_header = $headers['Authorization'];
-    if ($auth_header != null) {
-      $token = str_replace('Bearer ', '', $auth_header);
+    $auth_token = Authorizer::validate_token_header();
 
+    if (!$auth_token->is_valid()) {
+      return Responder::bad_request($auth_token->message());
+    }
 
-      //todo: add validation replace login to return a token and not a user
-      $token_result = Token::get_user_id_from_token($token);
+    $user = User::get_by_id($auth_token->user_id());
 
-
-      if (!$token_result->isOk()) {
-        Responder::bad_request("Unknown token received");
-        return;
-      }
-
-      $user = User::get_by_id($token_result->unwrap()['user_id']);
-
-      if ($user === null) {
-        Responder::bad_request("user not found");
-      } else {
-        Responder::success(json_encode($user));
-        return;
-      }
+    if ($user === null) {
+      Responder::bad_request("user not found");
     } else {
-      Responder::bad_request("No authorization token set");
+      Responder::success(json_encode($user));
+      return;
     }
   }
 
   public static function update()
   {
-    if (isset($_SERVER['HTTP_AUTHORIZATION'])) {
-      $auth_header = $_SERVER['HTTP_AUTHORIZATION'];
-      $token = str_replace('Bearer ', '', $auth_header);
 
+    $auth_token = Authorizer::validate_token_header();
 
-      $token_result = Token::get_user_id_from_token($token);
+    if (!$auth_token->is_valid()) {
+      return Responder::bad_request($auth_token->message());
+    }
 
-      if (!$token_result->isOk()) {
-        Responder::bad_request("Unknown token received");
-        return;
-      }
+    $user = User::get_by_id($auth_token->user_id());
 
-      $user = User::get_by_id($token_result->unwrap()['user_id']);
-
-      if ($user === null) {
-        Responder::bad_request("user not found");
-      } else {
-        Responder::success(json_encode($user));
-        return;
-      }
+    if ($user === null) {
+      Responder::bad_request("user not found");
     } else {
-      Responder::bad_request("No authorization token");
+      Responder::success(json_encode($user));
     }
   }
 }
