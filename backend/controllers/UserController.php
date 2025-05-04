@@ -4,31 +4,22 @@ require_once './backend/core/Token.php';;
 require_once './backend/core/Authorizer.php';;
 require_once './backend/util/Util.php';
 
-class UserContoller
+class UserController
 {
 
-  // /users/create
+  // POST /users/create
   public static function post()
   {
 
 
     $data = get_input_json();
 
-
-    $name = $data['name'] ?? null;
-    $password = $data['password'] ?? null;
-    $email = $data['email'] ?? null;
-    $contact = $data['contact'] ?? null;
-
-    if (
-      empty($name) ||
-      empty($password) ||
-      empty($email) ||
-      empty($contact)
-    ) {
-      Responder::error("Invalid input", 400); // 400 Bad Request
+    if (!has_required_keys($data, ['name', 'password', 'email', 'contact'])) {
+      Responder::bad_request("Invalid input");
       return;
     }
+
+    $email = $data['email'];
 
     if (User::get_by_email($email)) {
       Responder::error('User already exists', 409);
@@ -45,7 +36,7 @@ class UserContoller
     return;
   }
 
-  // /login
+  // POST /login
   public static function login()
   {
     $data = get_input_json();
@@ -63,7 +54,7 @@ class UserContoller
     $user = User::get_by_email($email);
 
     if ($user === null) {
-      Responder::bad_request("user not found");
+      Responder::unauthorized("Invalid credentials, user not found");
     }
 
     $token = Tokener::gen_user_token($user->id);
@@ -75,16 +66,16 @@ class UserContoller
 
     $data = [];
     $data['token'] = $token->unwrap();
-    Responder::success(json_encode($data));
+    Responder::success($data);
   }
 
-  // //users/user
+  // GET //user
   public static function get_user()
   {
     $auth_token = Authorizer::validate_token_header();
 
     if (!$auth_token->is_valid()) {
-      return Responder::bad_request($auth_token->message());
+      return Responder::unauthorized($auth_token->message());
     }
 
     $user = User::get_by_id($auth_token->user_id());
@@ -92,11 +83,12 @@ class UserContoller
     if ($user === null) {
       Responder::bad_request("user not found");
     } else {
-      Responder::success(json_encode($user));
+      Responder::success($user);
       return;
     }
   }
 
+  // POST /user/update
   public static function update()
   {
 
@@ -111,7 +103,7 @@ class UserContoller
     if ($user === null) {
       Responder::bad_request("user not found");
     } else {
-      Responder::success(json_encode($user));
+      Responder::success($user);
     }
   }
 }
