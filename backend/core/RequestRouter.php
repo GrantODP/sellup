@@ -1,5 +1,13 @@
 <?php
-require_once './backend/core/Responder.php';
+
+require_once 'Responder.php';
+
+$pattern = __DIR__ . "/../controllers/*.php";
+foreach (glob($pattern) as $filename) {
+
+  require_once $filename;
+}
+
 class Router
 {
   private $get_routes = [];
@@ -50,6 +58,11 @@ class Router
       return;
     }
 
-    call_user_func($controller);
+
+    try {
+      call_user_func($controller);
+    } catch (Throwable $e) {
+      Responder::server_error($e->getMessage());
+    }
   }
 }
