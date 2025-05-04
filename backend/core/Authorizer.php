@@ -18,10 +18,12 @@ class Authorizer
   public static function validate_token_header(): Token
   {
     $headers = getallheaders();
-    $auth_header = $headers['Authorization'];
-    if ($auth_header == null) {
+    $auth_header = $headers['authorization'];
+
+    if (empty($auth_header)) {
       return new Token([], TokenStatus::Missing, '');
     }
+
 
     $token = str_replace('Bearer ', '', $auth_header);
     $token_result = Tokener::get_user_id_from_token($token);
