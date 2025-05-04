@@ -1,0 +1,65 @@
+<?php
+require_once './backend/domain/User.php';
+require_once './backend/domain/Listing.php';
+require_once './backend/domain/Seller.php';
+require_once './backend/core/Token.php';;
+require_once './backend/core/Authorizer.php';;
+require_once './backend/util/Util.php';
+
+
+class Seller
+{
+
+
+  // POST /ad
+  public static function post_listing()
+  {
+    $input = get_input_json();
+    if ($input == null) {
+      return Responder::bad_request("No data provided");
+    }
+    if (!has_required_keys($input, ['price', 'cat_id', 'location_id', 'title'])) {
+      return Responder::bad_request("Missing one or more of the following parameters: {price, cat_id, location_id, title");
+    }
+
+    $auth_token = Authorizer::validate_token_header();
+
+    if (!$auth_token->is_valid()) {
+      return Responder::unauthorized($auth_token->message());
+    }
+
+    $seller = Seller::get_or_insert($auth_token->user_id());
+
+    if ($seller == null) {
+      return Responder::server_error("Unable to create a seller");
+    }
+    $input['seller_id'] = $seller->seller_id;
+    $listing_submission = new ListingSubmission($input);
+    $list_result = Listing::post($listing_submission);
+
+    if ($list_result->isErr()) {
+      return Responder::server_error("Error posting a ad:" . $list_result->unwrapErr());
+    }
+
+    return Responder::success();
+  }
+
+  // GET /seller
+  public static function get_seller()
+  {
+
+    $id = $_GET['id'] ?? null;
+    if ($id === null) {
+      Responder::bad_request("missing id");
+    }
+
+    $seller = Seller::get_seller($id);
+
+    if ($seller == null) {
+      return Responder::server_error("Unable to find seller");
+    }
+
+
+    return Responder::success($seller);
+  }
+}
