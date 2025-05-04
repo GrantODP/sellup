@@ -32,7 +32,7 @@ class Listing
   public string $location_id;
   public string $title;
   public ?string $description;
-
+  public string $slug;
 
   public function __construct(array $data)
   {
@@ -44,6 +44,7 @@ class Listing
     $this->location_id = $data['location_id'];
     $this->title = $data['title'];
     $this->description = $data['description'] ?? null;
+    $this->slug = $data['slug'] ?? null;
   }
 
 
@@ -81,9 +82,27 @@ class Listing
   { {
       try {
         Database::connect();
-
+        $sql = "
+  SELECT 
+    l.listing_id,
+    l.seller_id,
+    l.price,
+    l.date_posted,
+    a.ad_id,
+    a.cat_id,
+    a.location_id,
+    a.title,
+    a.description,
+    a.slug
+  FROM 
+    listings l
+  JOIN 
+    listing_ad a ON l.listing_id = a.listing_id
+  WHERE 
+    l.listing_id = :id
+";
         $db = Database::db();
-        $stmt = $db->prepare("SELECT * FROM listing_ad WHERE listing_id = :id LIMIT 1");
+        $stmt = $db->prepare($sql);
         $stmt->bindValue(':id', $listing_id);
         $stmt->execute();
 
@@ -98,5 +117,28 @@ class Listing
 
       return null;
     }
+  }
+  public static function get_by_slug(string $slug): ?Listing
+  {
+    try {
+      Database::connect();
+
+      $db = Database::db();
+
+
+      $stmt = $db->prepare('SELECT * FROM listing_details WHERE slug = :slug');
+      $stmt->bindValue(':slug', $slug);
+      $stmt->execute();
+      $row = $stmt->fetch(PDO::FETCH_ASSOC);
+      if (empty($row)) {
+        return null;
+      }
+      $listing =  new Listing($row);
+      return  $listing;
+    } catch (PDOException $e) {
+      echo "Error: " . $e->getMessage();
+    }
+
+    return null;
   }
 }
