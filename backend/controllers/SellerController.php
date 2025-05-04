@@ -7,7 +7,7 @@ require_once './backend/core/Authorizer.php';;
 require_once './backend/util/Util.php';
 
 
-class Seller
+class SellerController
 {
 
 
@@ -16,7 +16,7 @@ class Seller
   {
     $input = get_input_json();
     if ($input == null) {
-      return Responder::bad_request("No data provided");
+      return Responder::bad_request("No json provided or failed parsing json");
     }
     if (!has_required_keys($input, ['price', 'cat_id', 'location_id', 'title'])) {
       return Responder::bad_request("Missing one or more of the following parameters: {price, cat_id, location_id, title");
@@ -50,7 +50,7 @@ class Seller
 
     $id = $_GET['id'] ?? null;
     if ($id === null) {
-      Responder::bad_request("missing id");
+      return Responder::bad_request("missing id");
     }
 
     $seller = Seller::get_seller($id);
