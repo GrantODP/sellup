@@ -82,27 +82,9 @@ class Listing
   { {
       try {
         Database::connect();
-        $sql = "
-  SELECT 
-    l.listing_id,
-    l.seller_id,
-    l.price,
-    l.date_posted,
-    a.ad_id,
-    a.cat_id,
-    a.location_id,
-    a.title,
-    a.description,
-    a.slug
-  FROM 
-    listings l
-  JOIN 
-    listing_ad a ON l.listing_id = a.listing_id
-  WHERE 
-    l.listing_id = :id
-";
+
         $db = Database::db();
-        $stmt = $db->prepare($sql);
+        $stmt = $db->prepare('SELECT * FROM listing_details WHERE listing_id = :id');
         $stmt->bindValue(':id', $listing_id);
         $stmt->execute();
 
