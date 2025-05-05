@@ -58,6 +58,27 @@ class Seller
     return null;
   }
 
+  public static function get_user_id(int $seller_id): ?int
+  {
+
+    try {
+      Database::connect();
+
+      $db = Database::db();
+      $stmt = $db->prepare("SELECT user_id FROM sellers WHERE seller_id = :seller LIMIT 1");
+      $stmt->bindValue(':seller', $seller_id);
+      $stmt->execute();
+
+      $id = $stmt->fetch(PDO::FETCH_ASSOC);
+      if ($id) {
+        return  $id;
+      }
+    } catch (PDOException $e) {
+      echo "Error: " . $e->getMessage();
+    }
+    return null;
+  }
+
   public static function get_seller_by_user_id(int $user_id): ?Seller
   {
 
