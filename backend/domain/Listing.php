@@ -1,6 +1,7 @@
 <?php
 require_once './backend/core/Result.php';
 require_once './backend/db/Database.php';
+require_once './backend/util/Util.php';
 class ListingSubmission
 {
   public string $seller_id;
@@ -9,6 +10,7 @@ class ListingSubmission
   public string $location_id;
   public string $title;
   public ?string $description;
+  public string $slug;
 
   public function __construct(array $data)
   {
@@ -18,6 +20,7 @@ class ListingSubmission
     $this->location_id = $data['location_id'];
     $this->title = $data['title'];
     $this->description = $data['description'] ?? null;
+    $this->slug =  gen_slug($this->title);
   }
 }
 
@@ -63,13 +66,14 @@ class Listing
       ]);
 
       $listing_id = $db->lastInsertId();
-      $stmt_ad = $db->prepare("INSERT INTO listing_ad (listing_id, cat_id, location_id, title, description) VALUES (:listid, :cat_id, :loc, :title, :descp)");
+      $stmt_ad = $db->prepare("INSERT INTO listing_ad (listing_id, cat_id, location_id, title, description, slug) VALUES (:listid, :cat_id, :loc, :title, :descp, :slug)");
       $stmt_ad->execute([
         ':listid' => $listing_id,
         ':cat_id' => $submission->cat_id,
         ':loc' => $submission->location_id,
         ':title' => $submission->title,
         ':descp' => $submission->description,
+        ':slug' => $submission->slug,
       ]);
       $db->commit();
     } catch (PDOException $e) {
@@ -100,6 +104,7 @@ class Listing
       return null;
     }
   }
+
   public static function get_by_slug(string $slug): ?Listing
   {
     try {
