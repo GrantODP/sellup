@@ -20,7 +20,7 @@ class ListingSubmission
     $this->location_id = $data['location_id'];
     $this->title = $data['title'];
     $this->description = $data['description'] ?? null;
-    $this->slug =  gen_slug($this->title);
+    $this->slug = $this->seller_id  . '-' .  gen_slug($this->title);
   }
 }
 
