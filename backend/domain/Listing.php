@@ -128,4 +128,74 @@ class Listing
 
     return null;
   }
+  public static function get_all_by_category(string $cat_id): ?array
+  {
+    try {
+      Database::connect();
+
+      $db = Database::db();
+
+
+      $stmt = $db->prepare('SELECT * FROM listing_details WHERE cat_id = :cat_id');
+      $stmt->bindValue(':cat_id', $cat_id);
+      $stmt->execute();
+      $row = $stmt->fetch(PDO::FETCH_ASSOC);
+      if (empty($row)) {
+        return null;
+      }
+      return  $row;
+    } catch (PDOException $e) {
+      echo "Error: " . $e->getMessage();
+    }
+
+    return null;
+  }
+
+  public static function get_all_by_page(int $page, int $count, string $sort = "listing_id", bool $ascend = true): ?array
+  {
+    try {
+      Database::connect();
+      $offset = ($page - 1) * $count;
+      $order = $ascend ? 'ASC' : 'DESC';
+      $db = Database::db();
+      $stmt = $db->prepare("SELECT * FROM listing_details ORDER BY :sort_col :order LIMIT :count OFFSET :offset");
+      $stmt->bindValue(':sort_col', $sort);
+      $stmt->bindValue(':order', $order);
+      $stmt->bindValue(':count', $count);
+      $stmt->bindValue(':offset', $offset);
+      $stmt->execute();
+
+      $lists = $stmt->fetchAll(PDO::FETCH_ASSOC);
+      if ($lists) {
+        return  $lists;
+      }
+    } catch (PDOException $e) {
+      echo "Error: " . $e->getMessage();
+    }
+    return null;
+  }
+
+  public static function get_by_col_and_page(string $column, string $value, int $page, int $count, string $sort = "listing_id", string $sort_dir = 'ascend'): ?array
+  {
+    try {
+      Database::connect();
+      $offset = ($page - 1) * $count;
+
+      $order = $sort_dir == 'asc' ? 'ASC' : 'DESC';
+      $db = Database::db();
+      $stmt = $db->prepare("SELECT * FROM listing_details WHERE $column = :value ORDER BY $sort $order LIMIT :count OFFSET :offset");
+      $stmt->bindValue(':value', $value);
+      $stmt->bindValue(':count', (int)$count, PDO::PARAM_INT);
+      $stmt->bindValue(':offset', (int)$offset, PDO::PARAM_INT);
+      $stmt->execute();
+
+      $lists = $stmt->fetchAll(PDO::FETCH_ASSOC);
+      if ($lists) {
+        return  $lists;
+      }
+    } catch (PDOException $e) {
+      echo "Error: " . $e->getMessage();
+    }
+    return null;
+  }
 }
