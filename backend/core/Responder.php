@@ -20,7 +20,7 @@ class Responder
       'data' => $data
     ], $status);
   }
-  public static function success_paged($data = [], string $message = 'Success', int $page_num, int $limit, int $status = 200): void
+  public static function success_paged(int $page_num, int $limit, $data = [], string $message = 'Success', int $status = 200): void
   {
     self::json([
       'status' => 'success',
