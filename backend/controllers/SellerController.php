@@ -2,6 +2,7 @@
 require_once './backend/domain/User.php';
 require_once './backend/domain/Listing.php';
 require_once './backend/domain/Seller.php';
+require_once './backend/domain/Rating.php';
 require_once './backend/core/Token.php';;
 require_once './backend/core/Authorizer.php';;
 require_once './backend/util/Util.php';
@@ -61,5 +62,22 @@ class SellerController
 
 
     return Responder::success($seller);
+  }
+  // GET /seller/rating
+  public static function get_rating()
+  {
+
+    $id = $_GET['id'] ?? null;
+    if ($id === null) {
+      return Responder::bad_request("missing id");
+    }
+
+    $rating = Rating::get_seller_score($id);
+
+    if ($rating == null) {
+      return Responder::server_error("Unable to find rating for seller: " . $id);
+    }
+
+    return Responder::success($rating);
   }
 }

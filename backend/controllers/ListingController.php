@@ -1,6 +1,7 @@
 <?php
 require_once './backend/domain/User.php';
 require_once './backend/domain/Listing.php';
+require_once './backend/domain/Review.php';
 require_once './backend/core/Token.php';;
 require_once './backend/core/Authorizer.php';;
 require_once './backend/util/Util.php';
@@ -51,5 +52,68 @@ class ListingController
       return Responder::not_found('Listings not found');
     }
     return Responder::success_paged($page, $limit, $listings);
+  }
+  // GET /listing/rating
+  public static function get_rating()
+  {
+
+    $id = $_GET['id'] ?? null;
+    if ($id === null) {
+      return Responder::bad_request("missing id");
+    }
+
+    $rating = Rating::get_listing_score($id);
+
+    if ($rating == null) {
+      return Responder::server_error("Unable to find rating for listing: " . $id);
+    }
+
+    return Responder::success($rating);
+  }
+
+  // GET /listing/reviews
+  public static function get_reviews()
+  {
+
+    if (!has_required_keys($_GET, ['id'])) {
+      return Responder::bad_request("missing id");
+    }
+
+    $id = $_GET['id'];
+
+    $reviews = Review::get_listing_reviews($id);
+
+    if ($reviews == null) {
+      return Responder::server_error("Unable to find reviews for listing: " . $id);
+    }
+
+    return Responder::success($reviews);
+  }
+
+  // POST /listing/reviews
+  public static function write_review()
+  {
+
+    $data = get_input_json();
+    if (!has_required_keys($data, ['rating', 'listing_id'])) {
+      return Responder::bad_request("Missing 1 or more review parameters ['rating', 'listing_id']");
+    }
+
+    $auth_token = Authorizer::validate_token_header();
+
+    if (!$auth_token->is_valid()) {
+      return Responder::bad_request($auth_token->message());
+    }
+
+
+    $data['user_id'] = $auth_token->user_id();
+    $review = new Review($data);
+    $result = $review->write();
+
+    if ($result->isErr()) {
+      return Responder::server_error("Unable to write review for listing: " . $review->listing_id);
+    }
+
+    return Responder::success();
   }
 }
