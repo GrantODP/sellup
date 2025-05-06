@@ -14,6 +14,9 @@ function has_required_keys(array $data, array $keys): bool
     if (!array_key_exists($key, $data)) {
       return false;
     }
+    if (empty($data[$key])) {
+      return false;
+    }
   }
   return true;
 }
