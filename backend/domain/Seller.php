@@ -10,6 +10,7 @@ class Seller
   public string $created_at;
 
 
+
   public function __construct(array $seller)
   {
     $this->seller_id = $seller['seller_id'];
@@ -48,6 +49,8 @@ class Seller
       $stmt->execute();
 
       $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+
       if ($row) {
         $seller =  new Seller($row);
         return  $seller;
@@ -70,8 +73,9 @@ class Seller
       $stmt->execute();
 
       $id = $stmt->fetch(PDO::FETCH_ASSOC);
+
       if ($id) {
-        return  $id;
+        return  $id['user_id'];
       }
     } catch (PDOException $e) {
       echo "Error: " . $e->getMessage();
