@@ -74,10 +74,10 @@ class User
       $db = Database::db();
       $stmt = $db->prepare("INSERT INTO users (name, email, contact, password) VALUES (:name, :email, :contact, :password)");
       $stmt->execute([
-        ':name' => $data['name'],
-        ':email' => $data['email'],
-        ':contact' => $data['contact'],
-        ':password' => $data['password'],
+        ':name' => trim($data['name']),
+        ':email' => trim($data['email']),
+        ':contact' => trim($data['contact']),
+        ':password' => trim($data['password']),
       ]);
     } catch (PDOException $e) {
       return Result::Err("Error: " . $e->getMessage());
