@@ -95,6 +95,7 @@ class Image
       foreach ($rows as $row) {
         $images[] = new Image($row['file_path']);
       }
+      return $images;
     } catch (PDOException $e) {
       echo "Error: " . $e->getMessage();
     }
@@ -109,10 +110,10 @@ class Image
     $target_dir = realpath(__DIR__ . '/../../media/');
     foreach ($_FILES['images']['tmp_name'] as $index => $tmp_name) {
       $name = basename($_FILES['images']['name'][$index]);
-      $target = $target_dir . '/' . $listing_id . '-' . $name;
+      $target = $listing_id . '-' . $name;
+      $target_loc = $target_dir . '/' . $target;
 
-      var_dump($target);
-      if (move_uploaded_file($tmp_name, $target)) {
+      if (move_uploaded_file($tmp_name, $target_loc)) {
         $uploaded[] = $target;
       } else {
         $errors[] = $name;
@@ -135,7 +136,7 @@ class Image
       Database::connect();
 
       $db = Database::db();
-      $sql = "INSERT INTO images (file_path, listing_id) VALUES " . implode(", ", $placeholders);
+      $sql = "INSERT INTO images (file_path, listing_id) VALUES " . implode(", ", $placeholders) . " ON DUPLICATE KEY UPDATE file_path = VALUES(file_path) ";
       $stmt = $db->prepare($sql);
       $stmt->execute($values);
     } catch (PDOException $e) {
