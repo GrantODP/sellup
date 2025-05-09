@@ -136,7 +136,7 @@ class ListingController
       return Responder::server_error("Unable to find rating or listing for listing: " . $id);
     }
 
-    $images[] = Image::get_listing_images($listing->listing_id) ?? [];
+    $images = Image::get_listing_images($listing->listing_id) ?? [];
     $res = AdEvaluator::evaluate($listing, $rating, $images);
 
     if ($res->isErr()) {
