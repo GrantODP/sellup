@@ -1,6 +1,8 @@
 <?php
 require_once './backend/domain/User.php';
 require_once './backend/domain/Listing.php';
+require_once './backend/domain/Evaluator.php';
+require_once './backend/domain/ItemImage.php';
 require_once './backend/domain/Review.php';
 require_once './backend/core/Token.php';;
 require_once './backend/core/Authorizer.php';;
@@ -115,5 +117,32 @@ class ListingController
     }
 
     return Responder::success();
+  }
+
+  //GET /listings/evaluate
+  public static function evaluate()
+  {
+
+    $id = $_GET['id'] ?? null;
+    if ($id === null) {
+      return Responder::bad_request("missing id");
+    }
+
+    $rating = Rating::get_listing_score($id);
+
+    $listing = Listing::get_by_id($id);
+
+    if (empty($rating) || empty($listing)) {
+      return Responder::server_error("Unable to find rating or listing for listing: " . $id);
+    }
+
+    $images[] = Image::get_listing_images($listing->listing_id) ?? [];
+    $res = AdEvaluator::evaluate($listing, $rating, $images);
+
+    if ($res->isErr()) {
+      return Responder::server_error("Unable evaulate listing: " . $res->unwrapErr());
+    }
+
+    return Responder::success($res->unwrap());
   }
 }
