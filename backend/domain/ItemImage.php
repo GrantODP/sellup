@@ -10,7 +10,7 @@ class Image
 
   public function __construct($path)
   {
-    $this->path = $path;
+    $this->path = "./media/" . $path;
   }
 
 
