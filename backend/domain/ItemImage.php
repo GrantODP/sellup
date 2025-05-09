@@ -101,4 +101,48 @@ class Image
 
     return null;
   }
+
+  public static function save(int $listing_id): Result
+  {
+    $uploaded = [];
+    $errors = [];
+    $target_dir = realpath(__DIR__ . '/../../media/');
+    foreach ($_FILES['images']['tmp_name'] as $index => $tmp_name) {
+      $name = basename($_FILES['images']['name'][$index]);
+      $target = $target_dir . '/' . $listing_id . '-' . $name;
+
+      var_dump($target);
+      if (move_uploaded_file($tmp_name, $target)) {
+        $uploaded[] = $target;
+      } else {
+        $errors[] = $name;
+      }
+    }
+
+    if (empty($uploaded)) {
+      return Result::Err($errors);
+    }
+
+    $placeholders = [];
+    $values = [];
+    foreach ($uploaded as $upload) {
+      $placeholders[] = '(?, ?)';
+      $values[] = $upload;
+      $values[] = $listing_id;
+    }
+
+    try {
+      Database::connect();
+
+      $db = Database::db();
+      $sql = "INSERT INTO images (file_path, listing_id) VALUES " . implode(", ", $placeholders);
+      $stmt = $db->prepare($sql);
+      $stmt->execute($values);
+    } catch (PDOException $e) {
+      echo "Error: " . $e->getMessage();
+      return Result::Err($e->getMessage());
+    }
+
+    return Result::Ok(null);
+  }
 }

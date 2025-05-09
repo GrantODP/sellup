@@ -145,4 +145,47 @@ class ListingController
 
     return Responder::success($res->unwrap());
   }
+
+  //POST /listings/media
+  public static function add_listing_images()
+  {
+    if (!isset($_FILES['images'])) {
+      return Responder::bad_request("No files uploaded");
+    }
+
+    $id = $_GET['id'] ?? null;
+    if ($id === null) {
+      return Responder::bad_request("missing id");
+    }
+
+    $auth_token = Authorizer::validate_token_header();
+
+    if (!$auth_token->is_valid()) {
+      return Responder::bad_request($auth_token->message());
+    }
+
+    $seller = Seller::get_seller_by_user_id($auth_token->user_id());
+    $listing = Listing::get_by_id($id);
+
+    if (empty($listing)) {
+      return Responder::server_error("Unable to find listing: " . $id);
+    }
+    if (empty($seller)) {
+      return Responder::server_error("Unable to find seller for listing: " . $id);
+    }
+
+    if ($listing->seller_id !== $seller->seller_id) {
+      return Responder::unauthorized("Not authorized to edit listing");
+    }
+
+
+    $result = Image::save($listing->listing_id);
+
+    if ($result->isErr()) {
+      return Responder::server_error('Failed uploading: ' . implode(",", $result->unwrapErr()));
+    }
+
+
+    return Responder::success($result->unwrap());
+  }
 }
