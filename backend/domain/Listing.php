@@ -218,7 +218,6 @@ class Listing
         $params['lid'] = $location_id;
       }
 
-      var_dump($sql);
       $stmt = $db->prepare($sql);
       $stmt->execute($params);
 

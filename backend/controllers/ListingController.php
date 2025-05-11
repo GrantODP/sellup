@@ -197,15 +197,13 @@ class ListingController
     $query = trim($_GET['query']);
     $cat_id = $_GET['cat'] ?? 0;
     $location_id = $_GET['loc'] ?? 0;
-    var_dump($location_id);
 
-    var_dump($cat_id);
     $listings = Listing::fuzzy_find($query, $cat_id, $location_id);
 
     if ($listings == null) {
       $cerror = ($cat_id == 0) ? "" : ",category id:$cat_id";
       $lerror = ($location_id == 0) ? "" : ",location id:$location_id";
-      return Responder::not_found("Listings matching '$query' $cerror $lerror not found");
+      return Responder::not_found("Listings matching '$query'$cerror$lerror not found");
     }
     return Responder::success($listings);
   }
