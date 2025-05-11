@@ -198,4 +198,37 @@ class Listing
     }
     return null;
   }
+
+  public static function fuzzy_find(string $search_term, int $cat_id = 0, int $location_id = 0): ?array
+  {
+    try {
+      Database::connect();
+
+
+      $db = Database::db();
+      $sql = "SELECT * FROM listing_details WHERE MATCH (title) AGAINST (:search IN NATURAL LANGUAGE MODE)";
+      $params[':search'] = $search_term;
+
+      if ($cat_id > 0) {
+        $sql .= ' AND cat_id= :cid';
+        $params['cid'] = $cat_id;
+      }
+      if ($location_id > 0) {
+        $sql .= ' AND location_id= :lid';
+        $params['lid'] = $location_id;
+      }
+
+      var_dump($sql);
+      $stmt = $db->prepare($sql);
+      $stmt->execute($params);
+
+      $lists = $stmt->fetchAll(PDO::FETCH_ASSOC);
+      if ($lists) {
+        return  $lists;
+      }
+    } catch (PDOException $e) {
+      echo "Error: " . $e->getMessage();
+    }
+    return null;
+  }
 }
