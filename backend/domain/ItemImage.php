@@ -95,6 +95,7 @@ class Image
       foreach ($rows as $row) {
         $images[] = new Image($row['file_path']);
       }
+
       return $images;
     } catch (PDOException $e) {
       echo "Error: " . $e->getMessage();
