@@ -90,14 +90,11 @@ class Router
 
   private static function dynamic_call($path, $router)
   {
-    echo 'dynamic_call';
 
     foreach ($router as $pattern => $controller) {
-      echo $pattern;
       if (preg_match($pattern, $path, $matches)) {
 
         array_shift($matches);
-        var_dump($matches);
         try {
           return call_user_func_array($controller, $matches);
         } catch (Throwable $e) {
@@ -105,7 +102,6 @@ class Router
         }
         return true;
       }
-      var_dump($matches);
     }
     return false;
   }

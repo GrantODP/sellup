@@ -1,7 +1,16 @@
+
 RewriteEngine On
 
-RewriteRule ^/index\.php$ - [L,NC]
+# Don't rewrite index.php explicitly
+RewriteRule ^index\.php$ - [L,NC]
 
+# Rewrite static assets to /public/
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*\.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot))$ public/$1 [L]
+
+# If not a real file or directory, send to router
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule . index.php [L]
+
