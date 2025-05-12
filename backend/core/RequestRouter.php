@@ -42,7 +42,11 @@ class Router
   }
   public function post($path)
   {
-    self::call($path, $this->post_routes);
+    if (self::call($path, $this->post_routes)) {
+      return;
+    };
+
+    return Responder::bad_request("Unknown request");
   }
 
   public function handle()

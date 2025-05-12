@@ -1,6 +1,5 @@
 <?php
 
-
 require_once './backend/db/Database.php';
 require_once './backend/core/Result.php';
 
@@ -10,7 +9,7 @@ enum TokenStatus: string
   case Valid = 'valid';
   case Invalid = 'invalid: not logged in';
   case Unknown = 'Unknown token';
-  case Missing = 'No token authorization"';
+  case Missing = 'No token authorization';
 }
 
 class Token
@@ -108,6 +107,7 @@ class Tokener
 
     return Result::Ok($row);
   }
+
 
 
 
