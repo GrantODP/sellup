@@ -2,12 +2,16 @@
 
 require_once 'Responder.php';
 
-$pattern = __DIR__ . "/../controllers/*.php";
-foreach (glob($pattern) as $filename) {
+$back_pattern = __DIR__ . "/../controllers/*.php";
+$front_pattern = __DIR__ . "/../../frontend/controllers/*.php";
+foreach (glob($back_pattern) as $filename) {
 
   require_once $filename;
 }
+foreach (glob($front_pattern) as $filename) {
 
+  require_once $filename;
+}
 class Router
 {
   private $get_routes = [];
