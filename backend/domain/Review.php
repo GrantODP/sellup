@@ -1,0 +1,72 @@
+<?php
+require_once './backend/db/Database.php';
+require_once './backend/util/Util.php';
+require_once './backend/core/Result.php';
+
+
+
+class Review
+{
+  public string $message;
+  public int $user_id;
+  public int $listing_id;
+  public int $rating;
+
+
+  public function __construct(array $data)
+  {
+    $this->message = trim($data['message']) ?? '';
+    $this->user_id = trim($data['user_id']);
+    $this->listing_id = trim($data['listing_id']);
+    $this->rating = trim($data['rating']);
+  }
+
+  public  function write(): Result
+  {
+
+    try {
+      Database::connect();
+
+      $db = Database::db();
+
+      $stmt = $db->prepare("INSERT INTO reviews (user_id, listing_id, score, message) VALUES(:user, :list, :rate, :message)");
+      $stmt->bindValue(":user", $this->user_id);
+      $stmt->bindValue(":list", $this->listing_id);
+      $stmt->bindValue(":message", $this->message);
+      $stmt->bindValue(":rate", $this->rating);
+      $stmt->execute();
+
+
+      /*if ($score) {*/
+      /*  $rate =  new Rating($score);*/
+      /*  return  $rate;*/
+      /*}*/
+    } catch (PDOException $e) {
+      return Result::Err($e->getMessage());
+    }
+    return Result::Ok(null);
+  }
+
+  public static function get_listing_reviews(int $listing_id): ?array
+  {
+
+    try {
+      Database::connect();
+
+      $db = Database::db();
+
+      $stmt = $db->prepare("SELECT user_name, score as rating, message, created_at FROM review_details WHERE listing_id = :id ");
+      $stmt->bindValue(":id", $listing_id);
+      $stmt->execute();
+
+      $review = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+      if ($review) {
+        return  $review;
+      }
+    } catch (PDOException $e) {
+      echo "Error: " . $e->getMessage();
+    }
+    return null;
+  }
+}
