@@ -28,27 +28,23 @@ class ListingController
   }
   public static function get_listings_with_cat()
   {
-    if (!has_required_keys($_GET, ['id', 'page', 'limit'])) {
-      return Responder::bad_request("Missing one or more of the following parameters: ['id', 'page', 'limit']");
-    }
 
-    $id = $_GET['id'];
+    $id = $_GET['id'] ?? 0;
     $sort_val = $_GET['sort'] ?? null;
     $sort_dir = $_GET['dir'] ?? null;
-    $page = $_GET['page'];
-    $limit = $_GET['limit'];
+    $page = $_GET['page'] ?? 1;
+    $limit = $_GET['limit'] ?? 10;
     $accepted_sort = ['price', 'date', 'title'];
     $accepted_sord_dir = ['asc', 'desc'];
     if (empty($sort_val) || !in_array($sort_val, $accepted_sort)) {
-      $sort_val = 'date_posted';
+      $sort_val = 'date';
     }
 
     if (empty($sort_dir)  || !in_array($sort_dir, $accepted_sord_dir)) {
       $sort_dir = 'asc';
     }
 
-
-
+    //todo: check if id, page and limit are ints
     $listings = Listing::get_by_col_and_page('cat_id', $id, $page, $limit, $sort_val, $sort_dir);
     if ($listings === null) {
       return Responder::not_found('Listings not found');
