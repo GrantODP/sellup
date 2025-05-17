@@ -188,6 +188,27 @@ class ListingController
 
     return Responder::success($result->unwrap());
   }
+
+  public static function get_listing_images()
+  {
+
+    $id = $_GET['id'] ?? null;
+    if ($id === null) {
+      return Responder::bad_request("missing id");
+    }
+
+    $images = Image::get_listing_images($id);
+
+
+    if (empty($listing)) {
+      return Responder::server_error("Unable to find images for listing: " . $id);
+    }
+
+
+
+    return Responder::success($images);
+  }
+
   public static function search_listing()
   {
     if (!has_required_keys($_GET, ['query'])) {

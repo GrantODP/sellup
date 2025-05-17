@@ -6,7 +6,7 @@
   <base href="/c2c-commerce-site/public/">
   <title>Product Listing</title>
 
-  <link rel="stylesheet" href="styles.css"> <!-- Adjusted CSS path -->
+  <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
@@ -16,7 +16,7 @@
   </div>
 
 
-  <script src="ad.js"></script> <!-- Adjusted JS path -->
+  <script type="module" src="ad.js"></script>
 
 </body>
 

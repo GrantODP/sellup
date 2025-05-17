@@ -33,6 +33,13 @@ button {
   border-radius: 5px;
 }
 
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+  border-color: #aaa;
+}
+
 button:hover {
   background-color: #45a049;
 }
@@ -48,30 +55,158 @@ body {
   padding: 2rem;
 }
 
-.product {
-  background: white;
-  padding: 1.5rem;
-  border-radius: 10px;
-  max-width: 600px;
-  margin: auto;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+.container {
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  padding: 5px;
+  margin-top: 5px;
 }
 
-.product img {
-  max-width: 100%;
-  border-radius: 8px;
+
+#product-page {
+  padding: 2rem;
+  font-family: Arial, sans-serif;
 }
 
-.product h1 {
+.product-title {
+  font-size: 1.75rem;
+  margin-bottom: 1rem;
+}
+
+.product-layout {
+  display: flex;
+  gap: 2rem;
   margin-top: 1rem;
 }
 
-.product p.price {
+.product-left {
+  flex: 2;
+}
+
+.product-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.product-image {
+  border: 1px solid #000;
+  background-color: #eee;
+  height: 300px;
+}
+
+.product-box {
+  border: 1px solid #000;
+  padding: 0.75rem;
+  margin-top: 1rem;
+  background-color: #fafafa;
+  border-radius: 4px;
+}
+
+.box-title {
   font-weight: bold;
-  color: #27ae60;
+  margin-bottom: 0.5rem;
+}
+
+.box-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.seller-name {
+  font-weight: bold;
   font-size: 1.2rem;
 }
 
-.product p.description {
-  color: #555;
+.seller-rating {
+  display: flex;
+  justify-content: space-between;
+}
+
+.seller-meta {
+  width: 100%;
+}
+
+.add-cart {
+  width: 100%;
+  padding: 1rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.add-cart:hover {
+  background-color: #0056b3;
+}
+
+
+/*reviews*/
+
+
+#reviews-section {
+  margin-top: 2rem;
+  border: 1px solid #ccc;
+  padding: 1rem;
+  border-radius: 8px;
+  max-width: 600px;
+  /* limits the width */
+  background-color: #fff;
+}
+
+.review {
+  border: 1px solid grey;
+  padding: 1.25rem 1.5rem;
+  margin-top: 1.5rem;
+  border-radius: 8px;
+  background-color: #f9faff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.review:first-child {
+  margin-top: 0;
+  /* no top margin on first review */
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.review-user-date {
+  display: flex;
+  flex-direction: column;
+}
+
+.review-username {
+  font-weight: bold;
+  font-size: 1.1rem;
+  margin-bottom: 0.25rem;
+}
+
+.review-date {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.review-score {
+  font-weight: bold;
+  font-size: 1.25rem;
+  color: #f5a623;
+  /* gold-ish star color */
+}
+
+.review-text {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  line-height: 1.5;
+  font-size: 1rem;
+  color: #333;
 }

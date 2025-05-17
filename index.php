@@ -47,6 +47,7 @@ $router->add_post('/c2c-commerce-site/api/listings/media', 'ListingController::w
 $router->add_get('/c2c-commerce-site/api/listings/category', 'ListingController::get_listings_with_cat');
 $router->add_get('/c2c-commerce-site/api/listings/evaluate', 'ListingController::evaluate');
 $router->add_post('/c2c-commerce-site/api/listings/media', 'ListingController::add_listing_images');
+$router->add_get('/c2c-commerce-site/api/listings/media', 'ListingController::get_listing_images');
 $router->add_get('/c2c-commerce-site/api/listings/search', 'ListingController::search_listing');
 
 //Categories

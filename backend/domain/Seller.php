@@ -8,6 +8,9 @@ class Seller
   public string $seller_id;
   public string $verification;
   public string $created_at;
+  public string $name;
+  public string $email;
+  public string $contact;
 
 
 
@@ -16,6 +19,9 @@ class Seller
     $this->seller_id = $seller['seller_id'];
     $this->created_at = $seller['created_at'];
     $this->verification = $seller['verification_status'];
+    $this->name = $seller['user_name'];
+    $this->email = $seller['email'];
+    $this->contact = $seller['contact'];
   }
 
 
@@ -44,7 +50,7 @@ class Seller
       Database::connect();
 
       $db = Database::db();
-      $stmt = $db->prepare("SELECT * FROM sellers WHERE seller_id = :seller LIMIT 1");
+      $stmt = $db->prepare("SELECT * FROM seller_user_details WHERE seller_id = :seller LIMIT 1");
       $stmt->bindValue(':seller', $seller_id);
       $stmt->execute();
 

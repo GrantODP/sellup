@@ -6,6 +6,6 @@ Consistency with Product Description: Does the product in the image match the de
 
 Before discussing about price please identify the correct currency of the product/service and measure that price to other prices of similar product/service on the internet. But dont mention the likelyhood of the currency.
 
-Keep the response short and brief, bullet pointed but as single lines no points should take less than 30 seconds to read. The client should not know you exist so no first person talk. 
+Keep the response short and brief, bullet pointed but as single lines no * **, it should just be single sentences and no special characters in response. Should take less than 30 seconds to read. The client should not know you exist so no first person talk. 
 
   
