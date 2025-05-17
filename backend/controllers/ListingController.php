@@ -200,7 +200,7 @@ class ListingController
     $images = Image::get_listing_images($id);
 
 
-    if (empty($listing)) {
+    if (empty($images)) {
       return Responder::server_error("Unable to find images for listing: " . $id);
     }
 
