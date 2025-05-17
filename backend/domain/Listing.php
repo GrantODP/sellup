@@ -175,16 +175,21 @@ class Listing
     return null;
   }
 
-  public static function get_by_col_and_page(string $column, string $value, int $page, int $count, string $sort = "listing_id", string $sort_dir = 'ascend'): ?array
+  public static function get_by_col_and_page(string $column, int $id, int $page, int $count, string $sort = "listing_id", string $sort_dir = 'ascend'): ?array
   {
     try {
       Database::connect();
       $offset = ($page - 1) * $count;
-
       $order = $sort_dir == 'asc' ? 'ASC' : 'DESC';
       $db = Database::db();
-      $stmt = $db->prepare("SELECT * FROM listing_details WHERE $column = :value ORDER BY $sort $order LIMIT :count OFFSET :offset");
-      $stmt->bindValue(':value', $value);
+      $stmt = null;
+      if ($id == 0) {
+        $stmt = $db->prepare("SELECT * FROM listing_details ORDER BY $sort $order LIMIT :count OFFSET :offset");
+      } else {
+        $stmt = $db->prepare("SELECT * FROM listing_details WHERE $column = :value ORDER BY $sort $order LIMIT :count OFFSET :offset");
+      }
+
+      $stmt->bindValue(':value', $id);
       $stmt->bindValue(':count', (int)$count, PDO::PARAM_INT);
       $stmt->bindValue(':offset', (int)$offset, PDO::PARAM_INT);
       $stmt->execute();
