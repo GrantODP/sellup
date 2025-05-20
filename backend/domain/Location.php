@@ -17,7 +17,7 @@ class Location
       $db = Database::db();
 
 
-      $stmt = $db->prepare("SELECT * FROM users WHERE province = :province, city = :city LIMIT 1");
+      $stmt = $db->prepare("SELECT * FROM users WHERE province = :province AND city = :city LIMIT 1");
       $stmt->execute([
         ':province' => $province,
         ':city' => $city,
