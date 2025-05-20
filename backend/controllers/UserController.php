@@ -21,6 +21,7 @@ class UserController
     }
 
     $email = trim($data['email']);
+    $password = trim($data['password']);
 
     if (User::get_by_email($email)) {
       Responder::error(message: 'User already exists', status: 409);
@@ -29,12 +30,17 @@ class UserController
 
 
     $result = User::create($data);
-    if ($result->isOk()) {
-      Responder::success(status: 201);
-    } else {
-      Responder::error('Database error:' . $result->unwrapErr(), 500);
+
+    if ($result->isErr()) {
+      return Responder::error('Error:' . $result->unwrapErr(), 500);
     }
-    return;
+
+    $result_auth = Authorizer::store_validation($result->unwrap(), $password);
+    if ($result_auth->isErr()) {
+      return Responder::error('Error:' . $result_auth->unwrapErr(), 500);
+    }
+
+    return Responder::success(null);
   }
 
   // POST /login
@@ -57,11 +63,19 @@ class UserController
       return Responder::bad_request($email . " is not a valid email");
     }
 
-    //todo: add password validation
     $user = User::get_by_email($email);
 
-    if ($user === null) {
-      Responder::unauthorized("Invalid credentials, user not found");
+    if (empty($user)) {
+      Responder::unauthorized("No user with email $email");
+    }
+
+    $res_valid = Authorizer::validate($user->id, $password);
+    if ($res_valid->isErr()) {
+      return Responder::server_error($res_valid->unwrapErr());
+    }
+
+    if (!$res_valid->unwrap()) {
+      return Responder::unauthorized("Incorrect password");
     }
 
     $token = Tokener::get_token($user->id);
@@ -102,7 +116,6 @@ class UserController
     if (empty($user)) {
       Responder::not_found("user not found");
     } else {
-      $user->password = "";
       Responder::success($user);
       return;
     }

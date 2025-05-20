@@ -9,7 +9,6 @@ class User
   public string $name;
   public string $email;
   public string $contact;
-  public string $password;
 
   public function __construct(array $data)
   {
@@ -17,7 +16,6 @@ class User
     $this->name = $data['name'];
     $this->email = $data['email'];
     $this->contact = $data['contact'];
-    $this->password = $data['password'];
   }
 
   public static function get_by_id(string $user_id): ?User
@@ -72,13 +70,13 @@ class User
       Database::connect();
 
       $db = Database::db();
-      $stmt = $db->prepare("INSERT INTO users (name, email, contact, password) VALUES (:name, :email, :contact, :password)");
+      $stmt = $db->prepare("INSERT INTO users (name, email, contact) VALUES (:name, :email, :contact)");
       $stmt->execute([
         ':name' => trim($data['name']),
         ':email' => trim($data['email']),
         ':contact' => trim($data['contact']),
-        ':password' => trim($data['password']),
       ]);
+      return Result::Ok($db->lastInsertId());
     } catch (PDOException $e) {
       return Result::Err("Error: " . $e->getMessage());
     }
