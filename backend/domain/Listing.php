@@ -8,6 +8,7 @@ class ListingSubmission
   public string $price;
   public string $cat_id;
   public string $location_id;
+
   public string $title;
   public ?string $description;
   public string $slug;
@@ -30,9 +31,10 @@ class Listing
   public string $listing_id;
   public string $seller_id;
   public string $price;
-  public string $date_posted;
+  public string $date;
   public string $cat_id;
-  public string $location_id;
+  public string $province;
+  public string $city;
   public string $title;
   public ?string $description;
   public string $slug;
@@ -42,9 +44,10 @@ class Listing
     $this->listing_id = $data['listing_id'];
     $this->seller_id = $data['seller_id'];
     $this->price = $data['price'];
-    $this->date_posted = $data['date_posted'];
+    $this->date = $data['date'];
     $this->cat_id = $data['cat_id'];
-    $this->location_id = $data['location_id'];
+    $this->province = $data['province'];
+    $this->city = $data['city'];
     $this->title = $data['title'];
     $this->description = $data['description'] ?? null;
     $this->slug = $data['slug'] ?? null;
