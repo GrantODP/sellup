@@ -41,7 +41,7 @@ class UserController
   public static function login()
   {
     $data = get_input_json();
-    if ($data === null) {
+    if (empty($data)) {
       Responder::bad_request("invalid login submited");
       return;
     }
@@ -64,16 +64,27 @@ class UserController
       Responder::unauthorized("Invalid credentials, user not found");
     }
 
-    $token = Tokener::gen_user_token($user->id);
+    $token = Tokener::get_token($user->id);
+    if ($token->isErr()) {
+      $token = Tokener::gen_user_token($user->id);
+    }
 
-    if (!$token->isOk()) {
+    if ($token->isErr()) {
       Responder::server_error('Unable to generate auth token');
       return;
     }
 
-    $data = [];
-    $data['token'] = $token->unwrap();
-    Responder::success($data);
+    setcookie(
+      'auth_token',
+      $token->unwrap(),
+      [
+        'expires' => time() + 3600, // 1 hour
+        'path' => '/',
+        'secure' => true,     // Only send over HTTPS
+        'httponly' => true,   // Inaccessible to JavaScript
+        'samesite' => 'Strict' // Prevent CSRF
+      ]
+    );
   }
 
   // GET /user
