@@ -190,21 +190,7 @@ export function setOnClick(container_id, action) {
   document.getElementById(container_id).addEventListener("click", (e) => action());
 }
 
-export async function setActionSearchListener(action) {
-  const input = document.getElementById("search-input")
-  input.addEventListener("keypress", function (event) {
-    if (event.key === "Enter") {
-      action();
-    }
-  });
-  input.addEventListener("invalid", function () {
-    input.setCustomValidity("Please enter a search term.");
-  });
 
-  input.addEventListener("input", function () {
-    input.setCustomValidity("");
-  });
-}
 
 export function navigateWindow(page) {
   return window.location.href = `/c2c-commerce-site/${page}`;
@@ -215,5 +201,7 @@ export function login(email, password) {
     email: email,
     password: password
   }
-  return getResource('api/login', 'GET', data);
+  return getResource('login', 'POST', data);
 }
+
+

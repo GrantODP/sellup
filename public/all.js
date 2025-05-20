@@ -1,5 +1,18 @@
 
-import { getAdListings, getCategories, getCookie, getTemplate, getUrlParams, loadTemplates, navigateWindow, NotfoundError, renderErrorPage, renderStandardMessage, searchListing, setActionSearchListener, setOnClick } from './script.js';
+import {
+  getAdListings,
+  getCategories,
+  getCookie,
+  getTemplate,
+  getUrlParams,
+  loadTemplates,
+  navigateWindow,
+  NotfoundError,
+  renderErrorPage,
+  renderStandardMessage,
+  searchListing,
+}
+  from './script.js';
 
 async function renderCategories() {
 
@@ -17,14 +30,13 @@ async function renderCategories() {
     button.addEventListener("click", () => {
 
       document.cookie = `cat_name=${cat.name}`;
-      window.location = `/c2c-commerce-site/ads?id=${cat.cat_id}`;
+      window.location = `/c2c-commerce-site/ads?category=${cat.cat_id}`;
     })
     container.appendChild(button);
 
   });
 }
 async function populateListings(listings) {
-  console.log(listings);
   const container = document.getElementById("ads-container");
   container.innerHTML = "";
   if (!listings || listings.length === 0) {
@@ -35,11 +47,9 @@ async function populateListings(listings) {
   const template = document.createElement('article');
   template.className = 'ad-listing';
   template.innerHTML = template_html.trim();
-  console.log(template);
   listings.forEach(listing => {
     const ad_article = template.cloneNode(true);
 
-    console.log(ad_article);
     ad_article.querySelector('a').href = `/c2c-commerce-site/ads/${listing.slug}`;
     ad_article.querySelector('.ad-title').textContent = listing.title;
     ad_article.querySelector('.ad-price').textContent = `R${listing.price}`;
@@ -55,8 +65,8 @@ async function renderListings() {
   const params = getUrlParams();
 
 
-  const query = params.get('query') ?? '';
-  const id = params.get('id') ?? 0; //category
+  const query = params.get('q') ?? '';
+  const id = params.get('category') ?? 0; //category
   const sort_val = params.get('sort') ?? 'date';
   const sort_dir = params.get('dir') ?? 'desc';
   const page = params.get('page') ?? 1;
@@ -94,14 +104,17 @@ async function renderPage() {
 }
 
 async function initSearch() {
-  setActionSearchListener(searchAd);
-  setOnClick("search-btn", searchAd);
+  document.getElementById("search-bar").addEventListener("submit", async function (e) {
+    e.preventDefault();
+    const form_data = new FormData(this);
+    const search = form_data.get("q").trim();
+    console.log(search);
+    if (!search) {
+      return;
+    }
+    navigateWindow(`ads?q=${search}`);
+  });
 }
 
-function searchAd() {
-  console.log("searching")
-  const search = document.getElementById("search-input").value;
-  navigateWindow(`ads?query=${search}`);
-}
 
 renderPage();
