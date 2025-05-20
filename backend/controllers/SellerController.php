@@ -1,6 +1,7 @@
 <?php
 require_once './backend/domain/User.php';
 require_once './backend/domain/Listing.php';
+require_once './backend/domain/Location.php';
 require_once './backend/domain/Seller.php';
 require_once './backend/domain/Rating.php';
 require_once './backend/core/Token.php';;
@@ -19,8 +20,8 @@ class SellerController
     if ($input == null) {
       return Responder::bad_request("No json provided or failed parsing json");
     }
-    if (!has_required_keys($input, ['price', 'cat_id', 'location_id', 'title'])) {
-      return Responder::bad_request("Missing one or more of the following parameters: {price, cat_id, location_id, title");
+    if (!has_required_keys($input, ['price', 'cat_id', 'province', 'city', 'title'])) {
+      return Responder::bad_request("Missing one or more of the following parameters: {price, cat_id, province, city, title");
     }
 
     $auth_token = Authorizer::validate_token_header();
@@ -31,10 +32,18 @@ class SellerController
 
     $seller = Seller::get_or_insert($auth_token->user_id());
 
-    if ($seller == null) {
+    $location = Location::get_or_insert(trim(strtolower($input['province'])), trim(strtolower($input['city'])));
+    if (empty($seller)) {
       return Responder::server_error("Unable to create a seller");
     }
+
+    if ($location->isErr()) {
+      $error = $location->unwrapErr();
+      return Responder::server_error("Unable to find or make location: $error");
+    }
+
     $input['seller_id'] = $seller->seller_id;
+    $input['location_id'] = $location->unwrap();
     $listing_submission = new ListingSubmission($input);
     $list_result = Listing::post($listing_submission);
 

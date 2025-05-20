@@ -1,0 +1,42 @@
+<?php
+require_once './backend/core/result.php';
+require_once './backend/db/database.php';
+require_once './backend/util/util.php';
+
+
+class Location
+{
+
+
+
+  public static function get_or_insert($province, $city): Result
+  {
+    try {
+      Database::connect();
+
+      $db = Database::db();
+
+
+      $stmt = $db->prepare("SELECT * FROM users WHERE province = :province, city = :city LIMIT 1");
+      $stmt->execute([
+        ':province' => $province,
+        ':city' => $city,
+      ]);
+
+      $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+      if (!empty($row)) {
+        return  Result::Ok($row['location_id']);
+      }
+
+      $stmt = $db->prepare("INSERT INTO location (province, city) VALUES (:province, :city)");
+      $stmt->execute([
+        ':province' => $province,
+        ':city' => $city,
+      ]);
+      return Result::Ok($db->lastInsertId());
+    } catch (PDOException $e) {
+      return Result::Err("Error: " . $e->getMessage());
+    }
+  }
+}
