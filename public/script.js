@@ -194,7 +194,7 @@ export function navigateWindow(page) {
   return window.location.href = `/c2c-commerce-site/${page}`;
 }
 
-export function login(email, password) {
+export async function login(email, password) {
   const data = {
     email: email,
     password: password
