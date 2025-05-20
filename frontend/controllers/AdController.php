@@ -16,10 +16,14 @@ class PageController
 
   public static function get_all_ads_page()
   {
-    return Views::get_view('all_ads.php');
+    return Views::get_view('all_ads.html');
   }
   public static function get_user()
   {
     return Views::get_view('user.html');
+  }
+  public static function login()
+  {
+    return Views::get_view('login.html');
   }
 }
