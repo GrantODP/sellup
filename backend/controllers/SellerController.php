@@ -32,7 +32,10 @@ class SellerController
 
     $seller = Seller::get_or_insert($auth_token->user_id());
 
-    $location = Location::get_or_insert(trim(strtolower($input['province'])), trim(strtolower($input['city'])));
+    $location = Location::get_or_insert(
+      sentence_case($input['province']),
+      sentence_case($input['city'])
+    );
     if (empty($seller)) {
       return Responder::server_error("Unable to create a seller");
     }

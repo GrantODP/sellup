@@ -8,6 +8,12 @@ function get_input_json(): ?array
   return $data;
 }
 
+function sentence_case($string)
+{
+  $string = strtolower($string);
+  return ucfirst($string);
+}
+
 function has_required_keys(array $data, array $keys): bool
 {
   foreach ($keys as $key) {
