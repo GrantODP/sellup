@@ -190,8 +190,6 @@ export function setOnClick(container_id, action) {
   document.getElementById(container_id).addEventListener("click", (e) => action());
 }
 
-
-
 export function navigateWindow(page) {
   return window.location.href = `/c2c-commerce-site/${page}`;
 }
@@ -202,6 +200,13 @@ export function login(email, password) {
     password: password
   }
   return getResource('login', 'POST', data);
+}
+
+
+export function titleCase(str) {
+  return str.toLowerCase().split(' ').map(function (word) {
+    return word.charAt(0).toUpperCase() + word.slice(1);
+  }).join(' ');
 }
 
 

@@ -11,6 +11,7 @@ import {
   renderErrorPage,
   renderStandardMessage,
   searchListing,
+  titleCase,
 }
   from './script.js';
 
@@ -36,6 +37,7 @@ async function renderCategories() {
 
   });
 }
+
 async function populateListings(listings) {
   const container = document.getElementById("ads-container");
   container.innerHTML = "";
@@ -49,13 +51,17 @@ async function populateListings(listings) {
   template.innerHTML = template_html.trim();
   listings.forEach(listing => {
     const ad_article = template.cloneNode(true);
-
+    const date = new Date(listing.date);
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
     ad_article.querySelector('a').href = `/c2c-commerce-site/ads/${listing.slug}`;
     ad_article.querySelector('.ad-title').textContent = listing.title;
     ad_article.querySelector('.ad-price').textContent = `R${listing.price}`;
     ad_article.querySelector('.ad-description').textContent = listing.description;
-    ad_article.querySelector('.ad-date').textContent = `Posted on: ${listing.date.split(' ')[0]}`;
-    ad_article.querySelector('.ad-location').textContent = `Location: ${listing.province}, ${listing.city}`;
+    ad_article.querySelector('.ad-date').textContent = `Posted on: ${date.toLocaleDateString(undefined, options)}`;
+    ad_article.querySelector('.ad-location').textContent = `Location:
+      ${titleCase(listing.province)},
+      ${titleCase(listing.city)} `;
+
     container.appendChild(ad_article);
   })
 }
@@ -66,12 +72,11 @@ async function renderListings() {
 
 
   const query = params.get('q') ?? '';
-  const id = params.get('category') ?? 0; //category
+  const id = params.get('category') ?? 0;
   const sort_val = params.get('sort') ?? 'date';
   const sort_dir = params.get('dir') ?? 'desc';
   const page = params.get('page') ?? 1;
   const limit = params.get('limit') ?? 10;
-
   try {
 
     let listings;
@@ -112,7 +117,7 @@ async function initSearch() {
     if (!search) {
       return;
     }
-    navigateWindow(`ads?q=${search}`);
+    navigateWindow(`ads ? q = ${search} `);
   });
 }
 
