@@ -210,7 +210,10 @@ export function navigateWindow(page) {
   return window.location.href = `/c2c-commerce-site/${page}`;
 }
 
-export function login() {
-
-  return getResource('api/login');
+export function login(email, password) {
+  const data = {
+    email: email,
+    password: password
+  }
+  return getResource('api/login', 'GET', data);
 }
