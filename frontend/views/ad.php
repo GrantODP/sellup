@@ -11,7 +11,7 @@
 
 <body>
 
-  <div class="product" id="product">
+  <div class="product" id="page-body">
     <p>Loading product...</p>
   </div>
 

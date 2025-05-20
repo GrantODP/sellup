@@ -27,6 +27,8 @@ class ListingController
 
     return Responder::success($listing);
   }
+
+
   public static function get_listings_with_cat()
   {
 

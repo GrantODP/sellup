@@ -96,7 +96,7 @@ class Seller
       Database::connect();
 
       $db = Database::db();
-      $stmt = $db->prepare("SELECT * FROM sellers WHERE user_id = :user_id LIMIT 1");
+      $stmt = $db->prepare("SELECT * FROM seller_user_details WHERE user_id = :user_id LIMIT 1");
       $stmt->bindValue(':user_id', $user_id);
       $stmt->execute();
 

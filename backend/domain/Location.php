@@ -1,7 +1,7 @@
 <?php
-require_once './backend/core/result.php';
-require_once './backend/db/database.php';
-require_once './backend/util/util.php';
+require_once './backend/core/Result.php';
+require_once './backend/db/Database.php';
+require_once './backend/util/Util.php';
 
 
 class Location
@@ -17,7 +17,7 @@ class Location
       $db = Database::db();
 
 
-      $stmt = $db->prepare("SELECT * FROM users WHERE province = :province AND city = :city LIMIT 1");
+      $stmt = $db->prepare("SELECT * FROM location WHERE province = :province AND city = :city LIMIT 1");
       $stmt->execute([
         ':province' => $province,
         ':city' => $city,

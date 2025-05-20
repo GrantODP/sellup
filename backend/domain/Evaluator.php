@@ -17,7 +17,7 @@ class AdEvaluator
 
 
     $prompt = file_get_contents("./prompts/listing_prompt.txt");
-    $listing = "Here is the listing details: Price: R$ad->price, description: $ad->description, title: $ad->title, date posted: $ad->date_posted. ";
+    $listing = "Here is the listing details: Price: R$ad->price, description: $ad->description, title: $ad->title, date posted: $ad->date. ";
     $srating = "Here is the rating: $rating->rating out of 5 made by $rating->count reviews.";
 
     $prompt = $prompt . "\n" . $listing . "\n" . $srating;

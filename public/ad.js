@@ -1,4 +1,4 @@
-import { getAdReviews, getCookie, getSeller, getSingleAd, getSingleAdRating, loadTemplates, renderStars } from './script.js';
+import { renderErrorPage, getAdImagesLinks, getAdReviews, getCookie, getSeller, getSingleAd, getSingleAdRating, loadTemplates, populateProductImages, renderStars, NotfoundError, renderStandardMessage } from './script.js';
 
 const slug = getCookie("ad_slug");
 
@@ -6,7 +6,7 @@ const slug = getCookie("ad_slug");
 
 async function eval_product(id) {
   console.log("Evaluating");
-  const container = document.getElementById('product');
+  const container = document.getElementById('product-data');
   let button = container.querySelector('#eval_btn');
   button.innerText = 'evaluating';
   button.disabled = true;
@@ -24,25 +24,33 @@ async function eval_product(id) {
 
 
 async function renderAdScore(id) {
-  const score = await getSingleAdRating(id);
-  console.log(score);
-  const container = document.getElementById('product');
-  const star_body = container.querySelector('#ascore-body');
-  renderStars(star_body, score.rating);
+  const container = document.getElementById('product-data');
+  try {
+    const score = await getSingleAdRating(id);
+    console.log(score);
+    const star_body = container.querySelector('#ascore-body');
+    renderStars(star_body, score.rating);
+  } catch (err) {
+    console.log(err);
+    renderErrorPage(container, err.message);
+  }
 }
 async function renderSeller(id) {
-
   const container = document.getElementById('seller-info');
-  const seller = await getSeller(id);
-  console.log(seller);
-  container.querySelector('#sel-name').innerText = seller.name;
-  container.querySelector('#rate-count').innerText = seller.rating.count + " reviews";
-  container.querySelector('#contact').innerText = "Phone number: " + seller.contact;
-  container.querySelector('#verification').innerText = "Verification: " + seller.verification;
+  try {
+    const seller = await getSeller(id);
+    console.log(seller);
+    container.querySelector('#sel-name').innerText = seller.name;
+    container.querySelector('#rate-count').innerText = seller.rating.count + " reviews";
+    container.querySelector('#contact').innerText = "Phone number: " + seller.contact;
+    container.querySelector('#verification').innerText = "Verification: " + seller.verification;
 
-  const rate_body = container.querySelector('#rate-body');
-  renderStars(rate_body, seller.rating.rating);
+    const rate_body = container.querySelector('#rate-body');
+    renderStars(rate_body, seller.rating.rating);
+  } catch (err) {
 
+    renderErrorPage(container, err.message);
+  }
 }
 
 function renderSingleReview(review_data) {
@@ -63,17 +71,39 @@ function renderSingleReview(review_data) {
   container.appendChild(review);
 
 }
+
 async function renderReviews(id) {
-  const reviews = await getAdReviews(id);
-  reviews.forEach(element => {
-    renderSingleReview(element)
-  });
+  try {
+    const reviews = await getAdReviews(id);
+    reviews.forEach(element => {
+      renderSingleReview(element)
+    });
+  } catch (err) {
+    const container = document.getElementById('reviews-container');
+    if (err instanceof NotfoundError) {
+      renderStandardMessage(container, "No reviews");
+      return;
+    }
+    renderErrorPage(container, err.message);
+  }
 }
-
+async function renderAdImages(id) {
+  try {
+    const images = await getAdImagesLinks(id);
+    console.log(images);
+    populateProductImages(images);
+  } catch (err) {
+    const container = document.getElementById('product-image-container');
+    if (err instanceof NotfoundError) {
+      renderStandardMessage(container, "No images");
+      return;
+    }
+    renderErrorPage(container, err.message);
+  }
+}
 async function renderAd(slug) {
-  const container = document.getElementById('product');
+  const container = document.getElementById('page-body');
   const ad = await getSingleAd(slug);
-
   document.title = ad.title;
   await loadTemplates(container, '../frontend/views/ad_tempalte.html');
 
@@ -84,10 +114,12 @@ async function renderAd(slug) {
   await renderAdScore(ad.listing_id);
   await renderSeller(ad.seller_id);
   await renderReviews(ad.listing_id);
+  await renderAdImages(ad.listing_id);
+
 
 
 
 
 
 }
-renderAd(slug);
+await renderAd(slug);

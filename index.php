@@ -1,5 +1,13 @@
 <?php
-
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+set_error_handler(function ($errno, $errstr, $errfile, $errline) {
+  echo "Error [$errno]: $errstr in $errfile on line $errline\n";
+  echo "Call Stack:\n";
+  debug_print_backtrace();
+});
 // Load required classes (use autoloading in real projects)
 require_once './backend/core/Responder.php';
 require_once './backend/core/RequestRouter.php';
@@ -11,9 +19,7 @@ require_once './backend/domain/Listing.php';
 require_once './backend/domain/Seller.php';
 require_once './backend/core/Result.php';
 
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+
 C2Config::load();
 Database::connect();
 
@@ -42,13 +48,13 @@ $router->add_get('/c2c-commerce-site/api/listings/{slug}', 'ListingController::g
 $router->add_get('/c2c-commerce-site/api/listings/rating', 'ListingController::get_rating');
 $router->add_get('/c2c-commerce-site/api/listings/reviews', 'ListingController::get_reviews');
 $router->add_post('/c2c-commerce-site/api/listings/reviews', 'ListingController::write_review');
-$router->add_post('/c2c-commerce-site/api/listings/media', 'ListingController::write_review');
-/*$router->add_get('/c2c-commerce-site/api/listings', 'ListingController::get_listing');*/
+/*$router->add_get('/c2c- commerce-site/api/listings', 'ListingController::get_listing');*/
 $router->add_get('/c2c-commerce-site/api/listings/category', 'ListingController::get_listings_with_cat');
 $router->add_get('/c2c-commerce-site/api/listings/evaluate', 'ListingController::evaluate');
 $router->add_post('/c2c-commerce-site/api/listings/media', 'ListingController::add_listing_images');
 $router->add_get('/c2c-commerce-site/api/listings/media', 'ListingController::get_listing_images');
 $router->add_get('/c2c-commerce-site/api/listings/search', 'ListingController::search_listing');
+$router->add_get('/c2c-commerce-site/api/listings/preview', 'ListingController::get_listing_preview');
 
 //Categories
 $router->add_get('/c2c-commerce-site/api/categories', 'CategoryController::get_all');
@@ -64,8 +70,11 @@ $router->add_get('/c2c-commerce-site/media/{slug}', 'MediaController::get');
 
 //ONLY GETS
 //Views 
+
 $router->add_get('/c2c-commerce-site/test', 'TestController::test');
-$router->add_get('/c2c-commerce-site/ad/{slug}', 'AdController::get');
+$router->add_get('/c2c-commerce-site/ads/{slug}', 'PageController::get_ad_page');
+$router->add_get('/c2c-commerce-site/ads', 'PageController::get_all_ads_page');
+$router->add_get('/c2c-commerce-site/users', 'PageController::get_user');
 
 
 

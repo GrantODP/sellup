@@ -23,14 +23,14 @@ class UserController
     $email = trim($data['email']);
 
     if (User::get_by_email($email)) {
-      Responder::error('User already exists', 409);
+      Responder::error(message: 'User already exists', status: 409);
       return;
     }
 
 
     $result = User::create($data);
     if ($result->isOk()) {
-      Responder::success(null);
+      Responder::success(status: 201);
     } else {
       Responder::error('Database error:' . $result->unwrapErr(), 500);
     }
@@ -85,6 +85,7 @@ class UserController
         'samesite' => 'Strict' // Prevent CSRF
       ]
     );
+    return Responder::success();
   }
 
   // GET /user
@@ -98,9 +99,10 @@ class UserController
 
     $user = User::get_by_id($auth_token->user_id());
 
-    if ($user === null) {
-      Responder::bad_request("user not found");
+    if (empty($user)) {
+      Responder::not_found("user not found");
     } else {
+      $user->password = "";
       Responder::success($user);
       return;
     }

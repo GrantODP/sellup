@@ -10,7 +10,7 @@ class Image
 
   public function __construct($path)
   {
-    $this->path = "./media/" . $path;
+    $this->path = "media/" . $path;
   }
 
 
@@ -75,8 +75,10 @@ class Image
     return null;
   }
 
-  /** @return Image[]|null */
-  public static function get_listing_images(int $listing_id): ?array
+  /** @return Result */
+  //result can return null because there is none to return so result is still ok 
+  //error only if database or unknown error
+  public static function get_listing_images(int $listing_id): Result
   {
     try {
       Database::connect();
@@ -89,19 +91,19 @@ class Image
       $stmt->execute();
       $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
       if (empty($rows)) {
-        return null;
+        return Result::Ok(null);
       }
       $images = [];
       foreach ($rows as $row) {
         $images[] = new Image($row['file_path']);
       }
 
-      return $images;
+      return Result::Ok($images);
     } catch (PDOException $e) {
-      echo "Error: " . $e->getMessage();
+      return Result::Err($e->getMessage());
     }
 
-    return null;
+    return Result::Err("Unknown error");
   }
 
   public static function save(int $listing_id): Result

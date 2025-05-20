@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <base href="/c2c-commerce-site/public/">
+  <title>Ad listings</title>
+
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <div class="top-bar" id="top-bar">
+    <p class="l1">Loading resource</p>
+    <p class="l2">Loading resource</p>
+    <p class="l3">Loading resource</p>
+  </div>
+  <div class="search-container">
+    <input id="search-input" class="search-bar" type="text" placeholder="Search ads...">
+    <button id="search-btn">Search</button>
+  </div>
+  <div class="product" id="page-body">
+    <p>Loading resource</p>
+  </div>
+  <script type="module" src="all.js"></script>
+
+</body>
+
+</html>

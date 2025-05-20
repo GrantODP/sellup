@@ -55,7 +55,7 @@ class Review
 
       $db = Database::db();
 
-      $stmt = $db->prepare("SELECT user_name, score as rating, message, created_at FROM review_details WHERE listing_id = :id ");
+      $stmt = $db->prepare("SELECT review_id, user_name, score as rating, message, created_at FROM review_details WHERE listing_id = :id ");
       $stmt->bindValue(":id", $listing_id);
       $stmt->execute();
 

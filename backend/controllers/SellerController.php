@@ -13,11 +13,11 @@ class SellerController
 {
 
 
-  // POST /ad
+  // POST /listings
   public static function post_listing()
   {
     $input = get_input_json();
-    if ($input == null) {
+    if (empty($input)) {
       return Responder::bad_request("No json provided or failed parsing json");
     }
     if (!has_required_keys($input, ['price', 'cat_id', 'province', 'city', 'title'])) {
@@ -32,6 +32,7 @@ class SellerController
 
     $seller = Seller::get_or_insert($auth_token->user_id());
 
+    var_dump($seller);
     $location = Location::get_or_insert(trim(strtolower($input['province'])), trim(strtolower($input['city'])));
     if (empty($seller)) {
       return Responder::server_error("Unable to create a seller");
