@@ -1,4 +1,17 @@
-import { renderErrorPage, getAdImagesLinks, getAdReviews, getCookie, getSeller, getSingleAd, getSingleAdRating, loadTemplates, populateProductImages, renderStars, NotfoundError, renderStandardMessage } from './script.js';
+import {
+  renderErrorPage,
+  getAdImagesLinks,
+  getAdReviews,
+  getCookie,
+  getSeller,
+  getSingleAd,
+  getSingleAdRating,
+  loadTemplates,
+  populateProductImages,
+  renderStars,
+  NotfoundError,
+  renderStandardMessage
+} from './script.js';
 
 const slug = getCookie("ad_slug");
 
