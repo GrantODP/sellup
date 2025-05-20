@@ -60,6 +60,20 @@ class Tokener
   }
 
 
+  public static function get_token($user_id): Result
+  {
+    $db = Database::db();
+    $stmt = $db->prepare("SELECT token FROM tokens WHERE user_id = :id LIMIT 1");
+
+    $stmt->execute(['id' => $user_id]);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (empty($row)) {
+      return Result::Err("No token with matching user");
+    }
+
+    return Result::Ok($row['token']);
+  }
+
   public static function gen_user_token($user_id): Result
   {
     $token = self::generate();
@@ -98,8 +112,9 @@ class Tokener
       $stmt = $db->prepare("SELECT * FROM tokens WHERE token = :token LIMIT 1");
       $stmt->execute(['token' => $token]);
       $row = $stmt->fetch(PDO::FETCH_ASSOC);
-      if ($row === null) {
-        Result::Err("Token not found");
+
+      if (empty($row)) {
+        return Result::Err("Auth token not found. Must login");
       }
     } catch (PDOException $e) {
       return Result::Err("Error: " . $e->getMessage());

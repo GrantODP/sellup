@@ -5,6 +5,7 @@ require_once './backend/domain/Evaluator.php';
 require_once './backend/domain/ItemImage.php';
 require_once './backend/domain/Review.php';
 require_once './backend/core/Token.php';;
+require_once './backend/core/Result.php';;
 require_once './backend/core/Authorizer.php';;
 require_once './backend/util/Util.php';
 
@@ -47,7 +48,7 @@ class ListingController
     //todo: check if id, page and limit are ints
     $listings = Listing::get_by_col_and_page('cat_id', $id, $page, $limit, $sort_val, $sort_dir);
     if ($listings === null) {
-      return Responder::not_found('Listings not found');
+      return Responder::not_found('No listings found in category');
     }
     return Responder::success_paged($page, $limit, $listings);
   }
@@ -82,7 +83,7 @@ class ListingController
     $reviews = Review::get_listing_reviews($id);
 
     if ($reviews == null) {
-      return Responder::server_error("Unable to find reviews for listing: " . $id);
+      return Responder::not_found("Unable to find reviews for listing: " . $id);
     }
 
     return Responder::success($reviews);
@@ -127,12 +128,13 @@ class ListingController
     $rating = Rating::get_listing_score($id);
 
     $listing = Listing::get_by_id($id);
-
     if (empty($rating) || empty($listing)) {
       return Responder::server_error("Unable to find rating or listing for listing: " . $id);
     }
 
-    $images = Image::get_listing_images($listing->listing_id) ?? [];
+    $result = Image::get_listing_images($listing->listing_id);
+
+    $images = $result->isOk() ?  ($result->unwrap() ?? []) : [];
     $res = AdEvaluator::evaluate($listing, $rating, $images);
 
     if ($res->isErr()) {
@@ -193,16 +195,38 @@ class ListingController
       return Responder::bad_request("missing id");
     }
 
-    $images = Image::get_listing_images($id);
+    $result = Image::get_listing_images($id);
 
-
-    if (empty($images)) {
-      return Responder::server_error("Unable to find images for listing: " . $id);
+    if ($result->isErr()) {
+      return Responder::server_error("Server error");
     }
 
+    if (empty($result->unwrap())) {
+      return Responder::not_found("Unable to find images for listing: " . $id);
+    }
 
+    return Responder::success($result->unwrap());
+  }
 
-    return Responder::success($images);
+  public static function get_listing_preview()
+  {
+
+    $id = $_GET['id'] ?? null;
+    if ($id === null) {
+      return Responder::bad_request("missing id");
+    }
+
+    $result = Image::get_listing_images($id);
+
+    if ($result->isErr()) {
+      return Responder::server_error("Server error");
+    }
+
+    if (empty($result->unwrap())) {
+      return Responder::not_found("Unable to find preview for listing: " . $id);
+    }
+
+    return Responder::success($result->unwrap()[0]);
   }
 
   public static function search_listing()
