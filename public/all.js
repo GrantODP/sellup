@@ -79,6 +79,7 @@ async function renderListings() {
   const limit = params.get('limit') ?? 10;
   try {
 
+    console.log(query);
     let listings;
     if (query) {
       listings = await searchListing(query)
@@ -117,7 +118,7 @@ async function initSearch() {
     if (!search) {
       return;
     }
-    navigateWindow(`ads ? q = ${search} `);
+    navigateWindow(`ads?q=${search}`);
   });
 }
 
