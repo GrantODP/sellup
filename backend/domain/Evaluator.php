@@ -22,6 +22,12 @@ class AdEvaluator
 
     $prompt = $prompt . "\n" . $listing . "\n" . $srating;
     $response = LlmRequester::prompt_with_images($prompt, $images);
+    if ($response->isErr()) {
+      return $response;
+    }
+    $reval = "This is your response evaluate the response and correct it,Dont categorize old and new response just give them. Give your old response and your new evaluation: Also give your response as if you were an expert and not a ai agent " . $response->unwrap();
+    $response = LlmRequester::prompt_with_images($reval, $images);
+
     return $response;
   }
 }
