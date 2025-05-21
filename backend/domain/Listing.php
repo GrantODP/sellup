@@ -238,4 +238,28 @@ class Listing
     }
     return null;
   }
+
+  public static function get_listings(array $ids): ?array
+  {
+    $placeholders = implode(',', array_fill(0, count($ids), '?'));
+    try {
+      Database::connect();
+
+      $db = Database::db();
+
+
+      $stmt = $db->prepare("SELECT * FROM listings WHERE listing_id IN ($placeholders)");
+      $stmt->execute($ids);
+      $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
+      var_dump($row);
+      if (empty($row)) {
+        return null;
+      }
+      return  $row;
+    } catch (PDOException $e) {
+      echo "Error: " . $e->getMessage();
+    }
+
+    return null;
+  }
 }
