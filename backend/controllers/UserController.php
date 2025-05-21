@@ -2,6 +2,7 @@
 require_once './backend/domain/User.php';
 require_once './backend/domain/Listing.php';
 require_once './backend/domain/Cart.php';
+require_once './backend/domain/Order.php';
 require_once './backend/domain/Message.php';
 require_once './backend/core/Token.php';;
 require_once './backend/core/Authorizer.php';;
@@ -293,10 +294,46 @@ class UserController
     }
 
 
-    $result = Cart::checkout($user);
+    $result_cart = Cart::checkout($user);
+
+    if ($result_cart->isErr()) {
+      return Responder::error($result_cart->unwrapErr());
+    }
+
+    $order_result = Order::create_order($result_cart->unwrap());
+
+    if ($order_result->isErr()) {
+      return Responder::server_error($order_result->unwrapErr());
+    }
+
+    return Responder::success();
+  }
+
+  //GET users/orders
+  public static function get_orders()
+  {
+
+    $auth_token = Authorizer::validate_token_header();
+
+    if (!$auth_token->is_valid()) {
+      return Responder::unauthorized($auth_token->message());
+    }
+
+    $user = User::get_by_id($auth_token->user_id());
+
+    if (empty($user)) {
+      return Responder::not_found("No user found matching auth token");
+    }
+
+
+    $result = Order::get_orders($user);
 
     if ($result->isErr()) {
       return Responder::error($result->unwrapErr());
+    }
+
+    if (empty($result->unwrap())) {
+      return Responder::not_found("No orders matching user");
     }
 
     return Responder::success($result->unwrap());
