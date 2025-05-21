@@ -22,6 +22,13 @@ class Cart
     }
   }
 
+  public function has_items(): bool
+  {
+    return !empty($this->cart_items);
+  }
+
+
+
 
   public static function add_to_cart(User $user, Listing $listing, int $count): Result
   {
@@ -38,7 +45,7 @@ class Cart
       $stmt->execute([
         ':user_id' => $user->id,
         ':listing_id' => $listing->listing_id,
-        ':quantity' => $count
+        ':quantity' => $count,
       ]);
       return Result::Ok(0);
     } catch (PDOException $e) {
