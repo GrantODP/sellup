@@ -38,6 +38,10 @@ $router->add_post('/c2c-commerce-site/api/user/message', 'UserController::send_m
 $router->add_post('/c2c-commerce-site/api/user/message-seller', 'UserController::message_seller');
 $router->add_get('/c2c-commerce-site/api/user/conversations', 'UserController::get_conversations');
 $router->add_get('/c2c-commerce-site/api/user/message', 'UserController::get_messages_by_conversation');
+$router->add_post('/c2c-commerce-site/api/user/cart', 'UserController::add_to_cart');
+$router->add_get('/c2c-commerce-site/api/user/cart', 'UserController::get_cart');
+$router->add_post('/c2c-commerce-site/api/user/cart/checkout', 'UserController::checkout');
+$router->add_get('/c2c-commerce-site/api/user/orders', 'UserController::get_orders');
 
 //SellerController
 $router->add_post('/c2c-commerce-site/api/listings', 'SellerController::post_listing');
@@ -75,6 +79,7 @@ $router->add_get('/c2c-commerce-site/test', 'TestController::test');
 $router->add_get('/c2c-commerce-site/ads/{slug}', 'PageController::get_ad_page');
 $router->add_get('/c2c-commerce-site/ads', 'PageController::get_all_ads_page');
 $router->add_get('/c2c-commerce-site/users', 'PageController::get_user');
+$router->add_get('/c2c-commerce-site/login', 'PageController::login');
 
 
 
