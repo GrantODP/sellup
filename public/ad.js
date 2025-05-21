@@ -13,6 +13,8 @@ import {
   renderStandardMessage
 } from './script.js';
 
+import { marked } from 'https://cdn.jsdelivr.net/npm/marked@5.1.0/lib/marked.esm.js';
+
 const slug = getCookie("ad_slug");
 
 
@@ -29,7 +31,7 @@ async function eval_product(id) {
       return response.json();
     });
   console.log(eval_ad);
-  container.querySelector('#eval-body').innerText = eval_ad.data;
+  container.querySelector('#eval-body').innerHTML = marked.parse(eval_ad.data);
 
   button.disabled = false;
   button.innerText = 'Evaluate';
