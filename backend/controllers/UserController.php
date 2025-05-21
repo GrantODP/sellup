@@ -1,5 +1,7 @@
 <?php
 require_once './backend/domain/User.php';
+require_once './backend/domain/Listing.php';
+require_once './backend/domain/Cart.php';
 require_once './backend/domain/Message.php';
 require_once './backend/core/Token.php';;
 require_once './backend/core/Authorizer.php';;
@@ -129,7 +131,7 @@ class UserController
     $auth_token = Authorizer::validate_token_header();
 
     if (!$auth_token->is_valid()) {
-      return Responder::bad_request($auth_token->message());
+      return Responder::unauthorized($auth_token->message());
     }
 
     $user = User::get_by_id($auth_token->user_id());
@@ -151,7 +153,7 @@ class UserController
     $auth_token = Authorizer::validate_token_header();
 
     if (!$auth_token->is_valid()) {
-      return Responder::bad_request($auth_token->message());
+      return Responder::unauthorized($auth_token->message());
     }
 
 
@@ -182,7 +184,7 @@ class UserController
     $auth_token = Authorizer::validate_token_header();
 
     if (!$auth_token->is_valid()) {
-      return Responder::bad_request($auth_token->message());
+      return Responder::unauthorized($auth_token->message());
     }
 
 
@@ -208,5 +210,95 @@ class UserController
       return;
     }
     return Responder::success();
+  }
+
+  //POST user/cart
+  public static function add_to_cart()
+  {
+    $data = get_input_json();
+    if (!has_required_keys($data, ['listing_id', 'count'])) {
+      Responder::bad_request("Invalid json params");
+      return;
+    }
+
+    $auth_token = Authorizer::validate_token_header();
+
+    if (!$auth_token->is_valid()) {
+      return Responder::unauthorized($auth_token->message());
+    }
+
+    $user = User::get_by_id($auth_token->user_id());
+    $listing = Listing::get_by_id(trim($data["listing_id"]));
+
+    if (empty($user)) {
+      return Responder::not_found("No user found matching auth token");
+    }
+    if (empty($listing)) {
+
+      return Responder::not_found("No listing found matching id");
+    }
+
+    $result = Cart::add_to_cart($user, $listing, $data["count"]);
+
+    if ($result->isErr()) {
+      return Responder::error($result->unwrapErr());
+    }
+
+    return Responder::success();
+  }
+
+  //GET user/cart
+  public static function get_cart()
+  {
+
+    $auth_token = Authorizer::validate_token_header();
+
+    if (!$auth_token->is_valid()) {
+      return Responder::unauthorized($auth_token->message());
+    }
+
+    $user = User::get_by_id($auth_token->user_id());
+
+    if (empty($user)) {
+      return Responder::not_found("No user found matching auth token");
+    }
+
+
+    $result = Cart::get_cart($user);
+
+    if ($result->isErr()) {
+      return Responder::error($result->unwrapErr());
+    }
+
+    return Responder::success($result->unwrap());
+  }
+  //POST user/cart/checkout
+  public static function checkout()
+  {
+    $data = get_input_json();
+    if (!has_required_keys($data, ['payment_meta'])) {
+      Responder::bad_request("Invalid json params");
+      return;
+    }
+    $auth_token = Authorizer::validate_token_header();
+
+    if (!$auth_token->is_valid()) {
+      return Responder::unauthorized($auth_token->message());
+    }
+
+    $user = User::get_by_id($auth_token->user_id());
+
+    if (empty($user)) {
+      return Responder::not_found("No user found matching auth token");
+    }
+
+
+    $result = Cart::checkout($user);
+
+    if ($result->isErr()) {
+      return Responder::error($result->unwrapErr());
+    }
+
+    return Responder::success($result->unwrap());
   }
 }
