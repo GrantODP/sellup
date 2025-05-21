@@ -5,7 +5,7 @@ require_once './backend/core/Result.php';
 
 class User
 {
-  public string $id;
+  public int $id;
   public string $name;
   public string $email;
   public string $contact;
