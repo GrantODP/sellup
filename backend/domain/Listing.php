@@ -4,6 +4,7 @@ require_once './backend/db/Database.php';
 require_once './backend/util/Util.php';
 class ListingSubmission
 {
+  public int $id;
   public string $seller_id;
   public string $price;
   public string $cat_id;
@@ -13,12 +14,13 @@ class ListingSubmission
   public ?string $description;
   public string $slug;
 
-  public function __construct(array $data)
+  public function __construct(array $data, $listing_id = 0)
   {
+    $this->id = $listing_id;
     $this->seller_id = $data['seller_id'];
     $this->price = $data['price'];
-    $this->cat_id = $data['cat_id'];
-    $this->location_id = $data['location_id'];
+    $this->cat_id = $data['cat_id'] ?? 0;
+    $this->location_id = $data['location_id'] ?? 0;
     $this->title = $data['title'];
     $this->description = $data['description'] ?? null;
     $this->slug = $this->seller_id  . '-' .  gen_slug($this->title);
@@ -261,5 +263,42 @@ class Listing
     }
 
     return null;
+  }
+  public static function update(ListingSubmission $sub): Result
+  {
+    try {
+      Database::connect();
+
+      $db = Database::db();
+      $db->beginTransaction();
+      self::update_price($db, $sub->id, $sub->price);
+      self::update_ad($db, $sub);
+      $db->commit();
+    } catch (PDOException $e) {
+      echo "Error: " . $e->getMessage();
+      return Result::Err($e->getMessage());
+    }
+
+    return Result::Ok(0);
+  }
+
+  public static function update_ad($db, ListingSubmission $sub)
+  {
+    $stmt = $db->prepare("UPDATE listing_ad SET title = :title, description = :descp, slug = :slug WHERE listing_id = :id");
+    $stmt->execute([
+      ":id" => $sub->id,
+      ":title" => $sub->title,
+      ":descp" => $sub->description,
+      ":slug" => $sub->slug,
+    ]);
+  }
+
+  public static function update_price($db, int $id, float $price)
+  {
+    $stmt = $db->prepare("UPDATE listings SET price = :p WHERE listing_id = :id");
+    $stmt->execute([
+      ":id" => $id,
+      ":p" => $price,
+    ]);
   }
 }

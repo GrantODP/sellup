@@ -92,4 +92,46 @@ class SellerController
 
     return Responder::success($rating);
   }
+
+  // PUT /seller/listings
+  public static function update_listing()
+  {
+
+    $input = get_input_json();
+    if (empty($input)) {
+      return Responder::bad_request("No json provided or failed parsing json");
+    }
+    if (!has_required_keys($input, ['listing_id', 'price', 'title', 'description',])) {
+      return Responder::bad_request("Missing one or more   parameters");
+    }
+
+    $auth_token = Authorizer::validate_token_header();
+
+    if (!$auth_token->is_valid()) {
+      return Responder::unauthorized($auth_token->message());
+    }
+    $listing = Listing::get_by_id($input['listing_id']);
+    $seller = Seller::get_or_insert($auth_token->user_id());
+    if (empty($listing)) {
+      return Responder::not_found("No listing matching id");
+    }
+    if (empty($seller)) {
+      return Responder::forbidden("User is not a seller");
+    }
+
+    if ($listing->seller_id != $seller->seller_id) {
+      return Responder::forbidden("Seller is not the owner of listing");
+    }
+
+    $input['seller_id'] = $seller->seller_id;
+    $sub = new ListingSubmission($input, $listing->listing_id);
+
+    $result = Listing::update($sub);
+
+    if ($result->isErr()) {
+      return Responder::server_error($result->unwrapErr());
+    }
+
+    return Responder::success();
+  }
 }

@@ -42,11 +42,13 @@ $router->add_post('/c2c-commerce-site/api/user/cart', 'UserController::add_to_ca
 $router->add_get('/c2c-commerce-site/api/user/cart', 'UserController::get_cart');
 $router->add_post('/c2c-commerce-site/api/user/cart/checkout', 'UserController::checkout');
 $router->add_get('/c2c-commerce-site/api/user/orders', 'UserController::get_orders');
-
+$router->add_put('/c2c-commerce-site/api/user', 'UserController::update');
+$router->add_put('/c2c-commerce-site/api/user/password', 'UserController::update_password');
 //SellerController
 $router->add_post('/c2c-commerce-site/api/listings', 'SellerController::post_listing');
 $router->add_get('/c2c-commerce-site/api/sellers', 'SellerController::get_seller');
 $router->add_get('/c2c-commerce-site/api/sellers/rating', 'SellerController::get_rating');
+$router->add_put('/c2c-commerce-site/api/sellers/listings', 'SellerController::update_listing');
 //Listing controller
 $router->add_get('/c2c-commerce-site/api/listings/{slug}', 'ListingController::get_listing');
 $router->add_get('/c2c-commerce-site/api/listings/rating', 'ListingController::get_rating');
