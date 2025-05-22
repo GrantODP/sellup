@@ -14,8 +14,12 @@ function sentence_case($string)
   return ucfirst($string);
 }
 
-function has_required_keys(array $data, array $keys): bool
+function has_required_keys(?array $data, array $keys): bool
 {
+  if (!$data) {
+    return false;
+  }
+
   foreach ($keys as $key) {
     if (!array_key_exists($key, $data)) {
       return false;
