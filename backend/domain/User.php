@@ -2,6 +2,18 @@
 
 require_once './backend/db/Database.php';
 require_once './backend/core/Result.php';
+require_once './backend/core/Authorizer.php';
+class UserEditSubmission
+{
+
+  public string $contact;
+  public int $id;
+  public function __construct($id, $data)
+  {
+    $this->id = $id;
+    $this->contact = $data["contact"] ?? "";
+  }
+}
 
 class User
 {
@@ -63,31 +75,33 @@ class User
   }
 
 
-  public static function  create($data): Result
+  public static function  create($data, $password): Result
   {
-
     try {
       Database::connect();
 
       $db = Database::db();
+      $db->beginTransaction();
       $stmt = $db->prepare("INSERT INTO users (name, email, contact) VALUES (:name, :email, :contact)");
       $stmt->execute([
         ':name' => trim($data['name']),
         ':email' => trim($data['email']),
         ':contact' => trim($data['contact']),
       ]);
-      return Result::Ok($db->lastInsertId());
+      $last_id = $db->lastInsertId();
+      Authorizer::store_validation($db, $last_id, $password);
+      $db->commit();
+      return Result::Ok(0);
     } catch (PDOException $e) {
       return Result::Err("Error: " . $e->getMessage());
     }
-    return Result::Ok(null);
   }
 
   public static function delete(int $user_id): Result
   {
     try {
       $db = Database::db();
-      $stmt = $db->prepare("DELETE 1 FROM users WHERE user_id = :user_id");
+      $stmt = $db->prepare("DELETE * FROM users WHERE user_id = :user_id");
       $stmt->execute([':user_id' => $user_id]);
     } catch (PDOException $e) {
       return Result::Err("Error: " . $e->getMessage());
@@ -95,33 +109,42 @@ class User
     return Result::Ok(null);
   }
 
-  public static function update_name(int $user_id, string $name): Result
+  public static function update_user_info(UserEditSubmission $edit): Result
   {
+
     try {
+      Database::connect();
       $db = Database::db();
-      $stmt = $db->prepare("UPDATE users SET name = :name WHERE user_id = :user_id");
-      $stmt->execute([
-        ':user_id' => $user_id,
-        ':name' => $name
-      ]);
+      $db->beginTransaction();
+      if (!empty($edit->contact)) {
+        self::update_contact($db, $edit->id, $edit->contact);
+      }
+      $db->commit();
     } catch (PDOException $e) {
       return Result::Err("Error: " . $e->getMessage());
     }
     return Result::Ok(null);
   }
-
-  public static function update_contact(int $user_id, string $name): Result
+  public static function update_password(int $user_id, string $password, string $old_password): Result
   {
     try {
+      Database::connect();
       $db = Database::db();
-      $stmt = $db->prepare("UPDATE users SET contact = :contact WHERE user_id = :user_id");
-      $stmt->execute([
-        ':contact' => $user_id,
-        ':name' => $name
-      ]);
+      $db->beginTransaction();
+      $updated = Authorizer::update_validation($db, $user_id, $password, $old_password);
+      $db->commit();
+      return Result::Ok($updated);
     } catch (PDOException $e) {
       return Result::Err("Error: " . $e->getMessage());
     }
-    return Result::Ok(null);
+  }
+
+  public static function update_contact($db, int $user_id, string $contact)
+  {
+    $stmt = $db->prepare("UPDATE users SET contact = :contact WHERE user_id = :id");
+    $stmt->execute([
+      ':contact' => $contact,
+      ':id' => $user_id,
+    ]);
   }
 }

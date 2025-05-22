@@ -26,24 +26,26 @@ class UserController
     $email = trim($data['email']);
     $password = trim($data['password']);
 
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+      return Responder::bad_request($email . " is not a valid email");
+    }
+
+    if (Authorizer::is_valid($password)) {
+      return Responder::bad_request("Password does not meet criteria");
+    }
+
     if (User::get_by_email($email)) {
       Responder::error(message: 'User already exists', status: 409);
       return;
     }
 
-
-    $result = User::create($data);
+    $result = User::create($data, $password);
 
     if ($result->isErr()) {
       return Responder::error('Error:' . $result->unwrapErr(), 500);
     }
 
-    $result_auth = Authorizer::store_validation($result->unwrap(), $password);
-    if ($result_auth->isErr()) {
-      return Responder::error('Error:' . $result_auth->unwrapErr(), 500);
-    }
-
-    return Responder::success(null);
+    return Responder::success();
   }
 
   // POST /login
@@ -125,10 +127,10 @@ class UserController
   }
 
   //todo
-  // POST /user/update
+  // PUT /user
   public static function update()
   {
-
+    $data = get_input_json();
     $auth_token = Authorizer::validate_token_header();
 
     if (!$auth_token->is_valid()) {
@@ -137,13 +139,53 @@ class UserController
 
     $user = User::get_by_id($auth_token->user_id());
 
-    if ($user === null) {
-      Responder::bad_request("user not found");
-    } else {
-      Responder::success($user);
+    if (empty($user)) {
+      return Responder::not_found("user not found matching auth");
+    }
+    $sub = new UserEditSubmission($user->id, $data);
+    $result = User::update_user_info($sub);
+
+    if ($result->isErr()) {
+      return Responder::server_error("Unable to update user info: " . $result->unwrapErr());
     }
   }
 
+  // PUT /user/password
+  public static function update_password()
+  {
+
+    $auth_token = Authorizer::validate_token_header();
+
+    if (!$auth_token->is_valid()) {
+      return Responder::unauthorized($auth_token->message());
+    }
+
+    $data = get_input_json();
+    if (!has_required_keys($data, ['old_password', 'password'])) {
+      Responder::bad_request("No password or old password provided");
+      return;
+    }
+
+    $old = trim($data['old_password']);
+    $password = trim($data['password']);
+
+    $user = User::get_by_id($auth_token->user_id());
+
+    if (empty($user)) {
+      return Responder::not_found("user not found");
+    }
+
+    $result = User::update_password($user->id, $password, $old);
+
+    if ($result->isErr()) {
+      return Responder::server_error($result->unwrapErr());
+    }
+
+    if ($result->unwrap()) {
+      return Responder::success();
+    }
+    return Responder::unauthorized('Old password does not match original password');
+  }
 
   // POST /user/message
   public static function send_message()
