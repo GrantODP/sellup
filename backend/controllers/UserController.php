@@ -3,6 +3,7 @@ require_once './backend/domain/User.php';
 require_once './backend/domain/Listing.php';
 require_once './backend/domain/Cart.php';
 require_once './backend/domain/Order.php';
+require_once './backend/domain/Review.php';
 require_once './backend/domain/Message.php';
 require_once './backend/core/Token.php';;
 require_once './backend/core/Authorizer.php';;
@@ -15,9 +16,7 @@ class UserController
   public static function post()
   {
 
-
     $data = get_input_json();
-
     if (!has_required_keys($data, ['name', 'password', 'email', 'contact'])) {
       Responder::bad_request("Invalid input");
       return;
@@ -379,5 +378,44 @@ class UserController
     }
 
     return Responder::success($result->unwrap());
+  }
+  //PUT users/review
+  public static function edit_review()
+  {
+
+    $auth_token = Authorizer::validate_token_header();
+
+    if (!$auth_token->is_valid()) {
+      return Responder::unauthorized($auth_token->message());
+    }
+
+    $data = get_input_json();
+    if (!has_required_keys($data, ['message', 'rating'])) {
+      Responder::bad_request("Invalid json params");
+      return;
+    }
+    $user = User::get_by_id($auth_token->user_id());
+
+    if (empty($user)) {
+      return Responder::not_found("No user found matching auth token");
+    }
+
+    $review = Review::get_review(trim($data["review_id"]));
+
+    if (!$review) {
+      return Responder::not_found("Review matching id not found");
+    }
+    $uid = $review["user_id"] ?? 0;
+
+    if ($uid != $user->id) {
+      return Responder::forbidden("User not owner of review");
+    }
+
+    $result = Review::edit_review($review['review_id'], $data['message'], $data['rating']);
+    if ($result->isErr()) {
+      return Responder::error($result->unwrapErr());
+    }
+
+    return Responder::success();
   }
 }
