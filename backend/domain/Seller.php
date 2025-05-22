@@ -128,4 +128,28 @@ class Seller
 
     return self::get_seller_by_user_id($user_id);
   }
+  public static function update_verification(int $sell_id, $status): Result
+  {
+
+    try {
+      Database::connect();
+      $db = Database::db();
+      $db->beginTransaction();
+      self::_update_verification($db, $sell_id, $status);
+      $db->commit();
+      return Result::Ok(0);
+    } catch (PDOException $e) {
+      echo "Error: " . $e->getMessage();
+      return Result::Err($e->getMessage());
+    }
+  }
+
+  static function _update_verification($db, int $seller_id, string $status)
+  {
+    $stmt = $db->prepare("UPDATE sellers SET verification_status = :status WHERE seller_id = :id");
+    $stmt->execute([
+      ':status' => $status,
+      ':id' => $seller_id,
+    ]);
+  }
 }
