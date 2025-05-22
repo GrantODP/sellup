@@ -16,11 +16,21 @@ class Router
 {
   private $get_routes = [];
   private $post_routes = [];
+  private $put_routes = [];
+  private $delete_routes = [];
   private $dynamic_get_routes = [];
 
   public function add_post(string $path, $controller)
   {
     $this->post_routes[$path] = $controller;
+  }
+  public function add_put(string $path, $controller)
+  {
+    $this->put_routes[$path] = $controller;
+  }
+  public function add_delete(string $path, $controller)
+  {
+    $this->delete_routes[$path] = $controller;
   }
   public function add_get(string $path, $controller)
   {
@@ -52,6 +62,23 @@ class Router
 
     return Responder::bad_request("Unknown request");
   }
+  public function put($path)
+  {
+    if (self::call($path, $this->put_routes)) {
+      return;
+    };
+
+    return Responder::bad_request("Unknown request");
+  }
+
+  public function delete_op($path)
+  {
+    if (self::call($path, $this->delete_routes)) {
+      return;
+    };
+
+    return Responder::bad_request("Unknown request");
+  }
 
   public function handle()
   {
@@ -64,9 +91,9 @@ class Router
     } elseif ($method === 'POST') {
       $this->post($path);
     } elseif ($method === 'PUT') {
-      Responder::bad_request("Unsupported PUT");
+      $this->put($path);
     } elseif ($method === 'DELETE') {
-      Responder::bad_request("Unsupported DELETE");
+      $this->delete_op($path);
     } else {
       Responder::bad_request("Unknown request " . $method);
     }
