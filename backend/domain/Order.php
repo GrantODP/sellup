@@ -10,12 +10,16 @@ class Order
 {
 
   public int $order_id;
-  public int $items;
+  public array $items;
+  public int $user_id;
+  public float $total;
 
-  public function __construct(int $order_id, $items)
+  public function __construct(array $items, array $order)
   {
-    $this->order_id = $order_id;
+    $this->order_id = $order['order_id'];
     $this->items = $items;
+    $this->total = $order['total_amount'];
+    $this->user_id = $order['user_id'];
   }
 
   public static function create_order(Cart $cart): Result
@@ -99,21 +103,40 @@ class Order
       $db = Database::db();
 
       $stmt = $db->prepare("SELECT listing_id, quantity, price, subtotal FROM order_items WHERE order_id = :id");
+      $stmt_total = $db->prepare("SELECT total_amount, user_id, order_id FROM orders WHERE order_id = :id");
 
       $stmt->execute([
         ':id' => $order_id,
       ]);
+      $stmt_total->execute([
+        ':id' => $order_id,
+      ]);
+
 
       $order_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+      $total = $stmt_total->fetch(PDO::FETCH_ASSOC);
 
       if (empty($order_items)) {
         return null;
       }
-      return new Order($order_id, $order_items);
+
+      if (empty($stmt_total)) {
+        return null;
+      }
+      return new Order($order_items, $total);
     } catch (PDOException $e) {
       echo $e->getMessage();
       return null;
     }
+  }
+
+  public function pay($db)
+  {
+    $stmt = $db->prepare("UPDATE orders SET status = 'paid' WHERE order_id = :id");
+
+    $stmt->execute([
+      ':id' => $this->order_id,
+    ]);
   }
 
   public static function calc_total(Cart $cart, array $listings): float

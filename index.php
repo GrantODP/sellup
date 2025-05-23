@@ -41,6 +41,7 @@ $router->add_post('/c2c-commerce-site/api/user/cart', 'UserController::add_to_ca
 $router->add_get('/c2c-commerce-site/api/user/cart', 'UserController::get_cart');
 $router->add_post('/c2c-commerce-site/api/user/cart/checkout', 'UserController::checkout');
 $router->add_get('/c2c-commerce-site/api/user/orders', 'UserController::get_orders');
+$router->add_post('/c2c-commerce-site/api/user/orders/pay', 'UserController::pay_order');
 $router->add_put('/c2c-commerce-site/api/user', 'UserController::update');
 $router->add_put('/c2c-commerce-site/api/user/password', 'UserController::update_password');
 $router->add_put('/c2c-commerce-site/api/user/review', 'UserController::edit_review');

@@ -5,6 +5,7 @@ require_once './backend/domain/Cart.php';
 require_once './backend/domain/Order.php';
 require_once './backend/domain/Review.php';
 require_once './backend/domain/Message.php';
+require_once './backend/domain/Payment.php';
 require_once './backend/core/Token.php';;
 require_once './backend/core/Authorizer.php';;
 require_once './backend/util/Util.php';
@@ -317,11 +318,7 @@ class UserController
   //POST user/cart/checkout
   public static function checkout()
   {
-    $data = get_input_json();
-    if (!has_required_keys($data, ['payment_meta'])) {
-      Responder::bad_request("Invalid json params");
-      return;
-    }
+
     $auth_token = Authorizer::validate_token_header();
 
     if (!$auth_token->is_valid()) {
@@ -366,19 +363,79 @@ class UserController
       return Responder::not_found("No user found matching auth token");
     }
 
+    //Single order
+    $order_id = $_GET["id"] ?? 0;
+    var_dump($order_id);
+    if ($order_id) {
+      $order = Order::get_order($order_id);
+      if (empty($order)) {
+        return Responder::not_found("Order for user not found");
+      }
+      if ($order->user_id != $user->id) {
+        return Responder::forbidden("User not authorized to view order");
+      }
+      return Responder::success($order);
+    } else {
+      //get all
+      $result = Order::get_orders($user);
 
-    $result = Order::get_orders($user);
+      if ($result->isErr()) {
+        return Responder::error($result->unwrapErr());
+      }
 
-    if ($result->isErr()) {
-      return Responder::error($result->unwrapErr());
+      if (empty($result->unwrap())) {
+        return Responder::not_found("No orders matching user");
+      }
+      return Responder::success($result->unwrap());
     }
-
-    if (empty($result->unwrap())) {
-      return Responder::not_found("No orders matching user");
-    }
-
-    return Responder::success($result->unwrap());
   }
+  //POST users/orders/pay
+  public static function pay_order()
+  {
+
+    $auth_token = Authorizer::validate_token_header();
+
+    if (!$auth_token->is_valid()) {
+      return Responder::unauthorized($auth_token->message());
+    }
+
+    $data = get_input_json();
+
+    if (!has_required_keys($data, ['order_id', 'payment_meta'])) {
+      Responder::bad_request("Invalid json params");
+      return;
+    }
+    $user = User::get_by_id($auth_token->user_id());
+
+    if (empty($user)) {
+      return Responder::not_found("No user found matching auth token");
+    }
+
+
+    $order = Order::get_order(trim($data['order_id']));
+
+    if (empty($order)) {
+      return Responder::not_found("No order matching id");
+    }
+
+    if ($order->user_id != $user->id) {
+      return Responder::forbidden("User not authorized to pay order");
+    }
+
+    $payemnt = Payment::pay_order($order);
+
+    if ($payemnt->isErr()) {
+      return Responder::server_error($payemnt->unwrapErr());
+    }
+
+
+    if (!$payemnt->unwrap()) {
+      return Responder::bad_request("Payment for $order->order_id failed");
+    }
+
+    return Responder::success($order);
+  }
+
   //PUT users/review
   public static function edit_review()
   {
