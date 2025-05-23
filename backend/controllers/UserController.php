@@ -315,6 +315,36 @@ class UserController
 
     return Responder::success($result->unwrap());
   }
+  //DELETE user/cart
+  public static function delete_cart_item()
+  {
+    $listing_id = $_GET["id"] ?? 0;
+    if (empty($listing_id)) {
+      return Responder::bad_request('No listing id provided');
+    }
+
+    $auth_token = Authorizer::validate_token_header();
+
+    if (!$auth_token->is_valid()) {
+      return Responder::unauthorized($auth_token->message());
+    }
+
+    $user = User::get_by_id($auth_token->user_id());
+
+    if (empty($user)) {
+      return Responder::not_found("No user found matching auth token");
+    }
+
+
+    $result = Cart::remove_from_cart($user->id, $listing_id);
+
+    if ($result->isErr()) {
+      return Responder::error($result->unwrapErr());
+    }
+
+    return Responder::success();
+  }
+
   //POST user/cart/checkout
   public static function checkout()
   {

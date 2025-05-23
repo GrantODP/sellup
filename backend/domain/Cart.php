@@ -120,4 +120,30 @@ class Cart
     }
     return Result::Err("Unexpected error");
   }
+
+  public static function remove_from_cart($user_id, $listing_id): Result
+  {
+    try {
+      Database::connect();
+      $db = Database::db();
+
+
+      $sql = "DELETE FROM cart_items WHERE user_id = :user_id AND listing_id = :listing_id";
+      $stmt = $db->prepare($sql);
+      $stmt->execute([
+        ':user_id' => $user_id,
+        ':listing_id' => $listing_id,
+      ]);
+
+      if ($stmt->rowCount() === 0) {
+        return Result::Err("Listing not found in cart");
+      }
+
+      return Result::Ok(0);
+    } catch (PDOException $e) {
+      return Result::Err($e->getMessage());
+    }
+
+    return Result::Err("Unexpected error");
+  }
 }
