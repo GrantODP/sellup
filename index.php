@@ -39,8 +39,10 @@ $router->add_get('/c2c-commerce-site/api/user/conversations', 'UserController::g
 $router->add_get('/c2c-commerce-site/api/user/message', 'UserController::get_messages_by_conversation');
 $router->add_post('/c2c-commerce-site/api/user/cart', 'UserController::add_to_cart');
 $router->add_get('/c2c-commerce-site/api/user/cart', 'UserController::get_cart');
+$router->add_delete('/c2c-commerce-site/api/user/cart', 'UserController::delete_cart_item');
 $router->add_post('/c2c-commerce-site/api/user/cart/checkout', 'UserController::checkout');
 $router->add_get('/c2c-commerce-site/api/user/orders', 'UserController::get_orders');
+$router->add_delete('/c2c-commerce-site/api/user/orders', 'UserController::delete_order');
 $router->add_post('/c2c-commerce-site/api/user/orders/pay', 'UserController::pay_order');
 $router->add_put('/c2c-commerce-site/api/user', 'UserController::update');
 $router->add_put('/c2c-commerce-site/api/user/password', 'UserController::update_password');
@@ -50,6 +52,7 @@ $router->add_post('/c2c-commerce-site/api/listings', 'SellerController::post_lis
 $router->add_get('/c2c-commerce-site/api/sellers', 'SellerController::get_seller');
 $router->add_get('/c2c-commerce-site/api/sellers/rating', 'SellerController::get_rating');
 $router->add_put('/c2c-commerce-site/api/sellers/listings', 'SellerController::update_listing');
+$router->add_delete('/c2c-commerce-site/api/sellers/listings', 'SellerController::delete_listing');
 //Listing controller
 $router->add_get('/c2c-commerce-site/api/listings/{slug}', 'ListingController::get_listing');
 $router->add_get('/c2c-commerce-site/api/listings/rating', 'ListingController::get_rating');
