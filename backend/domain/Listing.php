@@ -301,4 +301,23 @@ class Listing
       ":p" => $price,
     ]);
   }
+
+  public static function delete_listing(Seller $sell, $id): Result
+  {
+    try {
+      Database::connect();
+
+      $db = Database::db();
+
+      $stmt = $db->prepare("DELETE FROM listings WHERE seller_id = :sid AND listing_id = :lid");
+      $stmt->execute([':lid' => $id, 'sid' => $sell->seller_id]);
+      if ($stmt->rowCount() === 0) {
+        return Result::Ok(false);
+      }
+    } catch (PDOException $e) {
+      echo "Error: " . $e->getMessage();
+      return Result::Err($e->getMessage());
+    }
+    return Result::Ok(true);
+  }
 }

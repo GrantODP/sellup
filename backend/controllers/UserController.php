@@ -395,7 +395,6 @@ class UserController
 
     //Single order
     $order_id = $_GET["id"] ?? 0;
-    var_dump($order_id);
     if ($order_id) {
       $order = Order::get_order($order_id);
       if (empty($order)) {
@@ -419,6 +418,40 @@ class UserController
       return Responder::success($result->unwrap());
     }
   }
+  // DELETE user/orders
+  public static function delete_order()
+  {
+
+    $auth_token = Authorizer::validate_token_header();
+
+    if (!$auth_token->is_valid()) {
+      return Responder::unauthorized($auth_token->message());
+    }
+
+    $user = User::get_by_id($auth_token->user_id());
+
+    if (empty($user)) {
+      return Responder::not_found("No user found matching auth token");
+    }
+
+    $order_id = $_GET["id"] ?? 0;
+    if (empty($order_id)) {
+      return Responder::not_found("Order for user not found");
+    }
+    $result = Order::delete_order($user, $order_id);
+    if ($result->isErr()) {
+      return Responder::server_error($result->unwrapErr());
+    }
+
+    $changed = $result->unwrap();
+
+    if (!$changed) {
+      return Responder::not_found("User does not have an order matching id");
+    }
+
+    return Responder::success($result->unwrap());
+  }
+
   //POST users/orders/pay
   public static function pay_order()
   {

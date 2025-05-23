@@ -129,6 +129,27 @@ class Order
       return null;
     }
   }
+  public static function delete_order(User $user, int $order_id): Result
+  {
+
+    try {
+      Database::connect();
+      $db = Database::db();
+
+      $stmt = $db->prepare("DELETE FROM orders WHERE order_id = :order_id AND user_id = :user_id");
+      $stmt->execute([
+        ':order_id' => $order_id,
+        ':user_id' => $user->id,
+      ]);
+
+      if ($stmt->rowCount() === 0) {
+        return Result::Ok(false);
+      }
+      return Result::Ok(true);
+    } catch (PDOException $e) {
+      return Result::Err($e->getMessage());
+    }
+  }
 
   public function pay($db)
   {

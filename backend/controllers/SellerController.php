@@ -134,4 +134,35 @@ class SellerController
 
     return Responder::success();
   }
+
+  // DELETE /seller/listings
+  public static function delete_listing()
+  {
+
+    $auth_token = Authorizer::validate_token_header();
+
+    if (!$auth_token->is_valid()) {
+      return Responder::unauthorized($auth_token->message());
+    }
+    $listing_id = $_GET["id"] ?? 0;
+    $seller = Seller::get_seller_by_user_id($auth_token->user_id());
+
+    if (empty($seller)) {
+      return Responder::forbidden("User is not a seller");
+    }
+
+
+    $result = Listing::delete_listing($seller, $listing_id);
+
+    if ($result->isErr()) {
+      return Responder::server_error($result->unwrapErr());
+    }
+
+    $can_update = $result->unwrap();
+    if (!$can_update) {
+      return Responder::not_found("Seller does not have listing matching id");
+    }
+
+    return Responder::success();
+  }
 }
