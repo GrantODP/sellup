@@ -14,20 +14,26 @@ class ListingController
 {
   public static function get_listing($listing_slug)
   {
-    $slug = $listing_slug ?? null;
-    if ($slug === null) {
-      return Responder::bad_request("Missing post listing slug");
-    }
+    $listing = $listing_slug ?? '';
+    $listing = Listing::get_by_slug($listing);
 
-    $listing = Listing::get_by_slug($slug);
-
-    if ($listing == null) {
-      return Responder::not_found("Listing: " . $slug . " not found");
+    if (empty($listing)) {
+      return Responder::not_found("Listing not found");
     }
 
     return Responder::success($listing);
   }
+  public static function get_listing_single()
+  {
+    $id = $_GET['id'] ?? 0;
+    $listing = Listing::get_by_id($id);
 
+    if (empty($listing)) {
+      return Responder::not_found("Listing not found");
+    }
+
+    return Responder::success($listing);
+  }
 
   public static function get_listings_with_cat()
   {

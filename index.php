@@ -57,6 +57,7 @@ $router->add_put('/c2c-commerce-site/api/sellers/listings', 'SellerController::u
 $router->add_delete('/c2c-commerce-site/api/sellers/listings', 'SellerController::delete_listing');
 //Listing controller
 $router->add_get('/c2c-commerce-site/api/listings/{slug}', 'ListingController::get_listing');
+$router->add_get('/c2c-commerce-site/api/listings', 'ListingController::get_listing_single');
 $router->add_get('/c2c-commerce-site/api/listings/rating', 'ListingController::get_rating');
 $router->add_get('/c2c-commerce-site/api/listings/reviews', 'ListingController::get_reviews');
 $router->add_post('/c2c-commerce-site/api/listings/reviews', 'ListingController::write_review');
@@ -86,7 +87,7 @@ $router->add_get('/c2c-commerce-site/media/{slug}', 'MediaController::get');
 $router->add_get('/c2c-commerce-site/test', 'TestController::test');
 $router->add_get('/c2c-commerce-site/ads/{slug}', 'PageController::get_ad_page');
 $router->add_get('/c2c-commerce-site/ads', 'PageController::get_all_ads_page');
-$router->add_get('/c2c-commerce-site/users', 'PageController::get_user');
+$router->add_get('/c2c-commerce-site/user', 'PageController::get_user');
 $router->add_get('/c2c-commerce-site/login', 'PageController::login');
 
 
