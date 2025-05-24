@@ -31,8 +31,10 @@ $router = new Router();
 //API
 //UserController
 $router->add_post('/c2c-commerce-site/api/user/create', 'UserController::post');
+$router->add_post('/c2c-commerce-site/api/user/report', 'UserController::report');
 $router->add_post('/c2c-commerce-site/api/login', 'UserController::login');
 $router->add_get('/c2c-commerce-site/api/user', 'UserController::get_user');
+$router->add_get('/c2c-commerce-site/api/auth/status', 'UserController::auth_valid');
 $router->add_post('/c2c-commerce-site/api/user/message', 'UserController::send_message');
 $router->add_post('/c2c-commerce-site/api/user/message-seller', 'UserController::message_seller');
 $router->add_get('/c2c-commerce-site/api/user/conversations', 'UserController::get_conversations');

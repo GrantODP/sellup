@@ -582,4 +582,12 @@ class UserController
 
     return Responder::success($report);
   }
+  //GET auth/status
+  public static function auth_valid()
+  {
+
+    $auth_token = Authorizer::validate_token_header();
+
+    return Responder::success($auth_token->status);
+  }
 }

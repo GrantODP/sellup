@@ -5,11 +5,11 @@ require_once './backend/core/Result.php';
 
 enum TokenStatus: string
 {
-  case Expired = 'expired: login in again';
+  case Expired = 'expired';
   case Valid = 'valid';
-  case Invalid = 'invalid: not logged in';
-  case Unknown = 'Unknown token';
-  case Missing = 'No token authorization';
+  case Invalid = 'invalid';
+  case Unknown = 'unknown';
+  case Missing = 'missing';
 }
 
 class Token
