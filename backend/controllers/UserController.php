@@ -18,7 +18,7 @@ class UserController
   {
 
     $data = get_input_json();
-    if (!has_required_keys($data, ['name', 'password', 'email', 'contact'])) {
+    if (!has_required_keys($data, ['username', 'password', 'email', 'contact'])) {
       Responder::bad_request("Invalid input");
       return;
     }
@@ -35,7 +35,7 @@ class UserController
     }
 
     if (User::get_by_email($email)) {
-      Responder::error(message: 'User already exists', status: 409);
+      Responder::error(message: 'User with email already exists', status: 409);
       return;
     }
 
