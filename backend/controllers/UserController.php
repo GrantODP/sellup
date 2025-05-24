@@ -3,6 +3,7 @@ require_once './backend/domain/User.php';
 require_once './backend/domain/Listing.php';
 require_once './backend/domain/Cart.php';
 require_once './backend/domain/Order.php';
+require_once './backend/domain/Report.php';
 require_once './backend/domain/Review.php';
 require_once './backend/domain/Message.php';
 require_once './backend/domain/Payment.php';
@@ -537,5 +538,48 @@ class UserController
     }
 
     return Responder::success();
+  }
+  //POST users/report
+  public static function report()
+  {
+
+    $auth_token = Authorizer::validate_token_header();
+
+    if (!$auth_token->is_valid()) {
+      return Responder::unauthorized($auth_token->message());
+    }
+
+    $data = get_input_json();
+
+    if (!has_required_keys($data, ['listing_id', 'message'])) {
+      Responder::bad_request("Invalid json params");
+      return;
+    }
+    $user = User::get_by_id($auth_token->user_id());
+
+    if (empty($user)) {
+      return Responder::not_found("No user found matching auth token");
+    }
+
+    $listing_id =  $data['listing_id'] ?? 0;
+    $message =  trim(($data['message'] ?? ''));
+
+    $listing = Listing::get_by_id($listing_id);
+
+    if (empty($listing)) {
+      return Responder::not_found("No order matching id");
+    }
+
+
+    $report = new Report($user, $listing, $message);
+
+    $result = $report->submit();
+
+
+    if ($result->isErr()) {
+      return Responder::server_error($result->unwrapErr());
+    }
+
+    return Responder::success($report);
   }
 }
