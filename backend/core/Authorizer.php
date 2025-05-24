@@ -16,15 +16,20 @@ class Authorizer
 
   public static function validate_token_header(): Token
   {
-    $headers = getallheaders();
-    $auth_header = $headers['authorization'] ?? null;
+    $token = $_COOKIE['auth_token'] ?? null;
 
-    if (empty($auth_header)) {
-      return new Token([], TokenStatus::Missing, 'No authorization header provided');
+    if (empty($token)) {
+      $headers = getallheaders();
+      $auth_header = $headers['authorization'] ?? null;
+      if (!empty($auth_header)) {
+        $token = str_replace('Bearer ', '', $auth_header);
+      }
     }
 
+    if (empty($token)) {
+      return new Token([], TokenStatus::Missing, 'No auth token provided');
+    }
 
-    $token = str_replace('Bearer ', '', $auth_header);
     $token_result = Tokener::get_user_id_from_token($token);
 
     if ($token_result->isErr()) {
