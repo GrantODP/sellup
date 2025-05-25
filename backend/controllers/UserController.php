@@ -590,4 +590,42 @@ class UserController
 
     return Responder::success($auth_token->status);
   }
+
+  // POST /listing/reviews
+  public static function write_review()
+  {
+
+    $data = get_input_json();
+    if (!has_required_keys($data, ['rating', 'listing_id'])) {
+      return Responder::bad_request("Missing 1 or more review parameters ['rating', 'listing_id']");
+    }
+
+    $auth_token = Authorizer::validate_token_header();
+
+    if (!$auth_token->is_valid()) {
+      return Responder::bad_request($auth_token->message());
+    }
+    $listing = $data['listing_id'] ?? 0;
+
+    $listing = Listing::get_by_id($listing);
+
+    if (empty($listing)) {
+      return Responder::not_found("Listing not found");
+    }
+
+    $can_order = Order::has_paid_ordered($auth_token->user_id(), $listing);
+    if (!$can_order->unwrap()) {
+      return Responder::forbidden("User has not paid for a listing");
+    }
+
+    $data['user_id'] = $auth_token->user_id();
+    $review = new Review($data);
+    $result = $review->write();
+
+    if ($result->isErr()) {
+      return Responder::server_error("Unable to write review for listing: " . $review->listing_id);
+    }
+
+    return Responder::success();
+  }
 }

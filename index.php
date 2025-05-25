@@ -48,7 +48,8 @@ $router->add_delete('/c2c-commerce-site/api/user/orders', 'UserController::delet
 $router->add_post('/c2c-commerce-site/api/user/orders/pay', 'UserController::pay_order');
 $router->add_put('/c2c-commerce-site/api/user', 'UserController::update');
 $router->add_put('/c2c-commerce-site/api/user/password', 'UserController::update_password');
-$router->add_put('/c2c-commerce-site/api/user/review', 'UserController::edit_review');
+$router->add_put('/c2c-commerce-site/api/user/reviews', 'UserController::edit_review');
+$router->add_post('/c2c-commerce-site/api/listings/reviews', 'UserController::write_review');
 //SellerController
 $router->add_post('/c2c-commerce-site/api/listings', 'SellerController::post_listing');
 $router->add_get('/c2c-commerce-site/api/sellers', 'SellerController::get_seller');
@@ -61,7 +62,7 @@ $router->add_get('/c2c-commerce-site/api/listings/{slug}', 'ListingController::g
 $router->add_get('/c2c-commerce-site/api/listings', 'ListingController::get_listing_single');
 $router->add_get('/c2c-commerce-site/api/listings/rating', 'ListingController::get_rating');
 $router->add_get('/c2c-commerce-site/api/listings/reviews', 'ListingController::get_reviews');
-$router->add_post('/c2c-commerce-site/api/listings/reviews', 'ListingController::write_review');
+$router->add_post('/c2c-commerce-site/api/listings/reviews', 'UserController::write_review');
 /*$router->add_get('/c2c- commerce-site/api/listings', 'ListingController::get_listing');*/
 $router->add_get('/c2c-commerce-site/api/listings/category', 'ListingController::get_listings_with_cat');
 $router->add_get('/c2c-commerce-site/api/listings/evaluate', 'ListingController::evaluate');

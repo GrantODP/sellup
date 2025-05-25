@@ -173,4 +173,28 @@ class Order
 
     return $amount;
   }
+  public static function has_paid_ordered($user_id, Listing $listing): Result
+  {
+    try {
+      Database::connect();
+      $db = Database::db();
+
+      $stmt = $db->prepare("
+            SELECT * FROM user_orders_items
+            WHERE user_id = :user_id AND listing_id = :listing_id AND status = 'paid'
+            LIMIT 1
+        ");
+
+      $stmt->execute([
+        ':user_id' => $user_id,
+        ':listing_id' => $listing->listing_id,
+      ]);
+
+      $found = $stmt->fetchColumn() !== false;
+
+      return Result::Ok($found);
+    } catch (PDOException $e) {
+      return Result::Err($e->getMessage());
+    }
+  }
 }

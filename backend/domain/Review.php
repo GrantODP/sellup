@@ -2,6 +2,7 @@
 require_once './backend/db/Database.php';
 require_once './backend/util/Util.php';
 require_once './backend/core/Result.php';
+require_once './backend/domain/Order.php';
 
 
 
@@ -29,7 +30,10 @@ class Review
 
       $db = Database::db();
 
-      $stmt = $db->prepare("INSERT INTO reviews (user_id, listing_id, score, message) VALUES(:user, :list, :rate, :message)");
+      $stmt = $db->prepare("INSERT INTO reviews (user_id, listing_id, score, message) VALUES(:user, :list, :rate, :message)
+        ON DUPLICATE KEY UPDATE
+        score = VALUES(score),
+        message = VALUES(message)");
       $stmt->bindValue(":user", $this->user_id);
       $stmt->bindValue(":list", $this->listing_id);
       $stmt->bindValue(":message", $this->message);
