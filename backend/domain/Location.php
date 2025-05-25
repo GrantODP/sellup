@@ -36,7 +36,7 @@ class Location
       ]);
       return Result::Ok($db->lastInsertId());
     } catch (PDOException $e) {
-      return Result::Err("Error: " . $e->getMessage());
+      return Result::Err(new InternalServerError("Error: " . $e->getMessage()));
     }
   }
 }

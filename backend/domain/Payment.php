@@ -45,8 +45,7 @@ class Payment
       $db->commit();
       return Result::Ok(true);
     } catch (PDOException $e) {
-      return Result::Err($e->getMessage());
+      return Result::Err(new InternalServerError("Error: " . $e->getMessage()));
     }
-    return Result::Err("Unexpected error");
   }
 }

@@ -37,13 +37,13 @@ class Report
       ]);
 
       if ($stmt->rowCount() == 0) {
-        return Result::Err("Failed to submit report");
+        return Result::Err(new BadRequestError("User already has a report"));
       }
 
       return Result::Ok(0);
     } catch (PDOException $e) {
       echo "Error: " . $e->getMessage();
-      return Result::Err("Database ERROR:" . $e->getMessage());
+      return Result::Err(new InternalServerError("Error: " . $e->getMessage()));
     }
   }
 }

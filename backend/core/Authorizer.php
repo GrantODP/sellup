@@ -75,12 +75,12 @@ class Authorizer
     $stmt->execute();
   }
 
-  public static function update_validation($db, int $user_id, string $password, $old_password): bool
+  public static function update_validation($db, int $user_id, string $password, $old_password): Result
   {
     $is_valid = self::validate_internal($db, $user_id, $old_password);
 
-    if (empty($is_valid)) {
-      return false;
+    if ($is_valid->isErr()) {
+      return $is_valid;
     }
 
     $salt = self::get_salt();
@@ -93,11 +93,13 @@ class Authorizer
     $stmt->bindParam(':salt', $salt, PDO::PARAM_STR);
     $stmt->bindParam(':id', $user_id, PDO::PARAM_INT);
     $stmt->execute();
-    return true;
+    return Result::Ok(true);
   }
 
   static function validate_internal($db, int $user_id, $password): Result
   {
+
+
     $sql = "
         SELECT password_hash, salt
         FROM user_auth 
@@ -117,7 +119,11 @@ class Authorizer
     $given = self::hash_password($salt, $password);
     $expected = $row['password_hash'];
 
-    return Result::Ok($given == $expected);
+    if ($given == $expected) {
+      return Result::Ok(true);
+    }
+
+    return Result::Err(new UnauthorizedError('Old password does not match'));
   }
   public static function validate(int $user_id, $password): Result
   {
@@ -126,8 +132,10 @@ class Authorizer
       $db = Database::db();
       return self::validate_internal($db, $user_id, $password);
     } catch (PDOException $e) {
-      Result::Err("Error: " . $e->getMessage());
+
+      return Result::Err(new InternalServerError($e->getMessage()));
     }
+
     return Result::Ok(false);
   }
 }

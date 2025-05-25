@@ -68,7 +68,7 @@ class Tokener
     $stmt->execute(['id' => $user_id]);
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
     if (empty($row)) {
-      return Result::Err("No token with matching user");
+      return Result::Err(new NotFoundError("No token with matching user"));
     }
 
     return Result::Ok($row['token']);
@@ -100,7 +100,7 @@ class Tokener
         ':expires_at' => $expires_at
       ]);
     } catch (PDOException $e) {
-      return Result::Err("Error: " . $e->getMessage());
+      return Result::Err(new UnauthorizedError($e->getMessage()));
     }
     return Result::Ok(null);
   }
@@ -114,10 +114,10 @@ class Tokener
       $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
       if (empty($row)) {
-        return Result::Err("Auth token not found. Must login");
+        return Result::Err(new NotFoundError("Auth token not found. Must login"));
       }
     } catch (PDOException $e) {
-      return Result::Err("Error: " . $e->getMessage());
+      return Result::Err(new UnauthorizedError($e->getMessage()));
     }
 
     return Result::Ok($row);

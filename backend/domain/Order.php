@@ -67,9 +67,9 @@ class Order
       $db->commit();
       return Result::Ok(null);
     } catch (PDOException $e) {
-      return Result::Err($e->getMessage());
+
+      return Result::Err(new InternalServerError("Error: " . $e->getMessage()));
     }
-    return Result::Err("Unexpected error");
   }
 
   public static function get_orders(User $user): Result
@@ -78,7 +78,7 @@ class Order
       Database::connect();
       $db = Database::db();
 
-      $stmt = $db->prepare("SELECT * FROM orders WHERE user_id = :id");
+      $stmt = $db->prepare("SELECT * FROM orders WHERE user_id = :id ORDER BY created_at DESC");
 
       $stmt->execute([
         ':id' => $user->id,
@@ -91,9 +91,8 @@ class Order
       }
       return Result::Ok($orders);
     } catch (PDOException $e) {
-      return Result::Err($e->getMessage());
+      return Result::Err(new InternalServerError("Error: " . $e->getMessage()));
     }
-    return Result::Err("Unexpected error");
   }
 
   public static function get_order(int $order_id): ?Order
@@ -143,11 +142,11 @@ class Order
       ]);
 
       if ($stmt->rowCount() === 0) {
-        return Result::Ok(false);
+        return Result::Err(new NotFoundError('Order for user not found'));
       }
       return Result::Ok(true);
     } catch (PDOException $e) {
-      return Result::Err($e->getMessage());
+      return Result::Err(new InternalServerError("Error: " . $e->getMessage()));
     }
   }
 
@@ -194,7 +193,7 @@ class Order
 
       return Result::Ok($found);
     } catch (PDOException $e) {
-      return Result::Err($e->getMessage());
+      return Result::Err(new InternalServerError("Error: " . $e->getMessage()));
     }
   }
 }

@@ -100,10 +100,8 @@ class Image
 
       return Result::Ok($images);
     } catch (PDOException $e) {
-      return Result::Err($e->getMessage());
+      return Result::Err(new InternalServerError($e->getMessage()));
     }
-
-    return Result::Err("Unknown error");
   }
 
   public static function save(int $listing_id): Result
@@ -124,7 +122,7 @@ class Image
     }
 
     if (empty($uploaded)) {
-      return Result::Err($errors);
+      return Result::Err(new BadRequestError(json_encode($errors)));
     }
 
     $placeholders = [];
@@ -143,8 +141,7 @@ class Image
       $stmt = $db->prepare($sql);
       $stmt->execute($values);
     } catch (PDOException $e) {
-      echo "Error: " . $e->getMessage();
-      return Result::Err($e->getMessage());
+      return Result::Err(new InternalServerError($e->getMessage()));
     }
 
     return Result::Ok(null);

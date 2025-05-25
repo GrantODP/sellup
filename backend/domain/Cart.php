@@ -49,9 +49,8 @@ class Cart
       ]);
       return Result::Ok(0);
     } catch (PDOException $e) {
-      return Result::Err($e->getMessage());
+      return Result::Err(new UnauthorizedError($e->getMessage()));
     }
-    return Result::Err("Unexpected error");
   }
 
   public static function checkout(User $user): Result
@@ -86,9 +85,8 @@ class Cart
 
       return Result::Ok($cart);
     } catch (PDOException $e) {
-      return Result::Err($e->getMessage());
+      return Result::Err(new UnauthorizedError($e->getMessage()));
     }
-    return Result::Err("Unexpected error");
   }
 
   public static function get_cart(User $user): Result
@@ -116,9 +114,8 @@ class Cart
 
       return Result::Ok($cart);
     } catch (PDOException $e) {
-      return Result::Err($e->getMessage());
+      return Result::Err(new UnauthorizedError($e->getMessage()));
     }
-    return Result::Err("Unexpected error");
   }
 
   public static function remove_from_cart($user_id, $listing_id): Result
@@ -136,14 +133,12 @@ class Cart
       ]);
 
       if ($stmt->rowCount() === 0) {
-        return Result::Err("Listing not found in cart");
+        return Result::Err(new NotFoundError("Listing not found in cart"));
       }
 
       return Result::Ok(0);
     } catch (PDOException $e) {
-      return Result::Err($e->getMessage());
+      return Result::Err(new UnauthorizedError($e->getMessage()));
     }
-
-    return Result::Err("Unexpected error");
   }
 }

@@ -82,7 +82,7 @@ class Listing
       ]);
       $db->commit();
     } catch (PDOException $e) {
-      return Result::Err("Error: " . $e->getMessage());
+      return Result::Err(new InternalServerError($e->getMessage()));
     }
     return Result::Ok(null);
   }
@@ -253,7 +253,6 @@ class Listing
       $stmt = $db->prepare("SELECT * FROM listings WHERE listing_id IN ($placeholders)");
       $stmt->execute($ids);
       $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
-      var_dump($row);
       if (empty($row)) {
         return null;
       }
@@ -275,8 +274,7 @@ class Listing
       self::update_ad($db, $sub);
       $db->commit();
     } catch (PDOException $e) {
-      echo "Error: " . $e->getMessage();
-      return Result::Err($e->getMessage());
+      return Result::Err(new InternalServerError($e->getMessage()));
     }
 
     return Result::Ok(0);
@@ -312,11 +310,11 @@ class Listing
       $stmt = $db->prepare("DELETE FROM listings WHERE seller_id = :sid AND listing_id = :lid");
       $stmt->execute([':lid' => $id, 'sid' => $sell->seller_id]);
       if ($stmt->rowCount() === 0) {
-        return Result::Ok(false);
+        return Result::Err(new NotFoundError("Listing not found for seller"));
       }
     } catch (PDOException $e) {
       echo "Error: " . $e->getMessage();
-      return Result::Err($e->getMessage());
+      return Result::Err(new InternalServerError($e->getMessage()));
     }
     return Result::Ok(true);
   }

@@ -37,7 +37,7 @@ class Seller
         ':userid' => $user_id,
       ]);
     } catch (PDOException $e) {
-      return Result::Err("Error: " . $e->getMessage());
+      return Result::Err(new InternalServerError("Error: " . $e->getMessage()));
     }
     return Result::Ok(null);
   }
@@ -139,8 +139,7 @@ class Seller
       $db->commit();
       return Result::Ok(0);
     } catch (PDOException $e) {
-      echo "Error: " . $e->getMessage();
-      return Result::Err($e->getMessage());
+      return Result::Err(new InternalServerError("Error: " . $e->getMessage()));
     }
   }
 

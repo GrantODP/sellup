@@ -39,14 +39,8 @@ class Review
       $stmt->bindValue(":message", $this->message);
       $stmt->bindValue(":rate", $this->rating);
       $stmt->execute();
-
-
-      /*if ($score) {*/
-      /*  $rate =  new Rating($score);*/
-      /*  return  $rate;*/
-      /*}*/
     } catch (PDOException $e) {
-      return Result::Err($e->getMessage());
+      return Result::Err(new InternalServerError("Error: " . $e->getMessage()));
     }
     return Result::Ok(null);
   }
@@ -113,10 +107,10 @@ class Review
 
       $affected = $stmt->rowCount();
       if ($affected === 0) {
-        return Result::Err("No review found with that ID, or no changes made");
+        return Result::Err(new NotFoundError("No review found with that ID, or no changes made"));
       }
     } catch (PDOException $e) {
-      return Result::Err($e->getMessage());
+      return Result::Err(new InternalServerError("Error: " . $e->getMessage()));
     }
     return Result::Ok(null);
   }

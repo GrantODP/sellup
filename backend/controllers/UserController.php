@@ -166,7 +166,6 @@ class UserController
       Responder::bad_request("No password or old password provided");
       return;
     }
-
     $old = trim($data['old_password']);
     $password = trim($data['password']);
 
@@ -179,13 +178,11 @@ class UserController
     $result = User::update_password($user->id, $password, $old);
 
     if ($result->isErr()) {
-      return Responder::server_error($result->unwrapErr());
+      $error = $result->unwrapErr();
+      return Responder::error($error->message, $error->code);
     }
 
-    if ($result->unwrap()) {
-      return Responder::success();
-    }
-    return Responder::unauthorized('Old password does not match original password');
+    return Responder::success();
   }
 
   // POST /user/message
@@ -623,7 +620,7 @@ class UserController
     $result = $review->write();
 
     if ($result->isErr()) {
-      return Responder::server_error("Unable to write review for listing: " . $review->listing_id);
+      return Responder::error("unable to write review for listing: " . $review->listing_id);
     }
 
     return Responder::success();

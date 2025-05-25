@@ -93,7 +93,7 @@ class User
       $db->commit();
       return Result::Ok(0);
     } catch (PDOException $e) {
-      return Result::Err("Error: " . $e->getMessage());
+      return Result::Err(new InternalServerError($e->getMessage()));
     }
   }
 
@@ -104,7 +104,7 @@ class User
       $stmt = $db->prepare("DELETE * FROM users WHERE user_id = :user_id");
       $stmt->execute([':user_id' => $user_id]);
     } catch (PDOException $e) {
-      return Result::Err("Error: " . $e->getMessage());
+      return Result::Err(new InternalServerError($e->getMessage()));
     }
     return Result::Ok(null);
   }
@@ -121,7 +121,7 @@ class User
       }
       $db->commit();
     } catch (PDOException $e) {
-      return Result::Err("Error: " . $e->getMessage());
+      return Result::Err(new InternalServerError($e->getMessage()));
     }
     return Result::Ok(null);
   }
@@ -132,8 +132,11 @@ class User
       $db = Database::db();
       $db->beginTransaction();
       $updated = Authorizer::update_validation($db, $user_id, $password, $old_password);
+      if ($updated->isErr()) {
+        return $updated;
+      }
       $db->commit();
-      return Result::Ok($updated);
+      return Result::Ok(true);
     } catch (PDOException $e) {
       return Result::Err("Error: " . $e->getMessage());
     }
