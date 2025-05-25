@@ -55,6 +55,7 @@ $router->add_get('/c2c-commerce-site/api/sellers', 'SellerController::get_seller
 $router->add_get('/c2c-commerce-site/api/sellers/rating', 'SellerController::get_rating');
 $router->add_put('/c2c-commerce-site/api/sellers/listings', 'SellerController::update_listing');
 $router->add_delete('/c2c-commerce-site/api/sellers/listings', 'SellerController::delete_listing');
+$router->add_post('/c2c-commerce-site/api/listings/media', 'SellerController::add_listing_images');
 //Listing controller
 $router->add_get('/c2c-commerce-site/api/listings/{slug}', 'ListingController::get_listing');
 $router->add_get('/c2c-commerce-site/api/listings', 'ListingController::get_listing_single');
@@ -64,7 +65,6 @@ $router->add_post('/c2c-commerce-site/api/listings/reviews', 'ListingController:
 /*$router->add_get('/c2c- commerce-site/api/listings', 'ListingController::get_listing');*/
 $router->add_get('/c2c-commerce-site/api/listings/category', 'ListingController::get_listings_with_cat');
 $router->add_get('/c2c-commerce-site/api/listings/evaluate', 'ListingController::evaluate');
-$router->add_post('/c2c-commerce-site/api/listings/media', 'ListingController::add_listing_images');
 $router->add_get('/c2c-commerce-site/api/listings/media', 'ListingController::get_listing_images');
 $router->add_get('/c2c-commerce-site/api/listings/search', 'ListingController::search_listing');
 $router->add_get('/c2c-commerce-site/api/listings/preview', 'ListingController::get_listing_preview');
