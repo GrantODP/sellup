@@ -139,7 +139,7 @@ export function populateProductImages(images) {
 
   const main_id = 'main-product-image';
   const main = document.createElement('img');
-  const src = `/c2c-commerce-site/${images[0].path}`;
+  const src = `/${images[0].path}`;
 
   main.id = main_id;
   main.src = src;
@@ -156,7 +156,7 @@ export function populateProductImages(images) {
 
   images.forEach((img, index) => {
     const thumb = document.createElement('img');
-    thumb.src = `/c2c-commerce-site/${img.path}`;
+    thumb.src = `/${img.path}`;
     thumb.alt = `Thumbnail ${index + 1} `;
     thumb.onclick = () => switchImage(thumb, main_id);
     thumbnails_container.appendChild(thumb);
@@ -204,7 +204,7 @@ export function setOnClick(container_id, action) {
 }
 
 export function navigateWindow(page) {
-  return window.location.href = `/c2c-commerce-site/${page}`;
+  return window.location.href = `/${page}`;
 }
 
 export async function login(email, password) {

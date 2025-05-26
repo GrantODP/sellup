@@ -88,16 +88,15 @@ $router->add_get('/c2c-commerce-site/media/{slug}', 'MediaController::get');
 //ONLY GETS
 //Views 
 
-$router->add_get('/c2c-commerce-site/test', 'TestController::test');
-$router->add_get('/c2c-commerce-site/ads/{slug}', 'PageController::get_ad_page');
-$router->add_get('/c2c-commerce-site/ads', 'PageController::get_all_ads_page');
-$router->add_get('/c2c-commerce-site/browse', 'PageController::get_all_ads_page');
-$router->add_get('/c2c-commerce-site/user', 'PageController::get_user');
-$router->add_get('/c2c-commerce-site/login', 'PageController::login');
-$router->add_get('/c2c-commerce-site/pay', 'PageController::payment');
-$router->add_get('/c2c-commerce-site/post-ad', 'PageController::post_ad');
-$router->add_get('/c2c-commerce-site/create-account', 'PageController::create_account');
-$router->add_get('/c2c-commerce-site/seller', 'PageController::seller');
+$router->add_get('/ads/{slug}', 'PageController::get_ad_page');
+$router->add_get('/ads', 'PageController::get_all_ads_page');
+$router->add_get('/browse', 'PageController::get_all_ads_page');
+$router->add_get('/user', 'PageController::get_user');
+$router->add_get('/login', 'PageController::login');
+$router->add_get('/pay', 'PageController::payment');
+$router->add_get('/post-ad', 'PageController::post_ad');
+$router->add_get('/create-account', 'PageController::create_account');
+$router->add_get('/seller', 'PageController::seller');
 
 
 

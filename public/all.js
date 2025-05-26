@@ -31,7 +31,7 @@ async function renderCategories() {
     button.className = "btn btn-outline-dark w-100 text-start rounded-0 border-top border-bottom";
     button.addEventListener("click", () => {
       document.cookie = `cat_name=${cat.name}`;
-      window.location = `/c2c-commerce-site/ads?category=${cat.cat_id}`;
+      window.location = `/ads?category=${cat.cat_id}`;
     })
     container.appendChild(button);
 
@@ -55,13 +55,13 @@ async function populateListings(listings) {
     const preview = await getPreview(listing.listing_id);
 
     if (preview) {
-      ad_article.querySelector('img').src = `/c2c-commerce-site/${preview.path}`;
+      ad_article.querySelector('img').src = `/${preview.path}`;
     }
 
     const date = new Date(listing.date);
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
 
-    ad_article.querySelector('a').href = `/c2c-commerce-site/ads/${listing.slug}`;
+    ad_article.querySelector('a').href = `/ads/${listing.slug}`;
     ad_article.querySelector('.ad-title').textContent = listing.title;
     ad_article.querySelector('.ad-price').textContent = `R${listing.price}`;
     ad_article.querySelector('.ad-description').textContent = listing.description;

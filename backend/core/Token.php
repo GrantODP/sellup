@@ -108,6 +108,7 @@ class Tokener
   public static function get_user_id_from_token(string $token): Result
   {
     try {
+      Database::connect();
       $db = Database::db();
       $stmt = $db->prepare("SELECT * FROM tokens WHERE token = :token LIMIT 1");
       $stmt->execute(['token' => $token]);

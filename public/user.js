@@ -218,7 +218,7 @@ async function loadCart(container) {
       <div class="text-center my-5">
         <h3>Your cart is empty 🛒</h3>
         <p>Looks like you haven't added anything yet.</p>
-        <a href="/c2c-commerce-site/browse" class="btn btn-primary mt-3">Start Shopping</a>
+        <a href="/browse" class="btn btn-primary mt-3">Start Shopping</a>
       </div>
     `;
     return;

@@ -5,7 +5,8 @@ function get_input_json(): ?array
 {
   $data = null;
   if ($_SERVER['CONTENT_TYPE'] === 'application/json') {
-    $data = get_input_json();
+    $json = file_get_contents('php://input');
+    $data = json_decode($json, true);
   } else {
     $data = $_POST;
   }
