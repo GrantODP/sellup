@@ -86,9 +86,6 @@ class Order
 
       $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-      if (empty($orders)) {
-        return Result::Ok(null);
-      }
       return Result::Ok($orders);
     } catch (PDOException $e) {
       return Result::Err(new InternalServerError("Error: " . $e->getMessage()));

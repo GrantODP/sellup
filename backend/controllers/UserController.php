@@ -379,9 +379,6 @@ class UserController
     $order_id = $_GET["id"] ?? 0;
     if ($order_id) {
       $order = Order::get_order($order_id);
-      if (empty($order)) {
-        return Responder::not_found("Order for user not found");
-      }
       if ($order->user_id != $user->id) {
         return Responder::forbidden("User not authorized to view order");
       }
@@ -394,9 +391,6 @@ class UserController
         return Responder::error($result->unwrapErr());
       }
 
-      if (empty($result->unwrap())) {
-        return Responder::not_found("No orders matching user");
-      }
       return Responder::success($result->unwrap());
     }
   }
