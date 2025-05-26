@@ -118,6 +118,8 @@ class User
       $db->beginTransaction();
       if (!empty($edit->contact)) {
         self::update_contact($db, $edit->id, $edit->contact);
+      } else {
+        return Result::Err(new BadRequestError("No contact info to update with"));
       }
       $db->commit();
     } catch (PDOException $e) {

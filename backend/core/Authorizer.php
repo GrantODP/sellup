@@ -123,7 +123,7 @@ class Authorizer
       return Result::Ok(true);
     }
 
-    return Result::Err(new UnauthorizedError('Old password does not match'));
+    return Result::Err(new UnauthorizedError('Password is incorrect'));
   }
   public static function validate(int $user_id, $password): Result
   {

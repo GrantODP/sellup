@@ -77,12 +77,10 @@ class UserController
 
     $res_valid = Authorizer::validate($user->id, $password);
     if ($res_valid->isErr()) {
-      return Responder::server_error($res_valid->unwrapErr());
+      $error = $res_valid->unwrapErr();
+      return Responder::error($error->message, $error->code);
     }
 
-    if (!$res_valid->unwrap()) {
-      return Responder::unauthorized("Incorrect password");
-    }
 
     $token = Tokener::get_token($user->id);
     if ($token->isErr()) {
@@ -127,7 +125,6 @@ class UserController
     }
   }
 
-  //todo
   // PUT /user
   public static function update()
   {
@@ -147,7 +144,8 @@ class UserController
     $result = User::update_user_info($sub);
 
     if ($result->isErr()) {
-      return Responder::server_error("Unable to update user info: " . $result->unwrapErr());
+      $error = $result->unwrapErr();
+      return Responder::error($error->message, $error->code);
     }
   }
 
