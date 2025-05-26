@@ -218,7 +218,6 @@ class User
       }
       $target_loc = $stored->unwrap()[0];
 
-      var_dump($target_loc);
       Database::connect();
       $db = Database::db();
       $db->beginTransaction();

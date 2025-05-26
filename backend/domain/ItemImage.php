@@ -126,11 +126,10 @@ class Image
 
       $name = basename($original_name);
       $name = $id . '-' . $name;
-      $target = md5($name . uniqid('', true)); // 32 chars
+      $target = substr(md5($name), 0, 16);
       $target_loc = $target_dir . '/' . $target;
-
       if (move_uploaded_file($tmp_name, $target_loc)) {
-        $uploaded[] = $target;
+        $uploaded[] = 'media/' . $target;
       } else {
         $errors[] = $name;
       }

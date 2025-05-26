@@ -3,8 +3,12 @@
 
 function get_input_json(): ?array
 {
-  $input = file_get_contents(('php://input'));
-  $data = json_decode($input, true);
+  $data = null;
+  if ($_SERVER['CONTENT_TYPE'] === 'application/json') {
+    $data = get_input_json();
+  } else {
+    $data = $_POST;
+  }
   return $data;
 }
 

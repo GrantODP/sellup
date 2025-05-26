@@ -100,7 +100,7 @@ class SellerController
     return Responder::success($rating);
   }
 
-  // PUT /seller/listings
+  // PUT /sellers/listings
   public static function update_listing()
   {
 
