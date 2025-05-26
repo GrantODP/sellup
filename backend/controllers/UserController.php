@@ -629,10 +629,6 @@ class UserController
 
     $seller = Seller::get_seller_by_user_id($user->id);
 
-    if (empty($seller)) {
-      return Responder::not_found('User is not a seller. Post a Ad to be a seller');
-    }
-
     return Responder::success($seller);
   }
 }
