@@ -10,11 +10,16 @@ import {
   populateProductImages,
   renderStars,
   NotfoundError,
-  renderStandardMessage
+  renderStandardMessage,
+  addToCart,
+  storeSessionData,
+  getSessionData,
+  isLoggedIn,
+  reportAd,
 } from './script.js';
 
 import { marked } from 'https://cdn.jsdelivr.net/npm/marked@5.1.0/lib/marked.esm.js';
-
+import Swal from 'https://cdn.jsdelivr.net/npm/sweetalert2@11/+esm';
 const slug = getCookie("ad_slug");
 
 
@@ -116,9 +121,95 @@ async function renderAdImages(id) {
     renderErrorPage(container, err.message);
   }
 }
+async function setReportAd() {
+
+  const logged_in = await isLoggedIn();
+  if (!logged_in) {
+    Swal.fire({
+      icon: 'info',
+      title: 'Must log in first'
+    });
+    return
+  }
+  const { value: message } = await Swal.fire(
+    {
+      icon: "question",
+      input: "textarea",
+      inputPlaceholder: "Why are you reporting?",
+      showCancelButton: true
+    }
+  );
+
+  const listing = getSessionData('ad').listing_id;
+  if (message && listing) {
+    try {
+
+      await reportAd(listing, message);
+      Swal.fire({
+        icon: 'success',
+        title: 'Submitted report'
+      });
+    } catch (err) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error reporting ad'
+      });
+    }
+  }
+
+}
+async function setAddToCart() {
+
+  const logged_in = await isLoggedIn();
+
+  if (!logged_in) {
+    Swal.fire({
+      icon: 'info',
+      title: 'Must log in first'
+    });
+    return
+  }
+  const { value: count } = await Swal.fire(
+    {
+      title: "Select how many to add to cart",
+      input: "select",
+      inputOptions: {
+        1: '1',
+        2: '2',
+        3: '3',
+        4: '4',
+        5: '5',
+        6: '6',
+        7: '7',
+        8: '8',
+        9: '9',
+        10: '10'
+      },
+    }
+  );
+
+  const listing = getSessionData('ad').listing_id;
+  if (count && listing) {
+    try {
+      await addToCart(listing, count);
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Added to cart'
+      });
+    } catch (err) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error adding to cart'
+      });
+    }
+  }
+
+}
 async function renderAd(slug) {
   const container = document.getElementById('page-body');
   const ad = await getSingleAd(slug);
+  storeSessionData('ad', ad);
   document.title = ad.title;
   await loadTemplates(container, '../frontend/views/ad_tempalte.html');
 
@@ -126,6 +217,8 @@ async function renderAd(slug) {
   container.querySelector('#ad-descp-body').innerText = ad.description;
   container.querySelector('#price').innerText = "R" + ad.price;
   container.querySelector('#eval_btn').onclick = () => { eval_product(ad.listing_id) };
+  container.querySelector('#add-cart-btn').onclick = setAddToCart;
+  container.querySelector('#report-ad').onclick = setReportAd;
   await renderAdScore(ad.listing_id);
   await renderSeller(ad.seller_id);
   await renderReviews(ad.listing_id);

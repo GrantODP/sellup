@@ -3,6 +3,7 @@ import {
   getAdListings,
   getCategories,
   getCookie,
+  getPreview,
   getTemplate,
   getUrlParams,
   loadTemplates,
@@ -18,7 +19,7 @@ import {
 async function renderCategories() {
 
   const categories = await getCategories();
-  const container = document.getElementById("category-content")
+  const container = document.getElementById(" category-container")
   const category_name = getCookie('cat_name') ?? "";
   const name_container = document.getElementById("category-name");
   name_container.innerText = category_name;
@@ -27,9 +28,8 @@ async function renderCategories() {
 
     const button = document.createElement('button');
     button.textContent = cat.name;
-    button.className = "category-btn";
+    button.className = "btn btn-outline-dark w-100 text-start rounded-0 border-top border-bottom";
     button.addEventListener("click", () => {
-
       document.cookie = `cat_name=${cat.name}`;
       window.location = `/c2c-commerce-site/ads?category=${cat.cat_id}`;
     })
@@ -49,21 +49,27 @@ async function populateListings(listings) {
   const template = document.createElement('article');
   template.className = 'ad-listing';
   template.innerHTML = template_html.trim();
-  listings.forEach(listing => {
+
+  for (const listing of listings) {
     const ad_article = template.cloneNode(true);
+    const preview = await getPreview(listing.listing_id);
+
+    if (preview) {
+      ad_article.querySelector('img').src = `/c2c-commerce-site/${preview.path}`;
+    }
+
     const date = new Date(listing.date);
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
+
     ad_article.querySelector('a').href = `/c2c-commerce-site/ads/${listing.slug}`;
     ad_article.querySelector('.ad-title').textContent = listing.title;
     ad_article.querySelector('.ad-price').textContent = `R${listing.price}`;
     ad_article.querySelector('.ad-description').textContent = listing.description;
     ad_article.querySelector('.ad-date').textContent = `Posted on: ${date.toLocaleDateString(undefined, options)}`;
-    ad_article.querySelector('.ad-location').textContent = `Location:
-      ${titleCase(listing.province)},
-      ${titleCase(listing.city)} `;
+    ad_article.querySelector('.ad-location').textContent = `Location: ${titleCase(listing.province)}, ${titleCase(listing.city)}`;
 
     container.appendChild(ad_article);
-  })
+  }
 }
 
 
@@ -88,7 +94,7 @@ async function renderListings() {
 
       listings = await getAdListings(id, page, limit, sort_val, sort_dir);
     }
-    populateListings(listings);
+    await populateListings(listings);
   }
   catch (err) {
     const container = document.getElementById("ads-container")
@@ -114,13 +120,16 @@ async function initSearch() {
     e.preventDefault();
     const form_data = new FormData(this);
     const search = form_data.get("q").trim();
-    console.log(search);
     if (!search) {
       return;
     }
+
+    document.cookie = `cat_name= Search for "${search}"`;
     navigateWindow(`ads?q=${search}`);
   });
 }
 
 
-renderPage();
+document.addEventListener("DOMContentLoaded", (e) => {
+  renderPage();
+});

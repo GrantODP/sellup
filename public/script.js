@@ -1,6 +1,8 @@
 export class NotfoundError extends Error { };
 export class Unauthorized extends Error { };
-
+import Swal from 'https://cdn.jsdelivr.net/npm/sweetalert2@11/+esm';
+export { Swal }
+export const SITE = 'c2c-commerce-site';
 export function getCookie(cname) {
   let name = cname + "=";
   let decodedCookie = decodeURIComponent(document.cookie);
@@ -22,6 +24,7 @@ export async function loadTemplates(container, url = 'templates.html') {
   const html = await res.text();
   container.innerHTML = html;
 }
+
 export async function getTemplate(url = 'templates.html') {
   const res = await fetch(url);
   const html = await res.text();
@@ -29,16 +32,17 @@ export async function getTemplate(url = 'templates.html') {
 }
 
 export async function getResource(uri, method = 'GET', data = null, headers = {}) {
-  const url = `/c2c-commerce-site/api/${uri}`;
+  const url = `/${SITE}/api/${uri}`;
+  const is_form = data instanceof FormData;
   const options = {
     method: method.toUpperCase(),
-    headers: {
+    headers: is_form ? headers : {
       'Content-Type': 'application/json',
       ...headers
     }
   };
   if (data && method.toUpperCase() !== 'GET') {
-    options.body = JSON.stringify(data);
+    options.body = is_form ? data : JSON.stringify(data);
   }
   const response = await fetch(url, options);
   const json = await response.json();
@@ -135,9 +139,18 @@ export function populateProductImages(images) {
 
   const main_id = 'main-product-image';
   const main = document.createElement('img');
+  const src = `/c2c-commerce-site/${images[0].path}`;
+
   main.id = main_id;
-  main.src = `/c2c-commerce-site/${images[0].path}`;
+  main.src = src;
   main.alt = "Main Product Image";
+  main.addEventListener('click', () => {
+    Swal.fire({
+      imageUrl: src,
+      imageHeight: '100%',
+      imageWidth: '100%',
+    });
+  });
   main_container.appendChild(main);
 
 
@@ -201,12 +214,162 @@ export async function login(email, password) {
   }
   return getResource('login', 'POST', data);
 }
+export async function getUserInfo() {
+  return getResource('user');
+}
 
-
+export async function addToCart(listing_id, count) {
+  const data = {
+    "listing_id": listing_id,
+    "count": count
+  }
+  return getResource('user/cart', 'POST', data);
+}
+export async function reportAd(listing_id, message) {
+  const data = {
+    "listing_id": listing_id,
+    "message": message
+  }
+  return getResource('user/report', 'POST', data);
+}
 export function titleCase(str) {
   return str.toLowerCase().split(' ').map(function (word) {
     return word.charAt(0).toUpperCase() + word.slice(1);
   }).join(' ');
 }
 
+
+export function popup(button) {
+  button.addEventListener("click", (e) => {
+    Swal.fire('Reported!', 'Your report has been submitted.', 'success');
+  });
+}
+
+export function storeSessionData(key, data) {
+  sessionStorage.setItem(key, JSON.stringify(data));
+}
+export function getSessionData(key) {
+  return JSON.parse(sessionStorage.getItem(key));
+}
+export function storeLocalData(key, data) {
+  localStorage.setItem(key, JSON.stringify(data));
+}
+export function getLocalData(key) {
+  return JSON.parse(localStorage.getItem(key));
+}
+export async function isLoggedIn() {
+  const token = await getResource('auth/status');
+  return token == 'valid';
+
+}
+export async function getPreview(listing_id) {
+  try {
+    const preview = await getResource(`listings/preview?id=${listing_id}`);
+    return preview;
+  } catch (err) {
+    return null;
+  }
+}
+
+export async function getOrders() {
+  return getResource(`user/orders`);
+}
+
+export async function getOrder(id) {
+
+  const order = await getResource(`user/orders?id=${id}`);
+  return order;
+}
+export async function cancelOrder(id) {
+  return getResource(`user/orders?id=${id}`, 'DELETE');
+}
+export async function getListing(id) {
+  const listing = await getResource(`listings?id=${id}`);
+  return listing;
+}
+
+
+export async function getCart() {
+  return getResource('user/cart', 'GET');
+}
+
+export async function removeCartItem(listing_id) {
+  return getResource(`user/cart?id=${listing_id}`, 'DELETE');
+}
+
+export async function checkout() {
+  return getResource(`user/cart/checkout`, 'POST');
+}
+
+export async function pay(order_id, pay_info) {
+  const data = {
+    order_id: order_id,
+    payment_meta: pay_info,
+  }
+  return getResource('user/orders/pay', 'POST', data);
+}
+
+
+export async function updateUserInfo(user_info) {
+  return getResource('user', 'PUT', user_info);
+}
+
+export async function updatePassword(old_pass, new_pass) {
+  const data = {
+    old_password: old_pass,
+    password: new_pass
+  };
+  return getResource('user/password', 'PUT', data);
+}
+
+
+//Seller
+export async function postAd(data) {
+  return getResource('listings', 'POST', data);
+}
+
+export async function updateListing(data) {
+  return getResource('sellers/listings', 'POST', data);
+}
+export async function deleteListing(listing_id) {
+  return getResource(`sellers/listings?id=${listing_id}`, 'DELETE');
+}
+
+export async function uploadLisingImages(listing_id, image_forms) {
+  console.assert(image_forms instanceof FormData, "images must be of form data");
+  return getResource(`listings/media?id=${listing_id}`, 'POST', image_forms);
+}
+
+//reviews
+export async function writeReview(listing_id, score, message) {
+  const data = {
+    listing_id: listing_id,
+    rating: score,
+    message: message,
+  };
+  return getResource(`listings/reviews`, 'POST', data);
+}
+
+export async function editReview(id, rating, message) {
+  const data = {
+    review_id: id,
+    rating: Math.min(rating, 5),
+    message: message,
+  };
+  return getResource('user', 'PUT', data);
+}
+
+export async function getLocations() {
+  return getResource('location');
+}
+
+export async function createAccount(acc_info) {
+  return getResource('user/create', 'POST', acc_info);
+}
+export async function getSellerListings(id) {
+  return getResource(`sellers/listings?id=${id}`);
+}
+export async function getUserSellerInfo() {
+  return getResource(`user/seller`);
+}
 

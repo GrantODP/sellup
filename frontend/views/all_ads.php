@@ -5,25 +5,28 @@
   <meta charset="UTF-8">
   <base href="/c2c-commerce-site/public/">
   <title>Ad listings</title>
-
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 
-<body>
-  <div class="top-bar" id="top-bar">
-    <p class="l1">Loading resource</p>
-    <p class="l2">Loading resource</p>
-    <p class="l3">Loading resource</p>
-  </div>
-  <div class="search-container">
-    <input id="search-input" class="search-bar" type="text" placeholder="Search ads...">
-    <button id="search-btn">Search</button>
-  </div>
+<body class="bg-light">
+
+  <?php include('navbar.html'); ?>
+  <form class="row g-2 my-2" role="search" id="search-bar">
+    <div class="col-9">
+      <input class="form-control" type="search" name="q" placeholder="Search ads...">
+    </div>
+    <div class="col-3">
+      <button class="btn btn-success w-100" type="submit">Search</button>
+    </div>
+  </form>
   <div class="product" id="page-body">
     <p>Loading resource</p>
   </div>
   <script type="module" src="all.js"></script>
-
+  <script src="js/navbar.js"></script>
 </body>
 
 </html>

@@ -50,11 +50,14 @@ $router->add_put('/c2c-commerce-site/api/user', 'UserController::update');
 $router->add_put('/c2c-commerce-site/api/user/password', 'UserController::update_password');
 $router->add_put('/c2c-commerce-site/api/user/reviews', 'UserController::edit_review');
 $router->add_post('/c2c-commerce-site/api/listings/reviews', 'UserController::write_review');
+$router->add_get('/c2c-commerce-site/api/user/seller', 'UserController::get_seller');
+$router->add_post('/c2c-commerce-site/api/user/profile-pic', 'UserController::upload_profile_pic');
 //SellerController
 $router->add_post('/c2c-commerce-site/api/listings', 'SellerController::post_listing');
+$router->add_get('/c2c-commerce-site/api/sellers/listings', 'SellerController::get_listings');
 $router->add_get('/c2c-commerce-site/api/sellers', 'SellerController::get_seller');
 $router->add_get('/c2c-commerce-site/api/sellers/rating', 'SellerController::get_rating');
-$router->add_put('/c2c-commerce-site/api/sellers/listings', 'SellerController::update_listing');
+$router->add_post('/c2c-commerce-site/api/sellers/listings', 'SellerController::update_listing');
 $router->add_delete('/c2c-commerce-site/api/sellers/listings', 'SellerController::delete_listing');
 $router->add_post('/c2c-commerce-site/api/listings/media', 'SellerController::add_listing_images');
 //Listing controller
@@ -93,6 +96,8 @@ $router->add_get('/c2c-commerce-site/user', 'PageController::get_user');
 $router->add_get('/c2c-commerce-site/login', 'PageController::login');
 $router->add_get('/c2c-commerce-site/pay', 'PageController::payment');
 $router->add_get('/c2c-commerce-site/post-ad', 'PageController::post_ad');
+$router->add_get('/c2c-commerce-site/create-account', 'PageController::create_account');
+$router->add_get('/c2c-commerce-site/seller', 'PageController::seller');
 
 
 

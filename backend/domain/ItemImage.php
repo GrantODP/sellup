@@ -129,7 +129,7 @@ class Image
       $target = substr(md5($name), 0, 16);
       $target_loc = $target_dir . '/' . $target;
       if (move_uploaded_file($tmp_name, $target_loc)) {
-        $uploaded[] = 'media/' . $target;
+        $uploaded[] = $target;
       } else {
         $errors[] = $name;
       }
@@ -158,7 +158,7 @@ class Image
       $values[] = $upload;
       $values[] = $listing_id;
     }
-
+    var_dump($uploaded);
     try {
       Database::connect();
 
