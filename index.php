@@ -21,7 +21,7 @@ require_once './backend/core/Result.php';
 
 
 C2Config::load();
-Database::connect();
+/* Database::connect(); */
 
 
 
