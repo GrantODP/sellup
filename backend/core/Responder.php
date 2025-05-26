@@ -1,4 +1,3 @@
-
 <?php
 
 class Responder
@@ -68,6 +67,3 @@ class Responder
     self::error($error->message, $error->code);
   }
 }
-
-
-?>
