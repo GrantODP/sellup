@@ -19,31 +19,17 @@ class UserController
   {
 
     $data = get_input_json();
-    if (!has_required_keys($data, ['username', 'password', 'email', 'contact'])) {
+    if (!has_required_keys($data, ['name', 'password', 'email', 'contact'])) {
       Responder::bad_request("Invalid input");
       return;
     }
 
-    $email = trim($data['email']);
-    $password = trim($data['password']);
 
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-      return Responder::bad_request($email . " is not a valid email");
-    }
-
-    if (Authorizer::is_valid($password)) {
-      return Responder::bad_request("Password does not meet criteria");
-    }
-
-    if (User::get_by_email($email)) {
-      Responder::error(message: 'User with email already exists', status: 409);
-      return;
-    }
-
-    $result = User::create($data, $password);
+    $result = User::create($data);
 
     if ($result->isErr()) {
-      return Responder::error('Error:' . $result->unwrapErr(), 500);
+      $error = $result->unwrapErr();
+      return Responder::error($error->message, $error->code);
     }
 
     return Responder::success();

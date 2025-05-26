@@ -74,22 +74,74 @@ class User
     return null;
   }
 
-
-  public static function  create($data, $password): Result
+  public static function has_no_duplicate_info($db, $data): Result
   {
+    $sql = "
+        SELECT 
+            EXISTS (SELECT 1 FROM users WHERE email = :email) AS email_exists,
+            EXISTS (SELECT 1 FROM users WHERE contact = :contact) AS phone_exists,
+            EXISTS (SELECT 1 FROM users WHERE name = :name) AS name_exists
+    ";
+    $stmt = $db->prepare($sql);
+    $stmt->execute([
+      ':email' => $data['email'],
+      ':contact' => $data['contact'],
+      ':name'  => $data['name'],
+    ]);
+
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($result['email_exists']) {
+      return Result::Err(new ConflictError("Email already exists"));
+    }
+
+    if ($result['phone_exists']) {
+      return Result::Err(new ConflictError("Phone number already exists"));
+    }
+
+    if ($result['name_exists']) {
+      return Result::Err(new ConflictError("Name already exists"));
+    }
+
+    return Result::Ok(0);
+  }
+
+  public static function internal_create($db, $data)
+  {
+
+    $stmt = $db->prepare("INSERT INTO users (name, email, contact) VALUES (:name, :email, :contact)");
+    $stmt->execute([
+      ':name' => $data['name'],
+      ':email' => $data['email'],
+      ':contact' => $data['contact'],
+    ]);
+    $last_id = $db->lastInsertId();
+    Authorizer::store_validation($db, $last_id, $data['password']);
+  }
+
+  public static function create($data): Result
+  {
+    $data['name'] = trim($data['name']);
+    $data['password'] = trim($data['password']);
+    $data['email'] = trim($data['email']);
+    $data['contact'] = trim($data['contact']);
+
+    if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
+      return Result::Err(new BadRequestError($data['email'] . " is not a valid email"));
+    }
+
     try {
       Database::connect();
 
       $db = Database::db();
       $db->beginTransaction();
-      $stmt = $db->prepare("INSERT INTO users (name, email, contact) VALUES (:name, :email, :contact)");
-      $stmt->execute([
-        ':name' => trim($data['name']),
-        ':email' => trim($data['email']),
-        ':contact' => trim($data['contact']),
-      ]);
-      $last_id = $db->lastInsertId();
-      Authorizer::store_validation($db, $last_id, $password);
+
+      $result = self::has_no_duplicate_info($db, $data);
+      if ($result->isErr()) {
+        return $result;
+      }
+      $result = self::internal_create($db, $data);
+
       $db->commit();
       return Result::Ok(0);
     } catch (PDOException $e) {

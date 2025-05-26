@@ -36,7 +36,13 @@ class UnauthorizedError extends ErrorType
     parent::__construct($message, 401);
   }
 }
-
+class ConflictError extends ErrorType
+{
+  public function __construct(string $message = "Unauthorized")
+  {
+    parent::__construct($message, 409);
+  }
+}
 class ForbiddenError extends ErrorType
 {
   public function __construct(string $message = "Forbidden")
