@@ -39,4 +39,23 @@ class Location
       return Result::Err(new InternalServerError("Error: " . $e->getMessage()));
     }
   }
+  public static function get_all(): Result
+  {
+    try {
+      Database::connect();
+
+      $db = Database::db();
+
+      $stmt = $db->prepare("SELECT * FROM location");
+      $stmt->execute();
+
+      $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
+      if (empty($row)) {
+        return  Result::Err(new NotFoundError("No locations are available"));
+      }
+      return Result::Ok($row);
+    } catch (PDOException $e) {
+      return Result::Err(new InternalServerError("Error: " . $e->getMessage()));
+    }
+  }
 }

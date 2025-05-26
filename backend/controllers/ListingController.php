@@ -188,4 +188,16 @@ class ListingController
     }
     return Responder::success($listings);
   }
+
+  //GET locations
+  public static function get_locations()
+  {
+    $location = Location::get_all();
+    if ($location->isErr()) {
+      $location = $location->unwrapErr();
+      return Responder::error($location->message, $location->code);
+    }
+
+    return Responder::success($location->unwrap());
+  }
 }

@@ -62,7 +62,7 @@ $router->add_get('/c2c-commerce-site/api/listings/{slug}', 'ListingController::g
 $router->add_get('/c2c-commerce-site/api/listings', 'ListingController::get_listing_single');
 $router->add_get('/c2c-commerce-site/api/listings/rating', 'ListingController::get_rating');
 $router->add_get('/c2c-commerce-site/api/listings/reviews', 'ListingController::get_reviews');
-$router->add_post('/c2c-commerce-site/api/listings/reviews', 'UserController::write_review');
+$router->add_get('/c2c-commerce-site/api/locations', 'ListingController::get_locations');
 /*$router->add_get('/c2c- commerce-site/api/listings', 'ListingController::get_listing');*/
 $router->add_get('/c2c-commerce-site/api/listings/category', 'ListingController::get_listings_with_cat');
 $router->add_get('/c2c-commerce-site/api/listings/evaluate', 'ListingController::evaluate');
@@ -88,8 +88,11 @@ $router->add_get('/c2c-commerce-site/media/{slug}', 'MediaController::get');
 $router->add_get('/c2c-commerce-site/test', 'TestController::test');
 $router->add_get('/c2c-commerce-site/ads/{slug}', 'PageController::get_ad_page');
 $router->add_get('/c2c-commerce-site/ads', 'PageController::get_all_ads_page');
+$router->add_get('/c2c-commerce-site/browse', 'PageController::get_all_ads_page');
 $router->add_get('/c2c-commerce-site/user', 'PageController::get_user');
 $router->add_get('/c2c-commerce-site/login', 'PageController::login');
+$router->add_get('/c2c-commerce-site/pay', 'PageController::payment');
+$router->add_get('/c2c-commerce-site/post-ad', 'PageController::post_ad');
 
 
 
