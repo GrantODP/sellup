@@ -509,7 +509,7 @@ class UserController
 
     $result = Review::edit_review($review['review_id'], $data['message'], $data['rating']);
     if ($result->isErr()) {
-      return Responder::error($result->unwrapErr());
+      return Responder::result_error($result);
     }
 
     return Responder::success();
@@ -552,7 +552,7 @@ class UserController
 
 
     if ($result->isErr()) {
-      return Responder::server_error($result->unwrapErr());
+      return Responder::result_error($result);
     }
 
     return Responder::success($report);
@@ -624,5 +624,31 @@ class UserController
     $seller = Seller::get_seller_by_user_id($user->id);
 
     return Responder::success($seller);
+  }
+  //POST user/profile-pic
+  public static function upload_profile_pic()
+  {
+    if (!isset($_FILES['images'])) {
+      return Responder::bad_request("No image to upload");
+    }
+    $auth_token = Authorizer::validate_token_header();
+
+    if (!$auth_token->is_valid()) {
+      return Responder::unauthorized($auth_token->message());
+    }
+
+    $user = User::get_by_id($auth_token->user_id());
+
+    if (empty($user)) {
+      return Responder::not_found("No user found matching auth token");
+    }
+
+    $result = $user->update_profile_pic();
+
+    if ($result->isErr()) {
+      return Responder::result_error($result);
+    }
+
+    return Responder::success();
   }
 }

@@ -3,6 +3,8 @@
 require_once './backend/db/Database.php';
 require_once './backend/core/Result.php';
 require_once './backend/core/Authorizer.php';
+require_once './backend/domain/ItemImage.php';
+
 class UserEditSubmission
 {
 
@@ -21,6 +23,7 @@ class User
   public string $name;
   public string $email;
   public string $contact;
+  public string $profile_pic;
 
   public function __construct(array $data)
   {
@@ -28,6 +31,7 @@ class User
     $this->name = $data['name'];
     $this->email = $data['email'];
     $this->contact = $data['contact'];
+    $this->profile_pic = $data['profile_pic'] ?? "";
   }
 
   public static function get_by_id(string $user_id): ?User
@@ -201,6 +205,35 @@ class User
     $stmt = $db->prepare("UPDATE users SET contact = :contact WHERE user_id = :id");
     $stmt->execute([
       ':contact' => $contact,
+      ':id' => $user_id,
+    ]);
+  }
+
+  public function update_profile_pic(): Result
+  {
+    try {
+      $stored = Image::store_image($this->id, 1);
+      if ($stored->isErr()) {
+        return $stored;
+      }
+      $target_loc = $stored->unwrap()[0];
+
+      var_dump($target_loc);
+      Database::connect();
+      $db = Database::db();
+      $db->beginTransaction();
+      self::internal_update_profile_pic($db, $this->id, $target_loc);
+      $db->commit();
+      return Result::Ok(true);
+    } catch (PDOException $e) {
+      return Result::Err(new InternalServerError("Error: " . $e->getMessage()));
+    }
+  }
+  static function internal_update_profile_pic($db, int $user_id, string $dir)
+  {
+    $stmt = $db->prepare("UPDATE users SET profile_pic = :pic WHERE user_id = :id");
+    $stmt->execute([
+      ':pic' => $dir,
       ':id' => $user_id,
     ]);
   }

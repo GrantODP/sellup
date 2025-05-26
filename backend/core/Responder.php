@@ -61,6 +61,12 @@ class Responder
   {
     self::error($message, 500);
   }
+
+  public static function result_error(Result $result): void
+  {
+    $error = $result->unwrapErr();
+    self::error($error->message, $error->code);
+  }
 }
 
 
