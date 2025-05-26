@@ -56,6 +56,13 @@ class SellerController
 
     return Responder::success();
   }
+  // GET /seller/listings
+  public static function get_listings()
+  {
+    $seller_id = $_GET["id"] ?? 0;
+    $listings = Listing::get_by_sid($seller_id);
+    return Responder::success($listings);
+  }
 
   // GET /seller
   public static function get_seller()

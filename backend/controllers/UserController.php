@@ -609,4 +609,30 @@ class UserController
 
     return Responder::success();
   }
+
+  //GET user/seller
+  public static function get_seller()
+  {
+
+    $auth_token = Authorizer::validate_token_header();
+
+    if (!$auth_token->is_valid()) {
+      return Responder::unauthorized($auth_token->message());
+    }
+
+    $user = User::get_by_id($auth_token->user_id());
+
+    if (empty($user)) {
+      return Responder::not_found("No user found matching auth token");
+    }
+
+
+    $seller = Seller::get_seller_by_user_id($user->id);
+
+    if (empty($seller)) {
+      return Responder::not_found('User is not a seller. Post a Ad to be a seller');
+    }
+
+    return Responder::success($seller);
+  }
 }

@@ -110,6 +110,25 @@ class Listing
     }
   }
 
+  public static function get_by_sid(int $seller_id): array
+  { {
+      try {
+        Database::connect();
+
+        $db = Database::db();
+        $stmt = $db->prepare('SELECT * FROM listing_details WHERE seller_id = :id');
+        $stmt->bindValue(':id', $seller_id);
+        $stmt->execute();
+
+        $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return  $row;
+      } catch (PDOException $e) {
+        echo "Error: " . $e->getMessage();
+      }
+      return [];
+    }
+  }
+
   public static function get_by_slug(string $slug): ?Listing
   {
     try {
