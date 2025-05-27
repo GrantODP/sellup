@@ -111,6 +111,26 @@ class UserController
     }
   }
 
+  // GET /user/reviews
+  public static function get_user_reviews()
+  {
+    $auth_token = Authorizer::validate_token_header();
+
+    if (!$auth_token->is_valid()) {
+      return Responder::unauthorized($auth_token->message());
+    }
+
+    $user = User::get_by_id($auth_token->user_id());
+
+    if (empty($user)) {
+      return Responder::not_found("user not found");
+    }
+
+    $reviews = Review::get_user_reviews($user->id);
+
+    return Responder::success($reviews);
+  }
+
   // PUT /user
   public static function update()
   {
@@ -133,6 +153,7 @@ class UserController
       $error = $result->unwrapErr();
       return Responder::error($error->message, $error->code);
     }
+    return Responder::success();
   }
 
   // PUT /user/password

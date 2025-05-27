@@ -4,7 +4,7 @@ $config =  [
     'host' => 'localhost',
     'user' => 'root',
     'password' => '',
-    'dbname' => 'mysql',
+    'dbname' => 'c2c',
   ],
   'llm' =>
   [

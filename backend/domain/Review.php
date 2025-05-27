@@ -91,6 +91,29 @@ class Review
     return null;
   }
 
+  public static function get_user_reviews(int $id): ?array
+  {
+
+    try {
+      Database::connect();
+
+      $db = Database::db();
+
+      $stmt = $db->prepare("SELECT * FROM review_details WHERE user_id = :id ");
+      $stmt->bindValue(":id", $id);
+      $stmt->execute();
+
+      $review = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+      if ($review) {
+        return  $review;
+      }
+    } catch (PDOException $e) {
+      echo "Error: " . $e->getMessage();
+    }
+    return null;
+  }
+
   public static function edit_review($id, string $message, int $rating): Result
   {
     $rating = min($rating, 5);

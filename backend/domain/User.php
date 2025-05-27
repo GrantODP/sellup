@@ -100,7 +100,7 @@ class User
     }
 
     if ($result['phone_exists']) {
-      return Result::Err(new ConflictError("Phone number already exists"));
+      return Result::Err(new ConflictError("Phone number already exists or belongs to someone else"));
     }
 
     if ($result['name_exists']) {

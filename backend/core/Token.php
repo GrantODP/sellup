@@ -62,7 +62,10 @@ class Tokener
 
   public static function get_token($user_id): Result
   {
+    try{
+    Database::connect();
     $db = Database::db();
+    
     $stmt = $db->prepare("SELECT token FROM tokens WHERE user_id = :id LIMIT 1");
 
     $stmt->execute(['id' => $user_id]);
@@ -72,6 +75,11 @@ class Tokener
     }
 
     return Result::Ok($row['token']);
+    } catch(PDOException $e)
+    {
+      return Result::Err(new InternalServerError($e->getMessage()));
+
+    }
   }
 
   public static function gen_user_token($user_id): Result
@@ -129,8 +137,10 @@ class Tokener
 
   private static function exists(string $token): bool
   {
+    Database::connect();
 
     $db = Database::db();
+
     $stmt = $db->prepare("SELECT * FROM tokens WHERE token = :token LIMIT 1");
     $stmt->execute(['token' => $token]);
     return $stmt->fetchColumn() !== false;
