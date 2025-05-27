@@ -119,6 +119,7 @@ export function switchImage(img, container_id) {
   const main = document.getElementById(container_id);
   if (main) {
     main.src = img.src;
+    storeSessionData('main-image-src', img.src);
   }
 }
 
@@ -134,44 +135,43 @@ export function getAdListings(category = 0, page = 1, limit = 5, sort = 'date', 
 export function populateProductImages(images) {
   const main_container = document.getElementById('product-image-container');
   const thumbnails_container = document.getElementById('product-image-thumbnails');
-
+  main_container.innerHTML = '';
   if (!images || images.length === 0) return;
 
   const main_id = 'main-product-image';
   const main = document.createElement('img');
-  const src = `/${images[0].path}`;
+  const src = `/c2c-commerce-site/${images[0].path}`;
+  storeSessionData('main-image-src', src);
 
   main.id = main_id;
   main.src = src;
   main.alt = "Main Product Image";
+  main.classList = "img-wrapper";
+  main.style.cssText = "max-height: 200px; overflow: hidden;";
   main.addEventListener('click', () => {
     Swal.fire({
-      imageUrl: src,
-      imageHeight: '100%',
+      imageUrl: getSessionData('main-image-src'),
+      imageAlt: 'Zoomed Product Image',
       imageWidth: '100%',
+      imageHeight: 'auto',
+      showConfirmButton: false,
+      background: '#f8f9fa',
+      padding: '1em',
+
     });
   });
   main_container.appendChild(main);
 
-
   images.forEach((img, index) => {
     const thumb = document.createElement('img');
-    thumb.src = `/${img.path}`;
+    thumb.classList = "img-thumbnail";
+    thumb.style.cssText = "width: 60px; height: auto; cursor: pointer;";
+    thumb.src = `/c2c-commerce-site/${img.path}`;
     thumb.alt = `Thumbnail ${index + 1} `;
     thumb.onclick = () => switchImage(thumb, main_id);
     thumbnails_container.appendChild(thumb);
   });
-  document.addEventListener('DOMContentLoaded', () => {
-    const mainImage = document.getElementById('main-product-image');
-    const container = document.getElementById('product-image-container');
 
-    let zoomed = false;
-
-    mainImage.addEventListener('click', () => {
-      zoomed = !zoomed;
-      container.classList.toggle('zoomed', zoomed);
-    });
-  });
 }
 export function renderErrorPage(container, message) {
   container.innerHTML = `
@@ -204,7 +204,7 @@ export function setOnClick(container_id, action) {
 }
 
 export function navigateWindow(page) {
-  return window.location.href = `/${page}`;
+  return window.location.href = `/c2c-commerce-site/${page}`;
 }
 
 export async function login(email, password) {
@@ -311,7 +311,9 @@ export async function pay(order_id, pay_info) {
 
 
 export async function updateUserInfo(user_info) {
-  return getResource('user', 'PUT', user_info);
+  const r = await getResource('user', 'PUT', user_info);
+  storeLocalData('user', await getUserInfo());
+  return r;
 }
 
 export async function updatePassword(old_pass, new_pass) {
@@ -372,4 +374,14 @@ export async function getSellerListings(id) {
 export async function getUserSellerInfo() {
   return getResource(`user/seller`);
 }
+
+export async function getHasPaidListing(id) {
+  return getResource(`user/orders/listings?id=${id}`);
+}
+
+export async function getUserReviews(listing_id = "") {
+  const param = listing_id ? `?id=${listing_id}` : '';
+  return getResource(`user/reviews${param}`);
+}
+
 

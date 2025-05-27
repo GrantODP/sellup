@@ -19,19 +19,19 @@ import {
 async function renderCategories() {
 
   const categories = await getCategories();
-  const container = document.getElementById(" category-container")
+  const container = document.getElementById("category-list")
   const category_name = getCookie('cat_name') ?? "";
   const name_container = document.getElementById("category-name");
   name_container.innerText = category_name;
 
   categories.forEach(cat => {
 
-    const button = document.createElement('button');
+    const button = document.createElement('a');
     button.textContent = cat.name;
-    button.className = "btn btn-outline-dark w-100 text-start rounded-0 border-top border-bottom";
+    button.className = "btn btn-outline-primary border text-start";
+    button.href = `/c2c-commerce-site/ads?category=${cat.cat_id}`
     button.addEventListener("click", () => {
       document.cookie = `cat_name=${cat.name}`;
-      window.location = `/ads?category=${cat.cat_id}`;
     })
     container.appendChild(button);
 
@@ -47,7 +47,6 @@ async function populateListings(listings) {
   }
   const template_html = await getTemplate('../frontend/views/ad_article.html');
   const template = document.createElement('article');
-  template.className = 'ad-listing';
   template.innerHTML = template_html.trim();
 
   for (const listing of listings) {
@@ -55,13 +54,13 @@ async function populateListings(listings) {
     const preview = await getPreview(listing.listing_id);
 
     if (preview) {
-      ad_article.querySelector('img').src = `/${preview.path}`;
+      ad_article.querySelector('img').src = `/c2c-commerce-site/${preview.path}`;
     }
 
     const date = new Date(listing.date);
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
 
-    ad_article.querySelector('a').href = `/ads/${listing.slug}`;
+    ad_article.querySelector('a').href = `/c2c-commerce-site/ads/${listing.slug}`;
     ad_article.querySelector('.ad-title').textContent = listing.title;
     ad_article.querySelector('.ad-price').textContent = `R${listing.price}`;
     ad_article.querySelector('.ad-description').textContent = listing.description;

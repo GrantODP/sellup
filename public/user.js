@@ -1,4 +1,4 @@
-import { checkout, getCart, getListing, getLocalData, getOrder, getOrders, getSessionData, getUrlParams, getUserInfo, isLoggedIn, navigateWindow, removeCartItem, storeSessionData, updatePassword, updateUserInfo } from "./script.js";
+import { checkout, getCart, getListing, getLocalData, storeLocalData, getOrder, getOrders, getSessionData, getUrlParams, getUserInfo, isLoggedIn, navigateWindow, removeCartItem, storeSessionData, updatePassword, updateUserInfo } from "./script.js";
 import Swal from 'https://cdn.jsdelivr.net/npm/sweetalert2@11/+esm';
 
 async function loadSection(section) {
@@ -18,7 +18,9 @@ async function loadUser() {
   content.innerHTML = '';
 
   try {
-    const user = getLocalData("user");
+    const user = getLocalData("user") ?? await getUserInfo();;
+    console.log(user);
+    storeLocalData('user', user);
 
     const userCard = document.createElement('div');
     userCard.className = 'card p-4';
@@ -47,7 +49,6 @@ async function loadUser() {
 
   } catch (err) {
     content.innerHTML = `<div class="alert alert-danger">Failed to load user info</div>`;
-    console.error('Error loading user info:', err);
   }
 }
 
@@ -73,8 +74,6 @@ async function loadOrders(container) {
 
   // Sort statuses: paid first, others after alphabetically
   const sortedStatuses = Object.keys(grouped).sort((a, b) => {
-    // if (a === 'paid') return -1;
-    // if (b === 'paid') return 1;
     return a.localeCompare(b);
   });
 
@@ -218,7 +217,7 @@ async function loadCart(container) {
       <div class="text-center my-5">
         <h3>Your cart is empty 🛒</h3>
         <p>Looks like you haven't added anything yet.</p>
-        <a href="/browse" class="btn btn-primary mt-3">Start Shopping</a>
+        <a href="/c2c-commerce-site/browse" target="_blank" class="btn btn-primary mt-3">Start Shopping</a>
       </div>
     `;
     return;
@@ -314,12 +313,8 @@ async function loadEditProfile() {
     <h3>Edit Profile</h3>
     <form id="edit-profile-form" class="mb-4">
       <div class="mb-3">
-        <label for="username" class="form-label">Username</label>
-        <input type="text" id="username" class="form-control" value="${user.username}" required>
-      </div>
-      <div class="mb-3">
-        <label for="email" class="form-label">Email</label>
-        <input type="email" id="email" class="form-control" value="${user.email}" required>
+        <label for="contact" class="form-label">Contact</label>
+        <input type="tel" id="contact" class="form-control" value="${user.contact}" required>
       </div>
       <button type="submit" class="btn btn-primary">Save Changes</button>
     </form>
@@ -328,8 +323,7 @@ async function loadEditProfile() {
   document.getElementById('edit-profile-form').addEventListener('submit', async function (e) {
     e.preventDefault();
     const updated = {
-      username: document.getElementById('username').value,
-      email: document.getElementById('email').value,
+      contact: document.getElementById('contact').value,
     };
     try {
       await updateUserInfo(updated);

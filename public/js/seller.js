@@ -38,7 +38,7 @@ async function loadSeller(container) {
         <p><strong>Name:</strong> ${seller.name}</p>
         <p><strong>Contact:</strong> ${seller.contact}</p>
         <p><strong>Verification status:</strong> ${seller.verification}</p>
-        <p><strong>Joined:</strong> ${new Date(seller.created_at).toLocaleDateString()}</p>
+        <p><strong>Selling from:</strong> ${new Date(seller.created_at).toLocaleDateString()}</p>
       </div>
     `;
 
@@ -70,7 +70,7 @@ async function loadAds(container) {
           <p class="card-text">
             <small class="text-muted">Posted on: ${new Date(ad.date).toLocaleDateString()}</small>
           </p>
-          <a href="/${SITE}/ads/${ad.slug}" class="btn btn-primary me-2">View</a>
+          <a href="/${SITE}/ads/${ad.slug}" target="_blank" class="btn btn-primary me-2">View</a>
           <button class="btn btn-secondary edit-btn" data-ad-id="${ad.listing_id}">Edit</button>
         </div>
       </div>

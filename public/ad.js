@@ -16,6 +16,10 @@ import {
   getSessionData,
   isLoggedIn,
   reportAd,
+  getUserReviews,
+  getHasPaidListing,
+  writeReview,
+  navigateWindow,
 } from './script.js';
 
 import { marked } from 'https://cdn.jsdelivr.net/npm/marked@5.1.0/lib/marked.esm.js';
@@ -73,30 +77,108 @@ async function renderSeller(id) {
   }
 }
 
-function renderSingleReview(review_data) {
-  const container = document.getElementById('reviews-container');
+function renderSingleReview(review_data, container) {
   const review = document.createElement('div');
-  review.classList.add('review');
   review.innerHTML = `
-    <div class="review-header">
-      <div>
-        <div class="review-username">${review_data.user_name}</div>
-        <div class="review-date">${review_data.created_at}</div>
+  <div class="card mb-3">
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-start mb-2">
+        <div>
+          <h6 class="mb-1">${review_data.user_name}</h6>
+          <small class="text-muted">${review_data.created_at}</small>
+        </div>
+        <div>
+          <span class="badge bg-warning text-dark fs-6">${review_data.rating}⭐</span>
+        </div>
       </div>
-      <div class="review-score">⭐ ${review_data.rating}</div>
+      <p class="mb-0">${review_data.message}</p>
     </div>
-    <div class="review-text">${review_data.message}</div>
-  `;
+  </div>
+`;
 
   container.appendChild(review);
 
 }
+function showUserReview(review) {
+  const container = document.getElementById('user-review');
+  container.classList.replace('d-none', 'd-block');
+
+  document.getElementById('review-rating').textContent = `${review.score}`;
+  document.getElementById('review-message').textContent = review.message;
+  document.getElementById('review-date').textContent = review.created_at;
+  const edit = document.getElementById('review-edit-btn');
+
+
+  window.currentReview = review;
+  edit.addEventListener('click', (e) => {
+    document.getElementById('review-write-h').textContent = "Edit Review";
+    showWriteReview(review);
+  })
+}
+
+function showWriteReview(review = {}) {
+  const ad = getSessionData('ad');
+  const formContainer = document.getElementById('write-review');
+  formContainer.classList.replace('d-none', 'd-block');
+
+  const rating = formContainer.querySelector('#rating');
+  const message = formContainer.querySelector('#message');
+  rating.value = review.score || 1;
+  message.value = review.message || "";
+
+  formContainer.addEventListener('submit', async function (e) {
+    e.preventDefault()
+    try {
+      await writeReview(ad.listing_id, rating.value, message.value);
+      Swal.fire({
+        title: 'Success',
+        text: 'Your review has been submitted.',
+        icon: 'success',
+        confirmButtonText: 'OK'
+      }).then(async function () {
+        formContainer.classList.replace('d-block', 'd-none');
+        await renderUpdatableInfo(ad);
+      });
+
+    } catch (err) {
+      Swal.fire({
+        icon: 'error',
+        title: err.message,
+      });
+    }
+  });
+}
+
+
+async function loadUserReviews(listing_id) {
+  try {
+    const review = await getUserReviews(listing_id);
+
+    if (review) {
+      return showUserReview(review);
+    }
+    console.log("No reviews");
+    const paid_order = await getHasPaidListing(listing_id);
+
+    if (paid_order) {
+      showWriteReview();
+    }
+  } catch (err) {
+    console.log(err);
+
+  }
+}
+
 
 async function renderReviews(id) {
   try {
+
+    await loadUserReviews(id);
     const reviews = await getAdReviews(id);
+    const container = document.getElementById('reviews-container');
+    container.innerHTML = '';
     reviews.forEach(element => {
-      renderSingleReview(element)
+      renderSingleReview(element, container);
     });
   } catch (err) {
     const container = document.getElementById('reviews-container');
@@ -206,6 +288,12 @@ async function setAddToCart() {
   }
 
 }
+async function renderUpdatableInfo(ad) {
+  await renderAdScore(ad.listing_id);
+  await renderSeller(ad.seller_id);
+  await renderReviews(ad.listing_id);
+
+}
 async function renderAd(slug) {
   const container = document.getElementById('page-body');
   const ad = await getSingleAd(slug);
@@ -219,9 +307,8 @@ async function renderAd(slug) {
   container.querySelector('#eval_btn').onclick = () => { eval_product(ad.listing_id) };
   container.querySelector('#add-cart-btn').onclick = setAddToCart;
   container.querySelector('#report-ad').onclick = setReportAd;
-  await renderAdScore(ad.listing_id);
-  await renderSeller(ad.seller_id);
-  await renderReviews(ad.listing_id);
+
+  await renderUpdatableInfo(ad);
   await renderAdImages(ad.listing_id);
 
 
