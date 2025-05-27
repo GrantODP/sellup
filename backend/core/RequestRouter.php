@@ -52,7 +52,7 @@ class Router
     if (self::dynamic_call($path, $this->dynamic_get_routes)) {
       return;
     }
-    return Responder::bad_request("Unknown request");
+    return Responder::not_found("Unknown request");
   }
   public function post($path)
   {
@@ -60,7 +60,7 @@ class Router
       return;
     };
 
-    return Responder::bad_request("Unknown request");
+    return Responder::not_found("Unknown request");
   }
   public function put($path)
   {
@@ -68,7 +68,7 @@ class Router
       return;
     };
 
-    return Responder::bad_request("Unknown request");
+    return Responder::not_found("Unknown request");
   }
 
   public function delete_op($path)
@@ -77,29 +77,29 @@ class Router
       return;
     };
 
-    return Responder::bad_request("Unknown request");
+    return Responder::not_found("Unknown request");
   }
 
-  public function handle($controller = "")
+  public function handle($default = "", $controller = "")
   {
     $method = $_SERVER['REQUEST_METHOD'];
     $uri = $_SERVER['REQUEST_URI'];
-    $path = parse_url($uri, PHP_URL_PATH);
+    $uri = parse_url($uri, PHP_URL_PATH);
+    $uri = rtrim($uri, '/');
+    $uri = $uri === '' ? '/' : $uri;
 
     if ($method === 'GET') {
-      $this->get($path);
+      $this->get($uri);
     } elseif ($method === 'POST') {
-      $this->post($path);
+      $this->post($uri);
     } elseif ($method === 'PUT') {
-      $this->put($path);
+      $this->put($uri);
     } elseif ($method === 'DELETE') {
-      $this->delete_op($path);
-    } else {
-      if ($controller) {
-        call_user_func($controller);
-      } else {
-        return Responder::bad_request("Unknown request " . $method);
-      }
+      $this->delete_op($uri);
+    }
+
+    if ($uri === $default) {
+      call_user_func($controller);
     }
   }
   private static function call($path, $router): bool
