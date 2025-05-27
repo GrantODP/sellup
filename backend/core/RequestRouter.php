@@ -80,7 +80,7 @@ class Router
     return Responder::bad_request("Unknown request");
   }
 
-  public function handle()
+  public function handle($controller = "")
   {
     $method = $_SERVER['REQUEST_METHOD'];
     $uri = $_SERVER['REQUEST_URI'];
@@ -95,7 +95,11 @@ class Router
     } elseif ($method === 'DELETE') {
       $this->delete_op($path);
     } else {
-      Responder::bad_request("Unknown request " . $method);
+      if ($controller) {
+        call_user_func($controller);
+      } else {
+        return Responder::bad_request("Unknown request " . $method);
+      }
     }
   }
   private static function call($path, $router): bool
