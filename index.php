@@ -112,5 +112,5 @@ $router->add_get('/c2c-commerce-site/seller', 'PageController::seller');
 
 
 
-
-$router->handle();
+$default = 'PageController::get_all_ads_page';
+$router->handle("", $default);
