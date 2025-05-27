@@ -114,6 +114,8 @@ class UserController
   // GET /user/reviews
   public static function get_user_reviews()
   {
+    $id = trim($_GET['id'] ?? 0);
+
     $auth_token = Authorizer::validate_token_header();
 
     if (!$auth_token->is_valid()) {
@@ -126,7 +128,7 @@ class UserController
       return Responder::not_found("user not found");
     }
 
-    $reviews = Review::get_user_reviews($user->id);
+    $reviews = Review::get_user_reviews($user->id, $id);
 
     return Responder::success($reviews);
   }

@@ -91,19 +91,28 @@ class Review
     return null;
   }
 
-  public static function get_user_reviews(int $id): ?array
+  public static function get_user_reviews(int $uid, int $listing_id = 0): ?array
   {
-
     try {
       Database::connect();
 
       $db = Database::db();
+      $params = [];
+      $sql =  "SELECT * FROM review_details WHERE user_id = :id ";
+      $params[':id'] = $uid;
 
-      $stmt = $db->prepare("SELECT * FROM review_details WHERE user_id = :id ");
-      $stmt->bindValue(":id", $id);
-      $stmt->execute();
+      if (!empty($listing_id)) {
+        $sql = $sql . " AND listing_id = :lid ";
+        $params[':lid'] = $listing_id;
+        $stmt = $db->prepare($sql);
+        $stmt->execute($params);
+        $review = $stmt->fetch(PDO::FETCH_ASSOC);
+      } else {
+        $stmt = $db->prepare($sql);
+        $stmt->execute($params);
 
-      $review = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $review = $stmt->fetchAll(PDO::FETCH_ASSOC);
+      }
 
       if ($review) {
         return  $review;
