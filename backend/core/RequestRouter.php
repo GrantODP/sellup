@@ -80,14 +80,19 @@ class Router
     return Responder::not_found("Unknown request");
   }
 
+  private static function clean_uri($uri): string
+  {
+    $uri = rtrim($uri, '/');
+    $uri = $uri === '' ? '/' : $uri;
+    return $uri;
+  }
+
   public function handle($default = "", $controller = "")
   {
     $method = $_SERVER['REQUEST_METHOD'];
     $uri = $_SERVER['REQUEST_URI'];
     $uri = parse_url($uri, PHP_URL_PATH);
-    $uri = rtrim($uri, '/');
-    $uri = $uri === '' ? '/' : $uri;
-
+    $uri = self::clean_uri($uri);
     if ($method === 'GET') {
       $this->get($uri);
     } elseif ($method === 'POST') {
@@ -98,7 +103,7 @@ class Router
       $this->delete_op($uri);
     }
 
-    if ($uri === $default) {
+    if ($uri === self::clean_uri($default)) {
       call_user_func($controller);
     }
   }
