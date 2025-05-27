@@ -3,12 +3,11 @@
 
 <head>
   <meta charset="UTF-8">
-  <base href="/public/">
+  <base href="/c2c-commerce-site/public/">
   <title>Ad listings</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
 </head>
 
 <body class="bg-light">
@@ -22,8 +21,12 @@
       <button class="btn btn-success w-100" type="submit">Search</button>
     </div>
   </form>
-  <div class="product" id="page-body">
-    <p>Loading resource</p>
+  <div class="container my-5 mx-1">
+    <div class="card text-center">
+      <div class="card-body" id="page-body">
+        <p class="mb-0">Loading resource...</p>
+      </div>
+    </div>
   </div>
   <script type="module" src="all.js"></script>
   <script src="js/navbar.js"></script>

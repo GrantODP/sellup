@@ -1,17 +1,36 @@
-<a href="#" class="ad-container">
-  <div class="ad-image">
-    <img id="ad-image" alt="ad image">
-  </div>
-  <div class="ad-link">
-    <div class="ad-header">
-      <h2 class="ad-title"></h2>
-      <span class="ad-price"></span>
-    </div>
-    <p class="ad-description"></p>
-    <div class="ad-meta">
-      <span class="ad-date"></span>
-      <span class="ad-location"></span>
-    </div>
-  </div>
+<a href="#" class="text-decoration-none text-dark">
+  <div class="card mb-3 shadow-sm">
+    <div class="row g-0">
+      <!-- Ad Image -->
+      <div class="col-md-4 d-flex justify-content-center align-items-center"
+        style="max-width: 200px; height: 200px; overflow: hidden;">
+        <img id="ad-image" class="img-fluid p-2 h-100 w-100 object-fit-cover rounded-start" alt="Ad image">
+      </div>
 
+      <!-- Ad Details -->
+      <div class="col-md-8 d-flex flex-column">
+        <div class="card-body d-flex flex-column justify-content-between p-3" style="min-height: 150px;">
+
+          <!-- Top  title + price -->
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h5 class="card-title mb-0 ad-title">Ad Title</h5>
+            <span class="text-success fw-bold ad-price">R 123</span>
+          </div>
+
+          <!-- Middle -->
+          <p class="card-text ad-description  mb-2 text-truncate text-start"
+            style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
+            Short description goes here that might be very long and should be truncated with an ellipsis.
+          </p>
+
+          <!-- Bottom row: date , location -->
+          <div class="d-flex justify-content-between text-muted small ad-meta">
+            <span class="ad-date">Posted on May 25</span>
+            <span class="ad-location">Cape Town</span>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
 </a>

@@ -44,6 +44,7 @@ $router->add_get('/c2c-commerce-site/api/user/cart', 'UserController::get_cart')
 $router->add_delete('/c2c-commerce-site/api/user/cart', 'UserController::delete_cart_item');
 $router->add_post('/c2c-commerce-site/api/user/cart/checkout', 'UserController::checkout');
 $router->add_get('/c2c-commerce-site/api/user/orders', 'UserController::get_orders');
+$router->add_get('/c2c-commerce-site/api/user/reviews', 'UserController::get_user_reviews');
 $router->add_delete('/c2c-commerce-site/api/user/orders', 'UserController::delete_order');
 $router->add_post('/c2c-commerce-site/api/user/orders/pay', 'UserController::pay_order');
 $router->add_put('/c2c-commerce-site/api/user', 'UserController::update');
@@ -52,6 +53,8 @@ $router->add_put('/c2c-commerce-site/api/user/reviews', 'UserController::edit_re
 $router->add_post('/c2c-commerce-site/api/listings/reviews', 'UserController::write_review');
 $router->add_get('/c2c-commerce-site/api/user/seller', 'UserController::get_seller');
 $router->add_post('/c2c-commerce-site/api/user/profile-pic', 'UserController::upload_profile_pic');
+$router->add_get('/c2c-commerce-site/api/user/orders/listings', 'UserController::get_is_listing_paid');
+
 //SellerController
 $router->add_post('/c2c-commerce-site/api/listings', 'SellerController::post_listing');
 $router->add_get('/c2c-commerce-site/api/sellers/listings', 'SellerController::get_listings');
@@ -88,15 +91,16 @@ $router->add_get('/c2c-commerce-site/media/{slug}', 'MediaController::get');
 //ONLY GETS
 //Views 
 
-$router->add_get('/ads/{slug}', 'PageController::get_ad_page');
-$router->add_get('/ads', 'PageController::get_all_ads_page');
-$router->add_get('/browse', 'PageController::get_all_ads_page');
-$router->add_get('/user', 'PageController::get_user');
-$router->add_get('/login', 'PageController::login');
-$router->add_get('/pay', 'PageController::payment');
-$router->add_get('/post-ad', 'PageController::post_ad');
-$router->add_get('/create-account', 'PageController::create_account');
-$router->add_get('/seller', 'PageController::seller');
+$router->add_get('/c2c-commerce-site/test', 'TestController::test');
+$router->add_get('/c2c-commerce-site/ads/{slug}', 'PageController::get_ad_page');
+$router->add_get('/c2c-commerce-site/ads', 'PageController::get_all_ads_page');
+$router->add_get('/c2c-commerce-site/browse', 'PageController::get_all_ads_page');
+$router->add_get('/c2c-commerce-site/user', 'PageController::get_user');
+$router->add_get('/c2c-commerce-site/login', 'PageController::login');
+$router->add_get('/c2c-commerce-site/pay', 'PageController::payment');
+$router->add_get('/c2c-commerce-site/post-ad', 'PageController::post_ad');
+$router->add_get('/c2c-commerce-site/create-account', 'PageController::create_account');
+$router->add_get('/c2c-commerce-site/seller', 'PageController::seller');
 
 
 

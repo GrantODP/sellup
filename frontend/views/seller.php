@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <base href="/public/">
+  <base href="/c2c-commerce-site/public/">
   <title>Seller Profile</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
@@ -23,7 +23,7 @@
             class=" btn btn-outline-light w-100 text-start border-top border-bottom border-0 rounded-0 text-white bg-transparent">
             Listed Ads
           </button>
-          <a id="btn-post-ad" href='/c2c-commerce-site/post-ad'
+          <a id="btn-post-ad" href='/c2c-commerce-site/post-ad' target="_blank"
             class=" btn btn-outline-light w-100 text-start border-top border-bottom border-0 rounded-0 text-white bg-transparent">
             Post Ad
           </a>

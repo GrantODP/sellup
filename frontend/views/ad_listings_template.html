@@ -1,13 +1,17 @@
-<div class="container-fluid mt-5">
+<div class="container-fluid mt-5 justify-content-start">
 
-  <div id="category-name"> Cat Name</div>
+  <div id="category-name" class="mb-5 "></div>
 
   <div id="ads-page-container" class="row">
-    <nav id=" category-container" class=" col-3 justify-items-start bg-light border rounded p-3py-4 px-0">
-
+    <!-- Sidebar: Categories -->
+    <nav id="category-container" class="col-md-3 mb-4 border">
+      <div class="bg-light rounded p-3 w-100 h-auto">
+        <h5 class="mb-3">Categories</h5>
+        <ul class="list-group btn-group-vertical" id="category-list">
+        </ul>
+      </div>
     </nav>
-
-    <div id="ads-container" class="main-content">
+    <div id="ads-container" class="col-md-9 mt-5">
     </div>
   </div>
 </div>
