@@ -497,7 +497,36 @@ class UserController
 
     return Responder::success($order);
   }
+  //GET users/orders/listings
+  public static function get_is_listing_paid()
+  {
 
+    $auth_token = Authorizer::validate_token_header();
+    $listing = $_GET['id'] ?? 0;
+    if (!$auth_token->is_valid()) {
+      return Responder::unauthorized($auth_token->message());
+    }
+
+    $user = User::get_by_id($auth_token->user_id());
+
+    if (empty($user)) {
+      return Responder::not_found("No user found matching auth token");
+    }
+
+    $listing = Listing::get_by_id($listing);
+
+    if (empty($listing)) {
+      return Responder::not_found("No listing found matching id");
+    }
+
+    $result = Order::has_paid_ordered($auth_token->user_id(), $listing);
+
+    if ($result->isErr()) {
+      return Responder::result_error($result);
+    }
+
+    return Responder::success($result->unwrap());
+  }
   //PUT users/review
   public static function edit_review()
   {
@@ -612,6 +641,11 @@ class UserController
     }
 
     $can_order = Order::has_paid_ordered($auth_token->user_id(), $listing);
+
+    if ($can_order->isErr()) {
+      return Responder::result_error($can_order);
+    }
+
     if (!$can_order->unwrap()) {
       return Responder::forbidden("User has not paid for a listing");
     }
