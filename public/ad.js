@@ -1,4 +1,5 @@
 import {
+toLocalDateStr,
   renderErrorPage,
   getAdImagesLinks,
   getAdReviews,
@@ -302,6 +303,7 @@ async function renderAd(slug) {
   await loadTemplates(container, '../frontend/views/ad_tempalte.html');
 
   container.querySelector('#ptitle').innerText = document.title;
+  container.querySelector('#date-post').innerText = `Posted: ${toLocalDateStr(ad.date).toLocaleDateString()}`;
   container.querySelector('#ad-descp-body').innerText = ad.description;
   container.querySelector('#price').innerText = "R" + ad.price;
   container.querySelector('#eval_btn').onclick = () => { eval_product(ad.listing_id) };
