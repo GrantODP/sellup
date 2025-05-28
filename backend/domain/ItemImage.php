@@ -158,7 +158,6 @@ class Image
       $values[] = $upload;
       $values[] = $listing_id;
     }
-    var_dump($uploaded);
     try {
       Database::connect();
 
