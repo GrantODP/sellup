@@ -13,7 +13,7 @@ class AdminController
 {
 
 
-  static function handle_admin(): Result
+  public static function handle_admin(): Result
   {
     $auth_token = Authorizer::validate_token_header();
     if (!$auth_token->is_valid()) {
