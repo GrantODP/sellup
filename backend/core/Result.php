@@ -66,7 +66,13 @@ class InternalServerError extends ErrorType
     parent::__construct($message, 500);
   }
 }
-
+class NoContent extends ErrorType
+{
+  public function __construct(string $message = "No Content")
+  {
+    parent::__construct($message, 204);
+  }
+}
 
 abstract class Result
 {
