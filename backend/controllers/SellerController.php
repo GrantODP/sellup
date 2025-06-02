@@ -1,6 +1,7 @@
 <?php
 require_once './backend/domain/User.php';
 require_once './backend/domain/Listing.php';
+require_once './backend/domain/Location.php';
 require_once './backend/domain/Seller.php';
 require_once './backend/domain/Rating.php';
 require_once './backend/core/Token.php';;
@@ -12,15 +13,15 @@ class SellerController
 {
 
 
-  // POST /ad
+  // POST /listings
   public static function post_listing()
   {
     $input = get_input_json();
-    if ($input == null) {
+    if (empty($input)) {
       return Responder::bad_request("No json provided or failed parsing json");
     }
-    if (!has_required_keys($input, ['price', 'cat_id', 'location_id', 'title'])) {
-      return Responder::bad_request("Missing one or more of the following parameters: {price, cat_id, location_id, title");
+    if (!has_required_keys($input, ['price', 'cat_id', 'province', 'city', 'title'])) {
+      return Responder::bad_request("Missing one or more of the following parameters: {price, cat_id, province, city, title");
     }
 
     $auth_token = Authorizer::validate_token_header();
@@ -31,10 +32,21 @@ class SellerController
 
     $seller = Seller::get_or_insert($auth_token->user_id());
 
-    if ($seller == null) {
+    $location = Location::get_or_insert(
+      sentence_case($input['province']),
+      sentence_case($input['city'])
+    );
+    if (empty($seller)) {
       return Responder::server_error("Unable to create a seller");
     }
+
+    if ($location->isErr()) {
+      $error = $location->unwrapErr();
+      return Responder::server_error("Unable to find or make location: $error");
+    }
+
     $input['seller_id'] = $seller->seller_id;
+    $input['location_id'] = $location->unwrap();
     $listing_submission = new ListingSubmission($input);
     $list_result = Listing::post($listing_submission);
 
@@ -43,6 +55,13 @@ class SellerController
     }
 
     return Responder::success();
+  }
+  // GET /seller/listings
+  public static function get_listings()
+  {
+    $seller_id = $_GET["id"] ?? 0;
+    $listings = Listing::get_by_sid($seller_id);
+    return Responder::success($listings);
   }
 
   // GET /seller
@@ -79,5 +98,120 @@ class SellerController
     }
 
     return Responder::success($rating);
+  }
+
+  // PUT /sellers/listings
+  public static function update_listing()
+  {
+
+    $input = get_input_json();
+    if (empty($input)) {
+      return Responder::bad_request("No json provided or failed parsing json");
+    }
+    if (!has_required_keys($input, ['listing_id', 'price', 'title', 'description',])) {
+      return Responder::bad_request("Missing one or more   parameters");
+    }
+
+    $auth_token = Authorizer::validate_token_header();
+
+    if (!$auth_token->is_valid()) {
+      return Responder::unauthorized($auth_token->message());
+    }
+    $listing = Listing::get_by_id($input['listing_id']);
+    $seller = Seller::get_or_insert($auth_token->user_id());
+    if (empty($listing)) {
+      return Responder::not_found("No listing matching id");
+    }
+    if (empty($seller)) {
+      return Responder::forbidden("User is not a seller");
+    }
+
+    if ($listing->seller_id != $seller->seller_id) {
+      return Responder::forbidden("Seller is not the owner of listing");
+    }
+
+    $input['seller_id'] = $seller->seller_id;
+    $sub = new ListingSubmission($input, $listing->listing_id);
+
+    $result = Listing::update($sub);
+
+    if ($result->isErr()) {
+      return Responder::server_error($result->unwrapErr());
+    }
+
+    return Responder::success();
+  }
+
+  // DELETE /seller/listings
+  public static function delete_listing()
+  {
+
+    $auth_token = Authorizer::validate_token_header();
+
+    if (!$auth_token->is_valid()) {
+      return Responder::unauthorized($auth_token->message());
+    }
+    $listing_id = $_GET["id"] ?? 0;
+    $seller = Seller::get_seller_by_user_id($auth_token->user_id());
+
+    if (empty($seller)) {
+      return Responder::forbidden("User is not a seller");
+    }
+
+
+    $result = Listing::delete_listing($seller, $listing_id);
+
+    if ($result->isErr()) {
+      return Responder::result_error($result);
+    }
+
+    $can_update = $result->unwrap();
+    if (!$can_update) {
+      return Responder::not_found("Seller does not have listing matching id");
+    }
+
+    return Responder::success();
+  }
+  //POST /listings/media
+  public static function add_listing_images()
+  {
+    if (!isset($_FILES['images'])) {
+      return Responder::bad_request("No files uploaded");
+    }
+
+    $id = $_GET['id'] ?? null;
+    if ($id === null) {
+      return Responder::bad_request("missing id");
+    }
+
+    $auth_token = Authorizer::validate_token_header();
+
+    if (!$auth_token->is_valid()) {
+      return Responder::bad_request($auth_token->message());
+    }
+
+    $seller = Seller::get_seller_by_user_id($auth_token->user_id());
+    $listing = Listing::get_by_id($id);
+
+    if (empty($listing)) {
+      return Responder::server_error("Unable to find listing: " . $id);
+    }
+    if (empty($seller)) {
+      return Responder::server_error("Unable to find seller for listing: " . $id);
+    }
+
+    if ($listing->seller_id !== $seller->seller_id) {
+      return Responder::unauthorized("Not authorized to edit listing");
+    }
+
+
+    $result = Image::save($listing->listing_id);
+
+    if ($result->isErr()) {
+      return Responder::server_error('Failed uploading: ' . implode(",", $result->unwrapErr()));
+    }
+
+
+    return Responder::success($result->unwrap());
   }
 }

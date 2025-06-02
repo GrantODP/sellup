@@ -1,7 +1,12 @@
 RewriteEngine On
 
-RewriteRule ^/index\.php$ - [L,NC]
+# Skip rewriting for actual files and directories (including in public)
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
 
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule . index.php [L]
+# Rewrite requests for static files to /public/
+RewriteRule ^(css|js|images|media|public)/(.*)$ public/$2 [L]
+
+# All other routes go to index.php (the router)
+RewriteRule ^ index.php [QSA,L]

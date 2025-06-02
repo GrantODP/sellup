@@ -5,11 +5,11 @@ require_once './backend/core/Result.php';
 
 enum TokenStatus: string
 {
-  case Expired = 'expired: login in again';
+  case Expired = 'expired';
   case Valid = 'valid';
-  case Invalid = 'invalid: not logged in';
-  case Unknown = 'Unknown token';
-  case Missing = 'No token authorization';
+  case Invalid = 'invalid';
+  case Unknown = 'unknown';
+  case Missing = 'missing';
 }
 
 class Token
@@ -60,6 +60,28 @@ class Tokener
   }
 
 
+  public static function get_token($user_id): Result
+  {
+    try{
+    Database::connect();
+    $db = Database::db();
+    
+    $stmt = $db->prepare("SELECT token FROM tokens WHERE user_id = :id LIMIT 1");
+
+    $stmt->execute(['id' => $user_id]);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (empty($row)) {
+      return Result::Err(new NotFoundError("No token with matching user"));
+    }
+
+    return Result::Ok($row['token']);
+    } catch(PDOException $e)
+    {
+      return Result::Err(new InternalServerError($e->getMessage()));
+
+    }
+  }
+
   public static function gen_user_token($user_id): Result
   {
     $token = self::generate();
@@ -86,7 +108,7 @@ class Tokener
         ':expires_at' => $expires_at
       ]);
     } catch (PDOException $e) {
-      return Result::Err("Error: " . $e->getMessage());
+      return Result::Err(new UnauthorizedError($e->getMessage()));
     }
     return Result::Ok(null);
   }
@@ -94,15 +116,17 @@ class Tokener
   public static function get_user_id_from_token(string $token): Result
   {
     try {
+      Database::connect();
       $db = Database::db();
       $stmt = $db->prepare("SELECT * FROM tokens WHERE token = :token LIMIT 1");
       $stmt->execute(['token' => $token]);
       $row = $stmt->fetch(PDO::FETCH_ASSOC);
-      if ($row === null) {
-        Result::Err("Token not found");
+
+      if (empty($row)) {
+        return Result::Err(new NotFoundError("Auth token not found. Must login"));
       }
     } catch (PDOException $e) {
-      return Result::Err("Error: " . $e->getMessage());
+      return Result::Err(new UnauthorizedError($e->getMessage()));
     }
 
     return Result::Ok($row);
@@ -113,8 +137,10 @@ class Tokener
 
   private static function exists(string $token): bool
   {
+    Database::connect();
 
     $db = Database::db();
+
     $stmt = $db->prepare("SELECT * FROM tokens WHERE token = :token LIMIT 1");
     $stmt->execute(['token' => $token]);
     return $stmt->fetchColumn() !== false;

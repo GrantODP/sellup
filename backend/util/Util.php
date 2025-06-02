@@ -3,13 +3,27 @@
 
 function get_input_json(): ?array
 {
-  $input = file_get_contents(('php://input'));
-  $data = json_decode($input, true);
+  $data = null;
+  if ($_SERVER['CONTENT_TYPE'] === 'application/json') {
+    $data = json_decode(file_get_contents('php://input'), true);
+  } else {
+    $data = $_POST;
+  }
   return $data;
 }
 
-function has_required_keys(array $data, array $keys): bool
+function sentence_case($string)
 {
+  $string = strtolower($string);
+  return ucfirst($string);
+}
+
+function has_required_keys(?array $data, array $keys): bool
+{
+  if (!$data) {
+    return false;
+  }
+
   foreach ($keys as $key) {
     if (!array_key_exists($key, $data)) {
       return false;

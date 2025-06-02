@@ -8,6 +8,9 @@ class Seller
   public string $seller_id;
   public string $verification;
   public string $created_at;
+  public string $name;
+  /* public string $email; */
+  public string $contact;
 
 
 
@@ -16,6 +19,9 @@ class Seller
     $this->seller_id = $seller['seller_id'];
     $this->created_at = $seller['created_at'];
     $this->verification = $seller['verification_status'];
+    $this->name = $seller['user_name'];
+    /* $this->email = $seller['email']; */
+    $this->contact = $seller['contact'];
   }
 
 
@@ -31,7 +37,7 @@ class Seller
         ':userid' => $user_id,
       ]);
     } catch (PDOException $e) {
-      return Result::Err("Error: " . $e->getMessage());
+      return Result::Err(new InternalServerError("Error: " . $e->getMessage()));
     }
     return Result::Ok(null);
   }
@@ -44,7 +50,7 @@ class Seller
       Database::connect();
 
       $db = Database::db();
-      $stmt = $db->prepare("SELECT * FROM sellers WHERE seller_id = :seller LIMIT 1");
+      $stmt = $db->prepare("SELECT * FROM seller_user_details WHERE seller_id = :seller LIMIT 1");
       $stmt->bindValue(':seller', $seller_id);
       $stmt->execute();
 
@@ -60,7 +66,23 @@ class Seller
     }
     return null;
   }
+  public static function get_all(): ?array
+  {
 
+    try {
+      Database::connect();
+
+      $db = Database::db();
+      $stmt = $db->prepare("SELECT * FROM seller_user_details ");
+      $stmt->execute();
+
+      $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
+      return $row;
+    } catch (PDOException $e) {
+      echo "Error: " . $e->getMessage();
+    }
+    return null;
+  }
   public static function get_user_id(int $seller_id): ?int
   {
 
@@ -90,7 +112,7 @@ class Seller
       Database::connect();
 
       $db = Database::db();
-      $stmt = $db->prepare("SELECT * FROM sellers WHERE user_id = :user_id LIMIT 1");
+      $stmt = $db->prepare("SELECT * FROM seller_user_details WHERE user_id = :user_id LIMIT 1");
       $stmt->bindValue(':user_id', $user_id);
       $stmt->execute();
 
@@ -121,5 +143,28 @@ class Seller
     }
 
     return self::get_seller_by_user_id($user_id);
+  }
+  public static function update_verification(int $sell_id, $status): Result
+  {
+
+    try {
+      Database::connect();
+      $db = Database::db();
+      $db->beginTransaction();
+      self::_update_verification($db, $sell_id, $status);
+      $db->commit();
+      return Result::Ok(0);
+    } catch (PDOException $e) {
+      return Result::Err(new InternalServerError("Error: " . $e->getMessage()));
+    }
+  }
+
+  static function _update_verification($db, int $seller_id, string $status)
+  {
+    $stmt = $db->prepare("UPDATE sellers SET verification_status = :status WHERE seller_id = :id");
+    $stmt->execute([
+      ':status' => $status,
+      ':id' => $seller_id,
+    ]);
   }
 }

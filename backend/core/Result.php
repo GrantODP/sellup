@@ -1,5 +1,78 @@
 <?php
+abstract class ErrorType
+{
+  public string $message;
+  public int $code;
 
+  public function __construct(string $message, int $status)
+  {
+    $this->message = $message;
+    $this->code = $status;
+  }
+
+  public function get_message(): string
+  {
+    return $this->message;
+  }
+
+  public function get_code(): int
+  {
+    return $this->code;
+  }
+}
+
+class BadRequestError extends ErrorType
+{
+  public function __construct(string $message = "Bad Request")
+  {
+    parent::__construct($message, 400);
+  }
+}
+
+class UnauthorizedError extends ErrorType
+{
+  public function __construct(string $message = "Unauthorized")
+  {
+    parent::__construct($message, 401);
+  }
+}
+class ConflictError extends ErrorType
+{
+  public function __construct(string $message = "Unauthorized")
+  {
+    parent::__construct($message, 409);
+  }
+}
+class ForbiddenError extends ErrorType
+{
+  public function __construct(string $message = "Forbidden")
+  {
+    parent::__construct($message, 403);
+  }
+}
+
+class NotFoundError extends ErrorType
+{
+  public function __construct(string $message = "Not Found")
+  {
+    parent::__construct($message, 404);
+  }
+}
+
+class InternalServerError extends ErrorType
+{
+  public function __construct(string $message = "Internal Server Error")
+  {
+    parent::__construct($message, 500);
+  }
+}
+class NoContent extends ErrorType
+{
+  public function __construct(string $message = "No Content")
+  {
+    parent::__construct($message, 204);
+  }
+}
 
 abstract class Result
 {

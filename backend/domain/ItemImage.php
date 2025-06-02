@@ -10,7 +10,7 @@ class Image
 
   public function __construct($path)
   {
-    $this->path = "./media/" . $path;
+    $this->path = "media/" . $path;
   }
 
 
@@ -75,8 +75,10 @@ class Image
     return null;
   }
 
-  /** @return Image[]|null */
-  public static function get_listing_images(int $listing_id): ?array
+  /** @return Result */
+  //result can return null because there is none to return so result is still ok 
+  //error only if database or unknown error
+  public static function get_listing_images(int $listing_id): Result
   {
     try {
       Database::connect();
@@ -89,31 +91,43 @@ class Image
       $stmt->execute();
       $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
       if (empty($rows)) {
-        return null;
+        return Result::Ok(null);
       }
       $images = [];
       foreach ($rows as $row) {
         $images[] = new Image($row['file_path']);
       }
 
-      return $images;
+      return Result::Ok($images);
     } catch (PDOException $e) {
-      echo "Error: " . $e->getMessage();
+      return Result::Err(new InternalServerError($e->getMessage()));
     }
-
-    return null;
   }
 
-  public static function save(int $listing_id): Result
+
+  public static function store_image($id, int $max = 5): Result
   {
     $uploaded = [];
     $errors = [];
     $target_dir = realpath(__DIR__ . '/../../media/');
-    foreach ($_FILES['images']['tmp_name'] as $index => $tmp_name) {
-      $name = basename($_FILES['images']['name'][$index]);
-      $target = $listing_id . '-' . $name;
-      $target_loc = $target_dir . '/' . $target;
+    $files = $_FILES['images'];
 
+    // Handle single and multiple files
+    $is_multi = is_array($files['tmp_name']);
+    $file_count = $is_multi ? count($files['tmp_name']) : 1;
+
+    if ($file_count > $max) {
+      $file_count = $max;
+    }
+
+    for ($i = 0; $i < $file_count; $i++) {
+      $tmp_name = $is_multi ? $files['tmp_name'][$i] : $files['tmp_name'];
+      $original_name = $is_multi ? $files['name'][$i] : $files['name'];
+
+      $name = basename($original_name);
+      $name = $id . '-' . $name;
+      $target = substr(md5($name), 0, 16);
+      $target_loc = $target_dir . '/' . $target;
       if (move_uploaded_file($tmp_name, $target_loc)) {
         $uploaded[] = $target;
       } else {
@@ -122,17 +136,28 @@ class Image
     }
 
     if (empty($uploaded)) {
-      return Result::Err($errors);
+      return Result::Err(new BadRequestError(json_encode($errors)));
     }
 
+    return Result::Ok($uploaded);
+  }
+
+
+  public static function save(int $listing_id): Result
+  {
+    $store_result = self::store_image($listing_id);
+    if ($store_result->isErr()) {
+      return $store_result;
+    }
+    $uploaded = $store_result->unwrap();
     $placeholders = [];
     $values = [];
+
     foreach ($uploaded as $upload) {
       $placeholders[] = '(?, ?)';
       $values[] = $upload;
       $values[] = $listing_id;
     }
-
     try {
       Database::connect();
 
@@ -141,8 +166,7 @@ class Image
       $stmt = $db->prepare($sql);
       $stmt->execute($values);
     } catch (PDOException $e) {
-      echo "Error: " . $e->getMessage();
-      return Result::Err($e->getMessage());
+      return Result::Err(new InternalServerError($e->getMessage()));
     }
 
     return Result::Ok(null);

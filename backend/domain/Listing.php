@@ -4,20 +4,23 @@ require_once './backend/db/Database.php';
 require_once './backend/util/Util.php';
 class ListingSubmission
 {
+  public int $id;
   public string $seller_id;
   public string $price;
   public string $cat_id;
   public string $location_id;
+
   public string $title;
   public ?string $description;
   public string $slug;
 
-  public function __construct(array $data)
+  public function __construct(array $data, $listing_id = 0)
   {
+    $this->id = $listing_id;
     $this->seller_id = $data['seller_id'];
     $this->price = $data['price'];
-    $this->cat_id = $data['cat_id'];
-    $this->location_id = $data['location_id'];
+    $this->cat_id = $data['cat_id'] ?? 0;
+    $this->location_id = $data['location_id'] ?? 0;
     $this->title = $data['title'];
     $this->description = $data['description'] ?? null;
     $this->slug = $this->seller_id  . '-' .  gen_slug($this->title);
@@ -30,9 +33,10 @@ class Listing
   public string $listing_id;
   public string $seller_id;
   public string $price;
-  public string $date_posted;
+  public string $date;
   public string $cat_id;
-  public string $location_id;
+  public string $province;
+  public string $city;
   public string $title;
   public ?string $description;
   public string $slug;
@@ -42,9 +46,10 @@ class Listing
     $this->listing_id = $data['listing_id'];
     $this->seller_id = $data['seller_id'];
     $this->price = $data['price'];
-    $this->date_posted = $data['date_posted'];
+    $this->date = $data['date'];
     $this->cat_id = $data['cat_id'];
-    $this->location_id = $data['location_id'];
+    $this->province = $data['province'];
+    $this->city = $data['city'];
     $this->title = $data['title'];
     $this->description = $data['description'] ?? null;
     $this->slug = $data['slug'] ?? null;
@@ -77,7 +82,7 @@ class Listing
       ]);
       $db->commit();
     } catch (PDOException $e) {
-      return Result::Err("Error: " . $e->getMessage());
+      return Result::Err(new InternalServerError($e->getMessage()));
     }
     return Result::Ok(null);
   }
@@ -102,6 +107,25 @@ class Listing
       }
 
       return null;
+    }
+  }
+
+  public static function get_by_sid(int $seller_id): array
+  { {
+      try {
+        Database::connect();
+
+        $db = Database::db();
+        $stmt = $db->prepare('SELECT * FROM listing_details WHERE seller_id = :id');
+        $stmt->bindValue(':id', $seller_id);
+        $stmt->execute();
+
+        $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return  $row;
+      } catch (PDOException $e) {
+        echo "Error: " . $e->getMessage();
+      }
+      return [];
     }
   }
 
@@ -175,16 +199,21 @@ class Listing
     return null;
   }
 
-  public static function get_by_col_and_page(string $column, string $value, int $page, int $count, string $sort = "listing_id", string $sort_dir = 'ascend'): ?array
+  public static function get_by_col_and_page(string $column, int $id, int $page, int $count, string $sort = "date", string $sort_dir = 'asc'): ?array
   {
     try {
       Database::connect();
       $offset = ($page - 1) * $count;
-
       $order = $sort_dir == 'asc' ? 'ASC' : 'DESC';
       $db = Database::db();
-      $stmt = $db->prepare("SELECT * FROM listing_details WHERE $column = :value ORDER BY $sort $order LIMIT :count OFFSET :offset");
-      $stmt->bindValue(':value', $value);
+      $stmt = null;
+      if ($id == 0) {
+        $stmt = $db->prepare("SELECT * FROM listing_details ORDER BY $sort $order LIMIT :count OFFSET :offset");
+      } else {
+        $stmt = $db->prepare("SELECT * FROM listing_details WHERE $column = :value ORDER BY $sort $order LIMIT :count OFFSET :offset");
+        $stmt->bindValue(':value', $id);
+      }
+
       $stmt->bindValue(':count', (int)$count, PDO::PARAM_INT);
       $stmt->bindValue(':offset', (int)$offset, PDO::PARAM_INT);
       $stmt->execute();
@@ -229,5 +258,104 @@ class Listing
       echo "Error: " . $e->getMessage();
     }
     return null;
+  }
+
+  public static function get_listings(array $ids): ?array
+  {
+    $placeholders = implode(',', array_fill(0, count($ids), '?'));
+    try {
+      Database::connect();
+
+      $db = Database::db();
+
+
+      $stmt = $db->prepare("SELECT * FROM listings WHERE listing_id IN ($placeholders)");
+      $stmt->execute($ids);
+      $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
+      if (empty($row)) {
+        return null;
+      }
+      return  $row;
+    } catch (PDOException $e) {
+      echo "Error: " . $e->getMessage();
+    }
+
+    return null;
+  }
+  public static function update(ListingSubmission $sub): Result
+  {
+    try {
+      Database::connect();
+
+      $db = Database::db();
+      $db->beginTransaction();
+      self::update_price($db, $sub->id, $sub->price);
+      self::update_ad($db, $sub);
+      $db->commit();
+    } catch (PDOException $e) {
+      return Result::Err(new InternalServerError($e->getMessage()));
+    }
+
+    return Result::Ok(0);
+  }
+
+  public static function update_ad($db, ListingSubmission $sub)
+  {
+    $stmt = $db->prepare("UPDATE listing_ad SET title = :title, description = :descp, slug = :slug WHERE listing_id = :id");
+    $stmt->execute([
+      ":id" => $sub->id,
+      ":title" => $sub->title,
+      ":descp" => $sub->description,
+      ":slug" => $sub->slug,
+    ]);
+  }
+
+  public static function update_price($db, int $id, float $price)
+  {
+    $stmt = $db->prepare("UPDATE listings SET price = :p WHERE listing_id = :id");
+    $stmt->execute([
+      ":id" => $id,
+      ":p" => $price,
+    ]);
+  }
+
+  public static function delete_listing(Seller $sell, $id): Result
+  {
+    try {
+      Database::connect();
+
+      $db = Database::db();
+
+      $stmt = $db->prepare("SELECT * FROM listing_details WHERE seller_id = :sid AND listing_id = :lid LIMIT 1");
+      $stmt->execute([':lid' => $id, 'sid' => $sell->seller_id]);
+      if ($stmt->rowCount() === 0) {
+        return Result::Err(new NotFoundError("Listing not found for seller"));
+      }
+      $row = $stmt->fetch(PDO::FETCH_ASSOC);
+      $lid = $row['listing_id'];
+      return self::delete_listing_force($lid);
+    } catch (PDOException $e) {
+      echo "Error: " . $e->getMessage();
+      $db->rollBack();
+      return Result::Err(new InternalServerError($e->getMessage()));
+    }
+    return Result::Ok(true);
+  }
+
+  public static function delete_listing_force($id): Result
+  {
+    try {
+      Database::connect();
+      $db = Database::db();
+      $stmt_del = $db->prepare("DELETE FROM listing_ad WHERE listing_id = :id");
+      $stmt_del->execute([':id' => $id]);
+      if ($stmt_del->rowCount() === 0) {
+        return Result::Err(new NotFoundError("No listing found by id"));
+      }
+    } catch (PDOException $e) {
+      echo "Error: " . $e->getMessage();
+      return Result::Err(new InternalServerError($e->getMessage()));
+    }
+    return Result::Ok(true);
   }
 }

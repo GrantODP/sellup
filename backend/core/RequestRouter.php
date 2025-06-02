@@ -2,21 +2,35 @@
 
 require_once 'Responder.php';
 
-$pattern = __DIR__ . "/../controllers/*.php";
-foreach (glob($pattern) as $filename) {
+$back_pattern = __DIR__ . "/../controllers/*.php";
+$front_pattern = __DIR__ . "/../../frontend/controllers/*.php";
+foreach (glob($back_pattern) as $filename) {
 
   require_once $filename;
 }
+foreach (glob($front_pattern) as $filename) {
 
+  require_once $filename;
+}
 class Router
 {
   private $get_routes = [];
   private $post_routes = [];
+  private $put_routes = [];
+  private $delete_routes = [];
   private $dynamic_get_routes = [];
 
   public function add_post(string $path, $controller)
   {
     $this->post_routes[$path] = $controller;
+  }
+  public function add_put(string $path, $controller)
+  {
+    $this->put_routes[$path] = $controller;
+  }
+  public function add_delete(string $path, $controller)
+  {
+    $this->delete_routes[$path] = $controller;
   }
   public function add_get(string $path, $controller)
   {
@@ -38,7 +52,7 @@ class Router
     if (self::dynamic_call($path, $this->dynamic_get_routes)) {
       return;
     }
-    return Responder::bad_request("Unknown request");
+    return Responder::not_found("Unknown request");
   }
   public function post($path)
   {
@@ -46,25 +60,51 @@ class Router
       return;
     };
 
-    return Responder::bad_request("Unknown request");
+    return Responder::not_found("Unknown request");
+  }
+  public function put($path)
+  {
+    if (self::call($path, $this->put_routes)) {
+      return;
+    };
+
+    return Responder::not_found("Unknown request");
   }
 
-  public function handle()
+  public function delete_op($path)
+  {
+    if (self::call($path, $this->delete_routes)) {
+      return;
+    };
+
+    return Responder::not_found("Unknown request");
+  }
+
+  private static function clean_uri($uri): string
+  {
+    $uri = rtrim($uri, '/');
+    $uri = $uri === '' ? '/' : $uri;
+    return $uri;
+  }
+
+  public function handle($default = "", $controller = "")
   {
     $method = $_SERVER['REQUEST_METHOD'];
     $uri = $_SERVER['REQUEST_URI'];
-    $path = parse_url($uri, PHP_URL_PATH);
-
+    $uri = parse_url($uri, PHP_URL_PATH);
+    $uri = self::clean_uri($uri);
     if ($method === 'GET') {
-      $this->get($path);
+      $this->get($uri);
     } elseif ($method === 'POST') {
-      $this->post($path);
+      $this->post($uri);
     } elseif ($method === 'PUT') {
-      Responder::bad_request("Unsupported PUT");
+      $this->put($uri);
     } elseif ($method === 'DELETE') {
-      Responder::bad_request("Unsupported DELETE");
-    } else {
-      Responder::bad_request("Unknown request " . $method);
+      $this->delete_op($uri);
+    }
+
+    if ($uri === self::clean_uri($default)) {
+      call_user_func($controller);
     }
   }
   private static function call($path, $router): bool
@@ -86,14 +126,11 @@ class Router
 
   private static function dynamic_call($path, $router)
   {
-    echo 'dynamic_call';
 
     foreach ($router as $pattern => $controller) {
-      echo $pattern;
       if (preg_match($pattern, $path, $matches)) {
 
         array_shift($matches);
-        var_dump($matches);
         try {
           return call_user_func_array($controller, $matches);
         } catch (Throwable $e) {
@@ -101,7 +138,6 @@ class Router
         }
         return true;
       }
-      var_dump($matches);
     }
     return false;
   }

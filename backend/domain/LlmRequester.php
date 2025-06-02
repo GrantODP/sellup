@@ -65,12 +65,12 @@ class LlmRequester
     $response =  curl_exec($ch);
 
     if (curl_errno($ch)) {
-      return Result::Err('Curl Error:' . curl_errno($ch));
+      return Result::Err(new InternalServerError('Curl Error:' . curl_errno($ch)));
     }
     $decoded = json_decode($response, true);
     $text = $decoded['candidates'][0]['content']['parts'][0]['text'] ?? null;
     if (empty($text)) {
-      return Result::Err('Error receving text from decoded response');
+      return Result::Err(new InternalServerError('Error receving text from decoded response'));
     }
     return Result::Ok($text);
   }
