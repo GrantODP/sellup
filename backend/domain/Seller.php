@@ -19,7 +19,7 @@ class Seller
     $this->seller_id = $seller['seller_id'];
     $this->created_at = $seller['created_at'];
     $this->verification = $seller['verification_status'];
-    $this->name = $seller['user_name'];
+    $this->name = $seller['name'];
     /* $this->email = $seller['email']; */
     $this->contact = $seller['contact'];
   }

@@ -1,5 +1,5 @@
 import {
-toLocalDateStr,
+  toLocalDateStr,
   renderErrorPage,
   getAdImagesLinks,
   getAdReviews,
@@ -85,7 +85,7 @@ function renderSingleReview(review_data, container) {
     <div class="card-body">
       <div class="d-flex justify-content-between align-items-start mb-2">
         <div>
-          <h6 class="mb-1">${review_data.user_name}</h6>
+          <h6 class="mb-1">${review_data.name}</h6>
           <small class="text-muted">${review_data.created_at}</small>
         </div>
         <div>

@@ -55,7 +55,7 @@ function showSection(id) {
 
 }
 async function loadCats() {
-  const cats = await getResource('/api/categories', 'GET', null, {}, true);
+  const cats = await getResource('/api/v1/categories', 'GET', null, {}, true);
   storeSessionData('cats', cats);
 }
 async function searchUser() {

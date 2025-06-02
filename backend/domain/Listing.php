@@ -46,7 +46,7 @@ class Listing
     $this->listing_id = $data['listing_id'];
     $this->seller_id = $data['seller_id'];
     $this->price = $data['price'];
-    $this->date = $data['date'];
+    $this->date = $data['created_at'];
     $this->cat_id = $data['cat_id'];
     $this->province = $data['province'];
     $this->city = $data['city'];

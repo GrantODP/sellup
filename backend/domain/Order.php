@@ -191,7 +191,7 @@ class Order
 
       $stmtItems = $db->prepare("
             SELECT * 
-            FROM orders_items 
+            FROM order_items 
             WHERE order_id = :order_id 
               AND listing_id = :listing_id 
             LIMIT 1

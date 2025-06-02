@@ -1,4 +1,4 @@
-import { Swal, navigateWindow, getSellerListings, getUserSellerInfo, isLoggedIn, getUrlParams, getLocalData, storeLocalData, SITE, updateListing, uploadLisingImages } from "../script.js";
+import { Swal, navigateWindow, getSellerListings, getUserSellerInfo, isLoggedIn, getUrlParams, getLocalData, storeLocalData, updateListing, uploadLisingImages } from "../script.js";
 
 async function loadSection(section) {
   const content = document.getElementById('main-content');
@@ -70,7 +70,7 @@ async function loadAds(container) {
           <p class="card-text">
             <small class="text-muted">Posted on: ${new Date(ad.date).toLocaleDateString()}</small>
           </p>
-          <a href="/${SITE}/ads/${ad.slug}" target="_blank" class="btn btn-primary me-2">View</a>
+          <a href="/ads/${ad.slug}" target="_blank" class="btn btn-primary me-2">View</a>
           <button class="btn btn-secondary edit-btn" data-ad-id="${ad.listing_id}">Edit</button>
         </div>
       </div>
