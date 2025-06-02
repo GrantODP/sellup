@@ -1,10 +1,10 @@
 <?php
 $config =  [
   'database' => [
-    'host' => 'sql208.infinityfree.com',
-    'user' => 'if0_39143221',
-    'password' => 'H20lD5xB9rvm',
-    'dbname' => 'if0_39143221_c2c',
+    'host' => 'mysql-1b7f1ee8-grantoranduprez-de06.i.aivencloud.com',
+    'user' => 'avnadmin',
+    'password' => 'AVNS_pww21FkaqpGQcgixFkB',
+    'dbname' => 'defaultdb',
   ],
   'llm' =>
   [
