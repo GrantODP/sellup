@@ -162,7 +162,7 @@ class SellerController
     $result = Listing::delete_listing($seller, $listing_id);
 
     if ($result->isErr()) {
-      return Responder::server_error($result->unwrapErr());
+      return Responder::result_error($result);
     }
 
     $can_update = $result->unwrap();

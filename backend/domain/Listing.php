@@ -326,13 +326,25 @@ class Listing
 
       $db = Database::db();
 
-      $stmt = $db->prepare("DELETE FROM listings WHERE seller_id = :sid AND listing_id = :lid");
+      $db->beginTransaction();
+      $stmt = $db->prepare("SELECT * FROM listing_details WHERE seller_id = :sid AND listing_id = :lid LIMIT 1");
       $stmt->execute([':lid' => $id, 'sid' => $sell->seller_id]);
       if ($stmt->rowCount() === 0) {
         return Result::Err(new NotFoundError("Listing not found for seller"));
       }
+      $row = $stmt->fetch(PDO::FETCH_ASSOC);
+      $lid = $row['listing_id'];
+      $stmt_del = $db->prepare("DELETE FROM listing_ad WHERE listing_id = :id");
+
+      $stmt_del->execute([':id' => $lid]);
+      if ($stmt_del->rowCount() === 0) {
+        return Result::Err(new InternalServerError("Error deleting ad"));
+      }
+
+      $db->commit();
     } catch (PDOException $e) {
       echo "Error: " . $e->getMessage();
+      $db->rollBack();
       return Result::Err(new InternalServerError($e->getMessage()));
     }
     return Result::Ok(true);
