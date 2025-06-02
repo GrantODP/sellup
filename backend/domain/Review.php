@@ -52,8 +52,12 @@ class Review
       Database::connect();
 
       $db = Database::db();
-
-      $stmt = $db->prepare("SELECT review_id, user_name, score as rating, message, created_at FROM review_details WHERE listing_id = :id ");
+      $stmt = $db->prepare("
+  SELECT r.review_id, u.user_name, r.score AS rating, r.message, r.created_at
+  FROM reviews r
+  JOIN users u ON r.user_id = u.user_id
+  WHERE r.listing_id = :id
+");
       $stmt->bindValue(":id", $listing_id);
       $stmt->execute();
 
@@ -75,8 +79,11 @@ class Review
       Database::connect();
 
       $db = Database::db();
-
-      $stmt = $db->prepare("SELECT * FROM review_details WHERE review_id = :id ");
+      $stmt = $db->prepare("
+  SELECT *  FROM reviews r
+  JOIN users u ON r.user_id = u.user_id
+  WHERE r.review_id = :id
+");
       $stmt->bindValue(":id", $id);
       $stmt->execute();
 
@@ -98,7 +105,11 @@ class Review
 
       $db = Database::db();
       $params = [];
-      $sql =  "SELECT * FROM review_details WHERE user_id = :id ";
+      $sql = "
+  SELECT *  FROM reviews r
+  JOIN users u ON r.user_id = u.user_id
+  WHERE r.user_id = :id
+";
       $params[':id'] = $uid;
 
       if (!empty($listing_id)) {

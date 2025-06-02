@@ -26,7 +26,7 @@ class Rating
 
       $db = Database::db();
 
-      $rating = $db->prepare("SELECT AVG(score) AS rating, COUNT(*) AS count FROM review_details WHERE listing_id = :id ");
+      $rating = $db->prepare("SELECT AVG(score) AS rating, COUNT(*) AS count FROM reviews WHERE listing_id = :id ");
       $rating->bindValue(":id", $listing_id);
       $rating->execute();
 
@@ -49,8 +49,13 @@ class Rating
       Database::connect();
 
       $db = Database::db();
-
-      $rating = $db->prepare("SELECT AVG(score) AS rating, COUNT(*) AS count FROM review_details WHERE seller_id = :id ");
+      $rating = $db->prepare("
+  SELECT AVG(r.score) AS rating, COUNT(*) AS count
+  FROM reviews r
+  JOIN listings l ON r.listing_id = l.listing_id
+  WHERE l.seller_id = :id
+");
+      $rating = $db->prepare($rating);
       $rating->bindValue(":id", $seller_id);
       $rating->execute();
 

@@ -169,28 +169,49 @@ class Order
 
     return $amount;
   }
+
   public static function has_paid_ordered($user_id, Listing $listing): Result
   {
     try {
       Database::connect();
       $db = Database::db();
 
-      $stmt = $db->prepare("
-            SELECT * FROM user_orders_items
-            WHERE user_id = :user_id AND listing_id = :listing_id AND status = 'paid'
+      $stmtOrders = $db->prepare("
+            SELECT order_id 
+            FROM orders 
+            WHERE user_id = :user_id 
+              AND status = 'paid'
+        ");
+      $stmtOrders->execute([':user_id' => $user_id]);
+      $paidOrders = $stmtOrders->fetchAll(PDO::FETCH_COLUMN);
+
+      if (empty($paidOrders)) {
+        return Result::Ok(false);
+      }
+
+      $stmtItems = $db->prepare("
+            SELECT * 
+            FROM orders_items 
+            WHERE order_id = :order_id 
+              AND listing_id = :listing_id 
             LIMIT 1
         ");
 
-      $stmt->execute([
-        ':user_id' => $user_id,
-        ':listing_id' => $listing->listing_id,
-      ]);
+      foreach ($paidOrders as $orderId) {
+        $stmtItems->execute([
+          ':order_id' => $orderId,
+          ':listing_id' => $listing->listing_id
+        ]);
 
-      $found = $stmt->fetchColumn() !== false;
+        if ($stmtItems->fetchColumn()) {
+          return Result::Ok(true); // found listing in a paid order
+        }
+      }
 
-      return Result::Ok($found);
+      return Result::Ok(false);
     } catch (PDOException $e) {
-      return Result::Err(new InternalServerError("Error: " . $e->getMessage()));
+      echo "Error: " . $e->getMessage();
+      return Result::Err(new InternalServerError($e->getMessage()));
     }
   }
 }
