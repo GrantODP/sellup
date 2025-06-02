@@ -183,4 +183,27 @@ class AdminController
 
     return Responder::success();
   }
+  // POST admin/user-admin
+  public static function make_user_admin()
+  {
+    $auth = self::handle_admin();
+    if ($auth->isErr()) {
+      return Responder::result_error($auth);
+    }
+
+    $id = $_GET['id'] ?? '';
+    $user = User::get_by_id($id);
+
+
+    if (empty($user)) {
+      return Responder::not_found("User not found");
+    }
+
+    $res = Admin::insert_admin($user);
+    if ($res->isErr()) {
+      return Responder::result_error($res);
+    }
+
+    return Responder::success();
+  }
 }
