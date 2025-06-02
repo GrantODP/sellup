@@ -13,11 +13,11 @@
 <body class="bg-light">
 
   <?php include('navbar.html'); ?>
-  <form class="row g-2 my-2" role="search" id="search-bar">
-    <div class="col-9">
+  <form class="row g-2 my-2 mx-2" role="search" id="search-bar">
+    <div class="col-11">
       <input class="form-control" type="search" name="q" placeholder="Search ads...">
     </div>
-    <div class="col-3">
+    <div class="col-1">
       <button class="btn btn-success w-100" type="submit">Search</button>
     </div>
   </form>
