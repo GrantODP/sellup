@@ -77,4 +77,24 @@ class Category
     }
     return Result::Ok(true);
   }
+  public static function update_category($id, $name, $description): Result
+  {
+    try {
+      Database::connect();
+      $db = Database::db();
+      $stmt = $db->prepare("UPDATE category SET name = :name, description = :description WHERE cat_id = :id");
+      $stmt->execute([
+        ':name' => $name,
+        ':description' => $description,
+        ':id' => $id
+      ]);
+
+      if ($stmt->rowCount() == 0) {
+        return Result::Err(new NoContent("No change occured"));
+      }
+    } catch (PDOException $e) {
+      return Result::Err(new InternalServerError($e->getMessage()));
+    }
+    return Result::Ok(true);
+  }
 }
