@@ -20,7 +20,7 @@
 
     <!-- ✅ Added Image Section -->
     <div class="image-box">
-      <img src="/c2c-commerce-site/media/SamA15.png" alt="Example Image">
+      <img src="/media/SamA15.png" alt="Example Image">
       <p>This is an image description.</p>
     </div>
   </main>

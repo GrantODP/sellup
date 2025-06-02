@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <base href="/c2c-commerce-site/public/">
+  <base href="/public/">
   <title>User Profile</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
@@ -38,7 +38,7 @@
               class="btn btn-link nav-link text-white text-start p-2 w-100">Cart</button>
           </li>
           <li class="nav-item mb-2">
-            <a id="btn-seller" href="/c2c-commerce-site/seller"
+            <a id="btn-seller" href="/seller"
               class="btn btn-link nav-link text-white text-start p-2 w-100">Seller info</a>
           </li>
         </ul>
