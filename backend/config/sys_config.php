@@ -1,10 +1,10 @@
 <?php
 $config =  [
   'database' => [
-    'host' => 'localhost',
+    'host' => 'sql208.infinityfree.com',
     'user' => 'if0_39143221',
     'password' => 'H20lD5xB9rvm',
-    'dbname' => 'c2c',
+    'dbname' => 'if0_39143221_c2c',
   ],
   'llm' =>
   [
