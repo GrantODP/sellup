@@ -8,31 +8,47 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
 </head>
+<style>
+  .side .nav-link:hover {
+    background-color: grey;
+  }
+</style>
 
 <body>
   <?php include('navbar.html'); ?>
-  <div class="cotainer-fluid">
+
+  <div class="container-fluid">
     <div class="row min-vh-100">
-      <nav class="col-md-3 col-lg-2 d-md-block bg-dark py-4 pe-0">
-        <div class="d-grid">
-          <button id="btn-profile"
-            class=" btn btn-primary w-100 text-start border-top border-bottom border-0 rounded-0 text-white bg-transparent">
-            Profile
-          </button>
-          <button id="btn-ads"
-            class=" btn btn-outline-light w-100 text-start border-top border-bottom border-0 rounded-0 text-white bg-transparent">
-            Listed Ads
-          </button>
-          <a id="btn-post-ad" href='/c2c-commerce-site/post-ad' target="_blank"
-            class=" btn btn-outline-light w-100 text-start border-top border-bottom border-0 rounded-0 text-white bg-transparent">
-            Post Ad
-          </a>
-        </div>
+      <!-- Sidebar -->
+      <nav class="col-3 bg-dark text-white p-3">
+        <h4 class="text-center mb-4">Seller Panel</h4>
+        <ul class="nav nav-pills flex-column w-100 side">
+          <li class="nav-item mb-2">
+            <button id="btn-profile" type="button"
+              class="btn btn-link nav-link text-white text-start p-2 w-100">
+              Profile
+            </button>
+          </li>
+          <li class="nav-item mb-2">
+            <button id="btn-ads" type="button"
+              class="btn btn-link nav-link text-white text-start p-2 w-100">
+              Listed Ads
+            </button>
+          </li>
+          <li class="nav-item mb-2">
+            <a id="btn-post-ad" href="/c2c-commerce-site/post-ad" target="_blank"
+              class="btn btn-link nav-link text-white text-start p-2 w-100">
+              Post Ad
+            </a>
+          </li>
+        </ul>
       </nav>
-      <!-- Main content -->
-      <main id="main-content" class=" col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+
+      <!-- Main Content -->
+      <main id="main-content" class="col-md-9 ms-sm-auto col-lg-9 px-md-4 py-4">
       </main>
     </div>
+  </div>
 
   </div>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"
