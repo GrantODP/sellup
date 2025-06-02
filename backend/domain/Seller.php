@@ -66,7 +66,23 @@ class Seller
     }
     return null;
   }
+  public static function get_all(): ?array
+  {
 
+    try {
+      Database::connect();
+
+      $db = Database::db();
+      $stmt = $db->prepare("SELECT * FROM sellers ");
+      $stmt->execute();
+
+      $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
+      return $row;
+    } catch (PDOException $e) {
+      echo "Error: " . $e->getMessage();
+    }
+    return null;
+  }
   public static function get_user_id(int $seller_id): ?int
   {
 
