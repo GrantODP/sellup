@@ -29,7 +29,7 @@ async function renderCategories() {
     const button = document.createElement('a');
     button.textContent = cat.name;
     button.className = "btn btn-outline-primary border border-dark  text-start";
-    button.href = `/c2c-commerce-site/ads?category=${cat.cat_id}`
+    button.href = `/ads?category=${cat.cat_id}`
     button.addEventListener("click", () => {
       updateCatHeader(cat.name);
     })
@@ -54,13 +54,13 @@ async function populateListings(listings) {
     const preview = await getPreview(listing.listing_id);
 
     if (preview) {
-      ad_article.querySelector('img').src = `/c2c-commerce-site/${preview.path}`;
+      ad_article.querySelector('img').src = `/${preview.path}`;
     }
 
     const date = new Date(listing.date);
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
 
-    ad_article.querySelector('a').href = `/c2c-commerce-site/ads/${listing.slug}`;
+    ad_article.querySelector('a').href = `/ads/${listing.slug}`;
     ad_article.querySelector('.ad-title').textContent = listing.title;
     ad_article.querySelector('.ad-price').textContent = `R${listing.price}`;
     ad_article.querySelector('.ad-description').textContent = listing.description;
