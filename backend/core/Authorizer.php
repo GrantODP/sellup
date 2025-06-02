@@ -82,7 +82,11 @@ class Authorizer
     if ($is_valid->isErr()) {
       return $is_valid;
     }
+    return self::update_validation_force($db, $user_id, $password);
+  }
 
+  public static function update_validation_force($db, int $user_id, string $password)
+  {
     $salt = self::get_salt();
     $hash = self::hash_password($salt, $password);
 
