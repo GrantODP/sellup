@@ -57,7 +57,7 @@ async function populateListings(listings) {
       ad_article.querySelector('img').src = `/${preview.path}`;
     }
 
-    const date = new Date(listing.date);
+    const date = new Date(listing.date_posted);
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
 
     ad_article.querySelector('a').href = `/ads/${listing.slug}`;

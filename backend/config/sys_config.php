@@ -4,7 +4,8 @@ $config =  [
     'host' => 'mysql-1b7f1ee8-grantoranduprez-de06.i.aivencloud.com',
     'user' => 'avnadmin',
     'password' => 'AVNS_pww21FkaqpGQcgixFkB',
-    'dbname' => 'defaultdb',
+    'port' => 15890,
+    'dbname' => 'c2c',
   ],
   'llm' =>
   [
