@@ -73,7 +73,7 @@ class Seller
       Database::connect();
 
       $db = Database::db();
-      $stmt = $db->prepare("SELECT * FROM sellers ");
+      $stmt = $db->prepare("SELECT * FROM seller_user_details ");
       $stmt->execute();
 
       $row = $stmt->fetchAll(PDO::FETCH_ASSOC);

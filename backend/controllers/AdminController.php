@@ -38,7 +38,8 @@ class AdminController
     if ($auth->isErr()) {
       return Responder::result_error($auth);
     }
-    $users = User::get_all();
+    $email = $_GET['email'] ?? '';
+    $users = User::get_by_email($email);
     return Responder::success($users);
   }
   // GET admin/sellers
@@ -48,7 +49,8 @@ class AdminController
     if ($auth->isErr()) {
       return Responder::result_error($auth);
     }
-    $sell = Seller::get_all();
+    $uid = $_GET['uid'] ?? 0;
+    $sell = Seller::get_seller_by_user_id($uid);
     return Responder::success($sell);
   }
 

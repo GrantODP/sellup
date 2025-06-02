@@ -175,7 +175,7 @@ class User
   {
     try {
       $db = Database::db();
-      $stmt = $db->prepare("DELETE * FROM users WHERE user_id = :user_id");
+      $stmt = $db->prepare("DELETE FROM users WHERE user_id = :user_id");
       $stmt->execute([':user_id' => $user_id]);
     } catch (PDOException $e) {
       return Result::Err(new InternalServerError($e->getMessage()));
