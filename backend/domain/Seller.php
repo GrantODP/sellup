@@ -50,7 +50,13 @@ class Seller
       Database::connect();
 
       $db = Database::db();
-      $stmt = $db->prepare("SELECT * FROM seller_user_details WHERE seller_id = :seller LIMIT 1");
+      $stmt = $db->prepare("
+  SELECT s.*, u.*
+  FROM sellers s
+  JOIN users u ON s.user_id = u.user_id
+  WHERE s.seller_id = :seller
+  LIMIT 1
+");
       $stmt->bindValue(':seller', $seller_id);
       $stmt->execute();
 
@@ -73,7 +79,13 @@ class Seller
       Database::connect();
 
       $db = Database::db();
-      $stmt = $db->prepare("SELECT * FROM seller_user_details ");
+      $stmt = $db->prepare("
+  SELECT s.*, u.*
+  FROM sellers s
+  JOIN users u ON s.user_id = u.user_id
+  WHERE s.seller_id = :seller
+  LIMIT 1
+");
       $stmt->execute();
 
       $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -112,7 +124,13 @@ class Seller
       Database::connect();
 
       $db = Database::db();
-      $stmt = $db->prepare("SELECT * FROM seller_user_details WHERE user_id = :user_id LIMIT 1");
+      $stmt = $db->prepare("
+  SELECT s.*, u.*
+  FROM sellers s
+  JOIN users u ON s.user_id = u.user_id
+  WHERE u.user_id = :user_id
+  LIMIT 1
+");
       $stmt->bindValue(':user_id', $user_id);
       $stmt->execute();
 

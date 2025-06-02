@@ -2,8 +2,8 @@
 $config =  [
   'database' => [
     'host' => 'localhost',
-    'user' => 'root',
-    'password' => '',
+    'user' => 'if0_39143221',
+    'password' => 'H20lD5xB9rvm',
     'dbname' => 'c2c',
   ],
   'llm' =>

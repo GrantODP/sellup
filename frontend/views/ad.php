@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
-  <base href="/c2c-commerce-site/public/">
+  <base href="/public/">
   <title>Product Listing</title>
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">

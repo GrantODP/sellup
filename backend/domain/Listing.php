@@ -93,7 +93,27 @@ class Listing
         Database::connect();
 
         $db = Database::db();
-        $stmt = $db->prepare('SELECT * FROM listing_details WHERE listing_id = :id');
+        $sql = "
+SELECT 
+  l.listing_id,
+  l.seller_id,
+  l.price,
+  l.date_posted,
+  la.ad_id,
+  la.cat_id,
+  la.location_id,
+  la.title,
+  la.description,
+  la.created_at,
+  la.slug,
+  loc.province,
+  loc.city
+FROM listings l
+JOIN listing_ad la ON l.listing_id = la.listing_id
+JOIN location loc ON la.location_id = loc.location_id
+WHERE l.listing_id = :id
+";
+        $stmt = $db->prepare($sql);
         $stmt->bindValue(':id', $listing_id);
         $stmt->execute();
 
@@ -116,7 +136,27 @@ class Listing
         Database::connect();
 
         $db = Database::db();
-        $stmt = $db->prepare('SELECT * FROM listing_details WHERE seller_id = :id');
+        $sql = "
+SELECT 
+  l.listing_id,
+  l.seller_id,
+  l.price,
+  l.date_posted,
+  la.ad_id,
+  la.cat_id,
+  la.location_id,
+  la.title,
+  la.description,
+  la.created_at,
+  la.slug,
+  loc.province,
+  loc.city
+FROM listings l
+JOIN listing_ad la ON l.listing_id = la.listing_id
+JOIN location loc ON la.location_id = loc.location_id
+WHERE l.seller_id = :id
+";
+        $stmt = $db->prepare($sql);
         $stmt->bindValue(':id', $seller_id);
         $stmt->execute();
 
@@ -135,9 +175,28 @@ class Listing
       Database::connect();
 
       $db = Database::db();
+      $sql = "
+SELECT 
+  l.listing_id,
+  l.seller_id,
+  l.price,
+  l.date_posted,
+  la.ad_id,
+  la.cat_id,
+  la.location_id,
+  la.title,
+  la.description,
+  la.created_at,
+  la.slug,
+  loc.province,
+  loc.city
+FROM listings l
+JOIN listing_ad la ON l.listing_id = la.listing_id
+JOIN location loc ON la.location_id = loc.location_id
+WHERE la.slug = :slug
+";
 
-
-      $stmt = $db->prepare('SELECT * FROM listing_details WHERE slug = :slug');
+      $stmt = $db->prepare($sql);
       $stmt->bindValue(':slug', $slug);
       $stmt->execute();
       $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -158,9 +217,28 @@ class Listing
       Database::connect();
 
       $db = Database::db();
+      $sql = "
+SELECT 
+  l.listing_id,
+  l.seller_id,
+  l.price,
+  l.date_posted,
+  la.ad_id,
+  la.cat_id,
+  la.location_id,
+  la.title,
+  la.description,
+  la.created_at,
+  la.slug,
+  loc.province,
+  loc.city
+FROM listings l
+JOIN listing_ad la ON l.listing_id = la.listing_id
+JOIN location loc ON la.location_id = loc.location_id
+WHERE la.cat_id = :cat_id
+";
 
-
-      $stmt = $db->prepare('SELECT * FROM listing_details WHERE cat_id = :cat_id');
+      $stmt = $db->prepare($sql);
       $stmt->bindValue(':cat_id', $cat_id);
       $stmt->execute();
       $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -181,84 +259,166 @@ class Listing
       Database::connect();
       $offset = ($page - 1) * $count;
       $order = $ascend ? 'ASC' : 'DESC';
+
+      $allowed = ['listing_id', 'price', 'date_posted', 'title', 'created_at'];
+      if (!in_array($sort, $allowed)) {
+        $sort = 'listing_id';
+      }
+
       $db = Database::db();
-      $stmt = $db->prepare("SELECT * FROM listing_details ORDER BY :sort_col :order LIMIT :count OFFSET :offset");
-      $stmt->bindValue(':sort_col', $sort);
-      $stmt->bindValue(':order', $order);
-      $stmt->bindValue(':count', $count);
-      $stmt->bindValue(':offset', $offset);
+
+      $sql = "
+      SELECT 
+        l.listing_id,
+        l.seller_id,
+        l.price,
+        l.date_posted,
+        la.ad_id,
+        la.cat_id,
+        la.location_id,
+        la.title,
+        la.description,
+        la.created_at,
+        la.slug,
+        loc.province,
+        loc.city
+      FROM listings l
+      JOIN listing_ad la ON l.listing_id = la.listing_id
+      JOIN location loc ON la.location_id = loc.location_id
+      ORDER BY $sort $order
+      LIMIT :count OFFSET :offset
+    ";
+
+      $stmt = $db->prepare($sql);
+      $stmt->bindValue(':count', $count, PDO::PARAM_INT);
+      $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
       $stmt->execute();
 
       $lists = $stmt->fetchAll(PDO::FETCH_ASSOC);
-      if ($lists) {
-        return  $lists;
-      }
+      return $lists ?: null;
     } catch (PDOException $e) {
       echo "Error: " . $e->getMessage();
+      return null;
     }
-    return null;
   }
 
-  public static function get_by_col_and_page(string $column, int $id, int $page, int $count, string $sort = "date", string $sort_dir = 'asc'): ?array
+
+  public static function get_by_col_and_page(string $column, int $id, int $page, int $count, string $sort = "date_posted", string $sort_dir = 'asc'): ?array
   {
     try {
       Database::connect();
       $offset = ($page - 1) * $count;
-      $order = $sort_dir == 'asc' ? 'ASC' : 'DESC';
-      $db = Database::db();
-      $stmt = null;
-      if ($id == 0) {
-        $stmt = $db->prepare("SELECT * FROM listing_details ORDER BY $sort $order LIMIT :count OFFSET :offset");
-      } else {
-        $stmt = $db->prepare("SELECT * FROM listing_details WHERE $column = :value ORDER BY $sort $order LIMIT :count OFFSET :offset");
-        $stmt->bindValue(':value', $id);
+      $order = strtolower($sort_dir) === 'asc' ? 'ASC' : 'DESC';
+
+      // Whitelist columns for WHERE and ORDER BY
+      $allowedColumns = ['listing_id', 'seller_id', 'cat_id', 'location_id'];
+      $allowedSort = ['listing_id', 'price', 'date_posted', 'title', 'created_at'];
+
+      // Validate column and sort
+      if (!in_array($column, $allowedColumns)) {
+        $column = 'listing_id';
+      }
+      if (!in_array($sort, $allowedSort)) {
+        $sort = 'date_posted';
       }
 
-      $stmt->bindValue(':count', (int)$count, PDO::PARAM_INT);
-      $stmt->bindValue(':offset', (int)$offset, PDO::PARAM_INT);
+      $db = Database::db();
+
+      $sql = "
+      SELECT 
+        l.listing_id,
+        l.seller_id,
+        l.price,
+        l.date_posted,
+        la.ad_id,
+        la.cat_id,
+        la.location_id,
+        la.title,
+        la.description,
+        la.created_at,
+        la.slug,
+        loc.province,
+        loc.city
+      FROM listings l
+      JOIN listing_ad la ON l.listing_id = la.listing_id
+      JOIN location loc ON la.location_id = loc.location_id
+    ";
+
+      if ($id !== 0) {
+        $sql .= " WHERE $column = :value";
+      }
+
+      $sql .= " ORDER BY $sort $order LIMIT :count OFFSET :offset";
+
+      $stmt = $db->prepare($sql);
+
+      if ($id !== 0) {
+        $stmt->bindValue(':value', $id, PDO::PARAM_INT);
+      }
+
+      $stmt->bindValue(':count', $count, PDO::PARAM_INT);
+      $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
       $stmt->execute();
 
       $lists = $stmt->fetchAll(PDO::FETCH_ASSOC);
-      if ($lists) {
-        return  $lists;
-      }
+      return $lists ?: null;
     } catch (PDOException $e) {
       echo "Error: " . $e->getMessage();
+      return null;
     }
-    return null;
   }
+
+
 
   public static function fuzzy_find(string $search_term, int $cat_id = 0, int $location_id = 0): ?array
   {
     try {
       Database::connect();
-
-
       $db = Database::db();
-      $sql = "SELECT * FROM listing_details WHERE MATCH (title) AGAINST (:search IN NATURAL LANGUAGE MODE)";
-      $params[':search'] = $search_term;
+
+      $sql = "
+      SELECT 
+        l.listing_id,
+        l.seller_id,
+        l.price,
+        l.date_posted,
+        la.ad_id,
+        la.cat_id,
+        la.location_id,
+        la.title,
+        la.description,
+        la.created_at,
+        la.slug,
+        loc.province,
+        loc.city
+      FROM listings l
+      JOIN listing_ad la ON l.listing_id = la.listing_id
+      JOIN location loc ON la.location_id = loc.location_id
+      WHERE MATCH (la.title) AGAINST (:search IN NATURAL LANGUAGE MODE)
+    ";
+
+      $params = [':search' => $search_term];
 
       if ($cat_id > 0) {
-        $sql .= ' AND cat_id= :cid';
-        $params['cid'] = $cat_id;
+        $sql .= ' AND la.cat_id = :cid';
+        $params[':cid'] = $cat_id;
       }
       if ($location_id > 0) {
-        $sql .= ' AND location_id= :lid';
-        $params['lid'] = $location_id;
+        $sql .= ' AND la.location_id = :lid';
+        $params[':lid'] = $location_id;
       }
 
       $stmt = $db->prepare($sql);
       $stmt->execute($params);
 
       $lists = $stmt->fetchAll(PDO::FETCH_ASSOC);
-      if ($lists) {
-        return  $lists;
-      }
+      return $lists ?: null;
     } catch (PDOException $e) {
       echo "Error: " . $e->getMessage();
+      return null;
     }
-    return null;
   }
+
 
   public static function get_listings(array $ids): ?array
   {
@@ -319,26 +479,36 @@ class Listing
     ]);
   }
 
+
   public static function delete_listing(Seller $sell, $id): Result
   {
     try {
       Database::connect();
-
       $db = Database::db();
 
-      $stmt = $db->prepare("SELECT * FROM listing_details WHERE seller_id = :sid AND listing_id = :lid LIMIT 1");
-      $stmt->execute([':lid' => $id, 'sid' => $sell->seller_id]);
+      // Join listings and listing_ad to check ownership
+      $stmt = $db->prepare("
+      SELECT l.listing_id
+      FROM listings l
+      JOIN listing_ad la ON l.listing_id = la.listing_id
+      WHERE l.seller_id = :sid AND l.listing_id = :lid
+      LIMIT 1
+    ");
+      $stmt->execute([':lid' => $id, ':sid' => $sell->seller_id]);
+
       if ($stmt->rowCount() === 0) {
         return Result::Err(new NotFoundError("Listing not found for seller"));
       }
+
       $row = $stmt->fetch(PDO::FETCH_ASSOC);
       $lid = $row['listing_id'];
+
       return self::delete_listing_force($lid);
     } catch (PDOException $e) {
       echo "Error: " . $e->getMessage();
-      $db->rollBack();
       return Result::Err(new InternalServerError($e->getMessage()));
     }
+
     return Result::Ok(true);
   }
 
