@@ -31,7 +31,7 @@ async function renderCategories() {
     button.className = "btn btn-outline-primary border text-start";
     button.href = `/c2c-commerce-site/ads?category=${cat.cat_id}`
     button.addEventListener("click", () => {
-      document.cookie = `cat_name=${cat.name}`;
+      updateCatHeader(cat.name);
     })
     container.appendChild(button);
 
@@ -84,7 +84,6 @@ async function renderListings() {
   const limit = params.get('limit') ?? 10;
   try {
 
-    console.log(query);
     let listings;
     if (query) {
       listings = await searchListing(query)
@@ -110,6 +109,7 @@ async function renderPage() {
   initSearch();
   const container = document.getElementById('page-body');
   await loadTemplates(container, '../frontend/views/ad_listings_template.html');
+
   renderCategories();
   renderListings()
 }
@@ -123,11 +123,15 @@ async function initSearch() {
       return;
     }
 
-    document.cookie = `cat_name= Search for "${search}"`;
+    updateCatHeader(`Search for "${search}`);
     navigateWindow(`ads?q=${search}`);
   });
 }
-
+function updateCatHeader(text = '') {
+  const name_container = document.getElementById("category-name");
+  name_container.innerText = text;
+  document.cookie = `cat_name=${text}`;
+}
 
 document.addEventListener("DOMContentLoaded", (e) => {
   renderPage();
