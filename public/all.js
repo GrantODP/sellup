@@ -28,7 +28,7 @@ async function renderCategories() {
 
     const button = document.createElement('a');
     button.textContent = cat.name;
-    button.className = "btn btn-outline-primary border text-start";
+    button.className = "btn btn-outline-primary border border-dark  text-start";
     button.href = `/c2c-commerce-site/ads?category=${cat.cat_id}`
     button.addEventListener("click", () => {
       updateCatHeader(cat.name);

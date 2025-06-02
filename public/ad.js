@@ -35,7 +35,7 @@ async function eval_product(id) {
   let button = container.querySelector('#eval_btn');
   button.innerText = 'evaluating';
   button.disabled = true;
-  const eval_ad = await fetch(`/c2c-commerce-site/api/listings/evaluate?id=${id}`)
+  const eval_ad = await fetch(`/api/v1/listings/evaluate?id=${id}`)
     .then(response => {
       if (!response.ok) throw new Error('Failed to evaluate product');
       return response.json();

@@ -9,13 +9,23 @@
     integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 </head>
+<style>
+  .lift-up {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .lift-up:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  }
+</style>
 
 <body class="bg-light">
 
   <?php include('navbar.html'); ?>
   <form class="row g-2 my-2 mx-2" role="search" id="search-bar">
     <div class="col-11">
-      <input class="form-control" type="search" name="q" placeholder="Search ads...">
+      <input class="form-control border border-dark" type="search" name="q" placeholder="Search ads...">
     </div>
     <div class="col-1">
       <button class="btn btn-success w-100" type="submit">Search</button>

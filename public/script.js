@@ -2,7 +2,7 @@ export class NotfoundError extends Error { };
 export class Unauthorized extends Error { };
 import Swal from 'https://cdn.jsdelivr.net/npm/sweetalert2@11/+esm';
 export { Swal }
-export const SITE = 'c2c-commerce-site';
+
 export function getCookie(cname) {
   let name = cname + "=";
   let decodedCookie = decodeURIComponent(document.cookie);
@@ -32,7 +32,7 @@ export async function getTemplate(url = 'templates.html') {
 }
 
 export async function getResource(uri, method = 'GET', data = null, headers = {}) {
-  const url = `/${SITE}/api/${uri}`;
+  const url = `/api/v1${uri}`;
   const is_form = data instanceof FormData;
   const options = {
     method: method.toUpperCase(),

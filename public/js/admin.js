@@ -1,6 +1,6 @@
 
 
-const BASE_API = "/c2c-commerce-site/api/admin";
+const BASE_API = "/api/v1/admin";
 
 function storeSessionData(key, data) {
   sessionStorage.setItem(key, JSON.stringify(data));
@@ -42,7 +42,7 @@ async function getResource(uri, method = 'GET', data = null, headers = {}, overw
 }
 
 function navigateWindow(page) {
-  return window.location.href = `/c2c-commerce-site/${page}`;
+  return window.location.href = `/${page}`;
 }
 
 function showSection(id) {
@@ -55,7 +55,7 @@ function showSection(id) {
 
 }
 async function loadCats() {
-  const cats = await getResource('/c2c-commerce-site/api/categories', 'GET', null, {}, true);
+  const cats = await getResource('/api/categories', 'GET', null, {}, true);
   storeSessionData('cats', cats);
 }
 async function searchUser() {
@@ -251,7 +251,7 @@ async function fillCategory() {
   }
 }
 async function isLoggedIn() {
-  const token = await getResource('/c2c-commerce-site/api/auth/status', 'GET', null, {}, true);
+  const token = await getResource('/api/v1/auth/status', 'GET', null, {}, true);
   return token == 'valid';
 
 }
