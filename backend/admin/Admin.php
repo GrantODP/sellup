@@ -58,4 +58,16 @@ class Admin
       return Result::Err(new InternalServerError($e->getMessage()));
     }
   }
+
+  public static function change_user_password(User $user, $password): Result
+  {
+    try {
+      Database::connect();
+      $db = Database::db();
+      $res = Authorizer::update_validation_force($db, $user->id, $password);
+      return $res;
+    } catch (PDOException $e) {
+      return Result::Err(new InternalServerError($e->getMessage()));
+    }
+  }
 }

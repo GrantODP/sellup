@@ -80,7 +80,15 @@ $router->add_get('/c2c-commerce-site/api/listings/preview', 'ListingController::
 $router->add_get('/c2c-commerce-site/api/categories', 'CategoryController::get_all');
 
 
-
+//Admin
+$router->add_get('/c2c-commerce-site/api/admin/users', 'AdminController::get_users');
+$router->add_get('/c2c-commerce-site/api/admin/sellers', 'AdminController::get_sellers');
+$router->add_delete('/c2c-commerce-site/api/admin/users', 'AdminController::delete_user');
+$router->add_delete('/c2c-commerce-site/api/admin/listings', 'AdminController::delete_listing');
+$router->add_post('/c2c-commerce-site/api/admin/categories', 'AdminController::category');
+$router->add_post('/c2c-commerce-site/api/admin/seller/verification', 'AdminController::update_seller_verification');
+$router->add_post('/c2c-commerce-site/api/admin/user/password', 'AdminController::update_user_password');
+$router->add_put('/c2c-commerce-site/api/admin/categories', 'AdminController::category');
 //Media
 $router->add_get('/c2c-commerce-site/media/{slug}', 'MediaController::get');
 
