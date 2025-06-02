@@ -346,12 +346,11 @@ class Listing
   {
     try {
       Database::connect();
-
       $db = Database::db();
       $stmt_del = $db->prepare("DELETE FROM listing_ad WHERE listing_id = :id");
       $stmt_del->execute([':id' => $id]);
       if ($stmt_del->rowCount() === 0) {
-        return Result::Err(new InternalServerError("Error deleting ad"));
+        return Result::Err(new NotFoundError("No listing found by id"));
       }
     } catch (PDOException $e) {
       echo "Error: " . $e->getMessage();
