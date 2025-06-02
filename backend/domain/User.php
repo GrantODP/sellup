@@ -56,6 +56,24 @@ class User
     return null;
   }
 
+  public static function get_all(): ?array
+  {
+    try {
+      Database::connect();
+
+      $db = Database::db();
+      $stmt = $db->prepare("SELECT * FROM users");
+      $stmt->execute();
+
+      $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
+      return $row;
+    } catch (PDOException $e) {
+      echo "Error: " . $e->getMessage();
+    }
+
+    return null;
+  }
+
   public static function get_by_email(string $email = ""): ?User
   {
     try {
@@ -153,7 +171,7 @@ class User
     }
   }
 
-  public static function delete(int $user_id): Result
+  public static function delete_user(int $user_id): Result
   {
     try {
       $db = Database::db();
