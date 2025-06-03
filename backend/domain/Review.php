@@ -53,7 +53,7 @@ class Review
 
       $db = Database::db();
       $stmt = $db->prepare("
-  SELECT r.review_id, u.user_name, r.score AS rating, r.message, r.created_at
+  SELECT r.review_id, u.name, r.score AS rating, r.message, r.created_at
   FROM reviews r
   JOIN users u ON r.user_id = u.user_id
   WHERE r.listing_id = :id

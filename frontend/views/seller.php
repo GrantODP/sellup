@@ -20,7 +20,7 @@
   <div class="container-fluid">
     <div class="row min-vh-100">
       <!-- Sidebar -->
-      <nav class="col-3 bg-dark text-white p-3">
+      <nav class="col-2 bg-dark text-white p-3">
         <h4 class="text-center mb-4">Seller Panel</h4>
         <ul class="nav nav-pills flex-column w-100 side">
           <li class="nav-item mb-2">
@@ -45,7 +45,7 @@
       </nav>
 
       <!-- Main Content -->
-      <main id="main-content" class="col-md-9 ms-sm-auto col-lg-9 px-md-4 py-4">
+      <main id="main-content" class="col-10 ms-sm-auto col-lg-9 px-md-4 py-4">
       </main>
     </div>
   </div>

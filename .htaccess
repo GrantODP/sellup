@@ -1,12 +1,22 @@
 RewriteEngine On
 
-# Skip rewriting for actual files and directories (including in public)
+
+RewriteRule ^public/(.*)$ - [L] 
+
+# 3. Skip rewriting for actual existing files and directories
+# (This should check for files/dirs relative to the DocumentRoot)
 RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^ - [L]
 
-# Rewrite requests for static files to /public/
-RewriteRule ^(css|js|images|media|public)/(.*)$ public/$2 [L]
+# 4. Rewrite requests for specific static asset directories to /public/
+# This rule only applies if the asset isn't already directly in public/ (handled by rule 2).
+# And it makes sense if your assets are typically requested as /css/file.css
+# but physically reside at /public/css/file.css
+RewriteRule ^(css|js|images|media)/(.*)$ public/$1/$2 [L] 
 
-# All other routes go to index.php (the router)
-RewriteRule ^ index.php [QSA,L]
+# 5. All other routes go to index.php (the router)
+# This rule catches everything else that hasn't been handled above.
+
+RewriteRule ^.*$ index.php [QSA,L]
+

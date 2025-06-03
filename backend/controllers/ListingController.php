@@ -120,7 +120,7 @@ class ListingController
     $res = AdEvaluator::evaluate($listing, $rating, $images);
 
     if ($res->isErr()) {
-      return Responder::server_error("Unable evaulate listing: " . $res->unwrapErr());
+      return Responder::result_error($res);
     }
 
     return Responder::success($res->unwrap());
@@ -138,7 +138,7 @@ class ListingController
     $result = Image::get_listing_images($id);
 
     if ($result->isErr()) {
-      return Responder::server_error("Server error");
+      return Responder::result_error($result);
     }
 
     if (empty($result->unwrap())) {

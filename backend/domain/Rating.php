@@ -55,7 +55,6 @@ class Rating
   JOIN listings l ON r.listing_id = l.listing_id
   WHERE l.seller_id = :id
 ");
-      $rating = $db->prepare($rating);
       $rating->bindValue(":id", $seller_id);
       $rating->execute();
 

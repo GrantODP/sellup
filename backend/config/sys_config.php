@@ -1,9 +1,10 @@
 <?php
 $config =  [
   'database' => [
-    'host' => 'localhost',
-    'user' => 'if0_39143221',
-    'password' => 'H20lD5xB9rvm',
+    'host' => 'mysql-1b7f1ee8-grantoranduprez-de06.i.aivencloud.com',
+    'user' => 'avnadmin',
+    'password' => 'AVNS_pww21FkaqpGQcgixFkB',
+    'port' => 15890,
     'dbname' => 'c2c',
   ],
   'llm' =>

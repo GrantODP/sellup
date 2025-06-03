@@ -5,7 +5,19 @@ require_once './backend/core/Result.php';
 require_once './backend/util/Util.php';
 require_once './backend/db/Database.php';
 
-
+if (!function_exists('getallheaders')) {
+  function getallheaders()
+  {
+    $headers = [];
+    foreach ($_SERVER as $name => $value) {
+      if (str_starts_with($name, 'HTTP_')) {
+        $key = str_replace('_', '-', strtolower(substr($name, 5)));
+        $headers[ucwords($key, '-')] = $value;
+      }
+    }
+    return $headers;
+  }
+}
 
 class Authorizer
 {

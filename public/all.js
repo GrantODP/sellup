@@ -39,33 +39,45 @@ async function renderCategories() {
 }
 
 async function populateListings(listings) {
-  const container = document.getElementById("ads-container");
+  const container = document.getElementById("products-container");
   container.innerHTML = "";
   if (!listings || listings.length === 0) {
     container.innerHTML = `<p>No listings available.</p>`;
     return;
   }
   const template_html = await getTemplate('../frontend/views/ad_article.html');
-  const template = document.createElement('article');
+  const template = document.createElement('div');
   template.innerHTML = template_html.trim();
 
-  for (const listing of listings) {
+
+  const previews = await Promise.all(listings.map(listing =>
+    getPreview(listing.listing_id)
+      .catch(err => {
+        console.error(`Error fetching preview for listing ${listing.listing_id}:`, err);
+        return null;  // Return null if error, so rendering still works
+      })
+      .then(preview => ({
+        listing,
+        preview
+      }))
+  ));
+
+  for (const { listing, preview } of previews) {
     const ad_article = template.cloneNode(true);
-    const preview = await getPreview(listing.listing_id);
 
     if (preview) {
       ad_article.querySelector('img').src = `/${preview.path}`;
     }
 
-    const date = new Date(listing.date);
+    const date = new Date(listing.date_posted);
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
 
     ad_article.querySelector('a').href = `/ads/${listing.slug}`;
-    ad_article.querySelector('.ad-title').textContent = listing.title;
-    ad_article.querySelector('.ad-price').textContent = `R${listing.price}`;
-    ad_article.querySelector('.ad-description').textContent = listing.description;
-    ad_article.querySelector('.ad-date').textContent = `Posted on: ${date.toLocaleDateString(undefined, options)}`;
-    ad_article.querySelector('.ad-location').textContent = `Location: ${titleCase(listing.province)}, ${titleCase(listing.city)}`;
+    ad_article.querySelector('.list-title').textContent = listing.title;
+    ad_article.querySelector('.list-price').textContent = `R${listing.price}`;
+    ad_article.querySelector('.list-description').textContent = listing.description;
+    ad_article.querySelector('.list-date').textContent = `Posted on: ${date.toLocaleDateString(undefined, options)}`;
+    ad_article.querySelector('.list-location').textContent = `Location: ${titleCase(listing.province)}, ${titleCase(listing.city)}`;
 
     container.appendChild(ad_article);
   }
@@ -92,10 +104,11 @@ async function renderListings() {
 
       listings = await getAdListings(id, page, limit, sort_val, sort_dir);
     }
+    console.log(listings);
     await populateListings(listings);
   }
   catch (err) {
-    const container = document.getElementById("ads-container")
+    const container = document.getElementById("products-container")
     if (err instanceof NotfoundError) {
       renderStandardMessage(container, err.message);
     }
@@ -107,8 +120,8 @@ async function renderListings() {
 }
 async function renderPage() {
   initSearch();
-  const container = document.getElementById('page-body');
-  await loadTemplates(container, '../frontend/views/ad_listings_template.html');
+  // const container = document.getElementById('page-body');
+  // await loadTemplates(container, '../frontend/views/ad_listings_template.html');
 
   renderCategories();
   renderListings()

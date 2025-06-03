@@ -32,7 +32,7 @@ export async function getTemplate(url = 'templates.html') {
 }
 
 export async function getResource(uri, method = 'GET', data = null, headers = {}) {
-  const url = `/api/v1${uri}`;
+  const url = `/api/v1/${uri}`;
   const is_form = data instanceof FormData;
   const options = {
     method: method.toUpperCase(),
@@ -386,7 +386,7 @@ export async function getUserReviews(listing_id = "") {
 
 
 export function toLocalDateStr(date) {
-const utc  = date.replace(" ", "T") + "Z";
-const dateObject = new Date(utc);
-return dateObject;
+  const utc = date.replace(" ", "T") + "Z";
+  const dateObject = new Date(utc);
+  return dateObject;
 }
