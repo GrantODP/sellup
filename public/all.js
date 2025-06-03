@@ -49,9 +49,21 @@ async function populateListings(listings) {
   const template = document.createElement('article');
   template.innerHTML = template_html.trim();
 
-  for (const listing of listings) {
+
+  const previews = await Promise.all(listings.map(listing =>
+    getPreview(listing.listing_id)
+      .catch(err => {
+        console.error(`Error fetching preview for listing ${listing.listing_id}:`, err);
+        return null;  // Return null if error, so rendering still works
+      })
+      .then(preview => ({
+        listing,
+        preview
+      }))
+  ));
+
+  for (const { listing, preview } of previews) {
     const ad_article = template.cloneNode(true);
-    const preview = await getPreview(listing.listing_id);
 
     if (preview) {
       ad_article.querySelector('img').src = `/${preview.path}`;
@@ -92,6 +104,7 @@ async function renderListings() {
 
       listings = await getAdListings(id, page, limit, sort_val, sort_dir);
     }
+    console.log(listings);
     await populateListings(listings);
   }
   catch (err) {
@@ -107,8 +120,8 @@ async function renderListings() {
 }
 async function renderPage() {
   initSearch();
-  const container = document.getElementById('page-body');
-  await loadTemplates(container, '../frontend/views/ad_listings_template.html');
+  // const container = document.getElementById('page-body');
+  // await loadTemplates(container, '../frontend/views/ad_listings_template.html');
 
   renderCategories();
   renderListings()
