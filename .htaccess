@@ -1,17 +1,7 @@
 RewriteEngine On
 
-# 1. Force HTTPS
-# This should always be the very first rule to ensure all traffic is secure.
-RewriteCond %{HTTPS} off
-RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301,NE] # Added NE flag for safety with encoded URIs
 
-# 2. Prevent infinite loops for public folder assets if DocumentRoot is not directly 'public'
-# This is crucial. If a request is already for something inside 'public/',
-# don't try to rewrite it again through the public/$2 rule.
-# This assumes your web server's DocumentRoot is NOT the 'public' directory itself.
-# If your DocumentRoot IS 'public', then skip this specific rule and the next one
-# that rewrites to 'public/$2' because it's no longer necessary.
-RewriteRule ^public/(.*)$ - [L] # If path starts with public/, stop processing here.
+RewriteRule ^public/(.*)$ - [L] 
 
 # 3. Skip rewriting for actual existing files and directories
 # (This should check for files/dirs relative to the DocumentRoot)
@@ -23,8 +13,10 @@ RewriteRule ^ - [L]
 # This rule only applies if the asset isn't already directly in public/ (handled by rule 2).
 # And it makes sense if your assets are typically requested as /css/file.css
 # but physically reside at /public/css/file.css
-RewriteRule ^(css|js|images|media)/(.*)$ public/$1/$2 [L] # Corrected to maintain subdirectories
+RewriteRule ^(css|js|images|media)/(.*)$ public/$1/$2 [L] 
 
 # 5. All other routes go to index.php (the router)
 # This rule catches everything else that hasn't been handled above.
-RewriteRule ^ index.php [QSA,L]
+
+RewriteRule ^.*$ index.php [QSA,L]
+
