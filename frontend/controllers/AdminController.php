@@ -14,7 +14,7 @@ class PageAdminController
   {
     $auth = AdminController::handle_admin();
     if ($auth->isErr()) {
-      return Views::get_view('unauthorized.html');
+      return Views::get_view('noauth.php');
     }
 
     return Views::get_view('admin.html');
