@@ -51,8 +51,8 @@ function showSection(id) {
     section.style.display = section.id === id ? 'block' : 'none';
   });
 
-  if (id == 'categories') loadCats();
 
+  if (id = 'categories') loadCats();
 }
 async function loadCats() {
   const cats = await getResource('/api/v1/categories', 'GET', null, {}, true);
@@ -66,12 +66,59 @@ async function searchUser() {
     return;
   }
 }
-
+async function searchListing() {
+  console.log('searching user');
+  const query = document.getElementById('list-search').value.toLowerCase().trim();
+  if (query) {
+    await displayListings(query);
+    return;
+  }
+}
 async function searchSeller() {
   const query = document.getElementById('seller-search').value.toLowerCase().trim();
   if (query) {
     displaySeller(query);
     return;
+  }
+}
+async function displayListings(query) {
+  const container = document.getElementById('listing-list');
+  container.innerHTML = '';
+  try {
+
+    const listings = await getResource(`/api/v1/listings/search?query=${query}`, 'GET', null, {}, true);
+
+    if (!listings) {
+      Swal.fire('Not found', "Listing(s) not found", 'info');
+      return;
+    }
+
+    listings.forEach((ad, index) => {
+      const card = document.createElement('div');
+      card.className = 'col-md-4';
+      card.innerHTML = `
+        <div class="card shadow-sm m-2">
+          <div class="card-body">
+            <h5 class="card-title">${ad.title}</h5>
+            <p class="card-text">
+              <strong>Id:</strong> ${ad.listing_id}<br>
+              <strong>Seller ID:</strong> ${ad.seller_id}<br>
+              <strong>Price:</strong> ${ad.price}<br>
+              <strong>Location:</strong> ${ad.province}, ${ad.city}<br>
+              <strong>Date:</strong> ${ad.date_posted}<br>
+            </p>
+            <a class="btn btn-success btn-sm" target= '#' href=/ads/${ad.slug}>View</a>
+            <button class="btn btn-danger btn-sm" onclick="deleteListing(${ad.listing_id})">Delete</button>
+          </div>
+        </div>
+      `;
+
+      container.appendChild(card);
+    });
+
+
+  } catch (err) {
+    Swal.fire('Error', err.message, 'error');
   }
 }
 
@@ -227,6 +274,7 @@ async function updateCategory() {
   } catch (err) {
     Swal.fire('Error', err.message, 'error');
   }
+
 }
 async function fillCategory() {
   const name = document.getElementById('catName');
@@ -262,6 +310,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     navigateWindow('login');
   }
 
+
   document.getElementById('searchSeller').addEventListener('submit', async function (e) {
     e.preventDefault();
     await searchSeller();
@@ -270,6 +319,11 @@ document.addEventListener("DOMContentLoaded", async function () {
     e.preventDefault();
     await searchUser();
   });
+  document.getElementById('searchListing').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    await searchListing();
+  });
   showSection('users');
 });
+
 
