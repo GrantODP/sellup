@@ -1,4 +1,5 @@
 <?php
+ob_start();
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -126,3 +127,5 @@ $router->add_get('/admin', 'PageAdminController::admin');
 $default = 'PageController::get_all_ads_page';
 
 $router->handle("", $default);
+
+ob_end_flush();
