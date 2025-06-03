@@ -36,7 +36,7 @@
       <div class="card-body" id="page-body">
         <div class="container-fluid mt-5 justify-content-start">
           <div id="category-name" class="mb-5 fw-bold"></div>
-          <div id="ads-page-container" class="row">
+          <div id="products-page-container" class="row">
             <!-- Sidebar: Categories -->
             <nav id="category-container" class="col-md-3 mb-4">
               <div class="bg-light rounded p-3 w-100 h-auto">
@@ -45,7 +45,7 @@
                 </ul>
               </div>
             </nav>
-            <div id="ads-container" class="col-md-9 mt-0">
+            <div id="products-container" class="col-md-9 mt-0">
             </div>
           </div>
         </div>

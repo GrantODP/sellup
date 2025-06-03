@@ -39,7 +39,7 @@ async function renderCategories() {
 }
 
 async function populateListings(listings) {
-  const container = document.getElementById("ads-container");
+  const container = document.getElementById("products-container");
   container.innerHTML = "";
   if (!listings || listings.length === 0) {
     container.innerHTML = `<p>No listings available.</p>`;
@@ -73,11 +73,11 @@ async function populateListings(listings) {
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
 
     ad_article.querySelector('a').href = `/ads/${listing.slug}`;
-    ad_article.querySelector('.ad-title').textContent = listing.title;
-    ad_article.querySelector('.ad-price').textContent = `R${listing.price}`;
-    ad_article.querySelector('.ad-description').textContent = listing.description;
-    ad_article.querySelector('.ad-date').textContent = `Posted on: ${date.toLocaleDateString(undefined, options)}`;
-    ad_article.querySelector('.ad-location').textContent = `Location: ${titleCase(listing.province)}, ${titleCase(listing.city)}`;
+    ad_article.querySelector('.list-title').textContent = listing.title;
+    ad_article.querySelector('.list-price').textContent = `R${listing.price}`;
+    ad_article.querySelector('.list-description').textContent = listing.description;
+    ad_article.querySelector('.list-date').textContent = `Posted on: ${date.toLocaleDateString(undefined, options)}`;
+    ad_article.querySelector('.list-location').textContent = `Location: ${titleCase(listing.province)}, ${titleCase(listing.city)}`;
 
     container.appendChild(ad_article);
   }

@@ -4,7 +4,7 @@ RewriteEngine On
 RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^ - [L]
-
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 # Rewrite requests for static files to /public/
 RewriteRule ^(css|js|images|media|public)/(.*)$ public/$2 [L]
 
