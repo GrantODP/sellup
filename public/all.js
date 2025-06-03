@@ -46,8 +46,7 @@ async function populateListings(listings) {
     return;
   }
   const template_html = await getTemplate('../frontend/views/ad_article.html');
-  console.log(template_html);
-  const template = document.createElement('article');
+  const template = document.createElement('div');
   template.innerHTML = template_html.trim();
 
 
