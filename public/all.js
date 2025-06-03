@@ -108,7 +108,7 @@ async function renderListings() {
     await populateListings(listings);
   }
   catch (err) {
-    const container = document.getElementById("ads-container")
+    const container = document.getElementById("products-container")
     if (err instanceof NotfoundError) {
       renderStandardMessage(container, err.message);
     }

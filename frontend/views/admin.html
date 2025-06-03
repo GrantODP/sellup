@@ -72,14 +72,19 @@
         <!-- LISTINGS -->
         <div id="listings" class="admin-section">
           <h3>Listings</h3>
-          <input type="text" id="deleteListingId" class="form-control mb-2" placeholder="Listing ID">
-          <button class="btn btn-danger" onclick="deleteListing()">Delete Listing</button>
+          <form id="searchListing" class="my-5">
+            <input type="text" name="listing_search" id="list-search" class="form-control mb-4"
+              placeholder="Search listing title">
+            <button type="submit" class="btn btn-primary">Search Listing</button>
+            <div id="listing-list" class="row gy-3 my-5"></div>
+          </form>
         </div>
 
         <!-- CATEGORIES -->
         <div id="categories" class="admin-section">
           <h3>Add Category</h3>
-          <input type="text" id="catId" oninput="fillCategory()" class="form-control mb-2" placeholder="Category ID">
+          <input type="text" id="catId" name="category_id" oninput="fillCategory()" class="form-control mb-2"
+            placeholder="Category ID">
           <input type="text" id="catName" class="form-control mb-2" placeholder="Category Name">
           <input type="text" id="catDescp" class="form-control mb-2" placeholder="Category Description">
           <button class="btn btn-success" onclick="addCategory()">Add Category</button>
