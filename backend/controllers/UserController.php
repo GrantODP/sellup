@@ -92,6 +92,23 @@ class UserController
     return Responder::success();
   }
 
+  // POST /logout
+  public static function logout()
+  {
+    setcookie(
+      'auth_token',
+      '',
+      [
+        'expires' => time() - 3600, // 1 hour
+        'path' => '/',
+        'secure' => true,     // Only send over HTTPS
+        'httponly' => true,   // Inaccessible to JavaScript
+        'samesite' => 'Strict' // Prevent CSRF
+      ]
+    );
+    return Responder::success();
+  }
+
   // GET /user
   public static function get_user()
   {

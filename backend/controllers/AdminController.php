@@ -30,6 +30,49 @@ class AdminController
     return $admin_auth;
   }
 
+  // POST admin
+  public static function create_admin()
+  {
+    $auth = self::handle_admin();
+    if ($auth->isErr()) {
+      return Responder::result_error($auth);
+    }
+    $user_id = $_GET['id'] ?? 0;
+    $user = User::get_by_id($user_id);
+
+    if (empty($user)) {
+      return Responder::not_found('No user by id');
+    }
+
+    $result = Admin::insert_admin($user);
+    if ($result->isErr()) {
+      return Responder::result_error($result);
+    }
+
+    return Responder::success();
+  }
+  // DELETE admin
+  public static function delete_admin()
+  {
+    $auth = self::handle_admin();
+    if ($auth->isErr()) {
+      return Responder::result_error($auth);
+    }
+    $user_id = $_GET['id'] ?? 0;
+    $user = User::get_by_id($user_id);
+
+    if (empty($user)) {
+      return Responder::not_found('No user by id');
+    }
+
+    $result = Admin::delete_admin($user);
+    if ($result->isErr()) {
+      return Responder::result_error($result);
+    }
+
+    return Responder::success();
+  }
+
 
   // GET admin/users
   public static function get_users()
@@ -39,7 +82,11 @@ class AdminController
       return Responder::result_error($auth);
     }
     $email = $_GET['email'] ?? '';
-    $users = User::get_by_email($email);
+    if (empty($email)) {
+      $users = User::get_all();
+    } else {
+      $users = User::get_by_email($email);
+    }
     return Responder::success($users);
   }
   // GET admin/sellers
