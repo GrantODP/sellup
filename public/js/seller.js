@@ -1,5 +1,4 @@
 import { Swal, navigateWindow, getSellerListings, getUserSellerInfo, isLoggedIn, getUrlParams, getLocalData, storeLocalData, updateListing, uploadLisingImages } from "../script.js";
-
 async function loadSection(section) {
   const content = document.getElementById('main-content');
   try {
@@ -121,7 +120,7 @@ function loadListingEdit(listing) {
 
       <div class="mb-3">
         <label for="images" class="form-label">Upload Images</label>
-        <input class="form-control" type="file" id="images" name="images[]" accept="image/*" multiple>
+        <input class="form-control" id="imageInput" type="file" id="images" name="images[]" accept="image/*" multiple>
         <small class="form-text text-muted">You can upload multiple images.</small>
       </div>
 
@@ -130,6 +129,7 @@ function loadListingEdit(listing) {
 
     <button type="button" class="btn btn-link mt-3" id="cancel-edit">Cancel</button>
   `;
+
 
   document.getElementById('cancel-edit').addEventListener('click', () => {
     loadAds(container);
@@ -167,7 +167,6 @@ function loadListingEdit(listing) {
   document.getElementById('upload-images-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
-
     try {
       await uploadLisingImages(listing.listing_id, formData);
 
@@ -188,14 +187,18 @@ function loadListingEdit(listing) {
       });
     }
   });
+
 }
+
 
 function initPage() {
   document.getElementById('btn-profile').onclick = () => loadSection('info');
   document.getElementById('btn-ads').onclick = () => loadSection('ads');
+
   const sec = getUrlParams().get('sec') ?? 'info';
 
   loadSection(sec);
+
 }
 
 document.addEventListener("DOMContentLoaded", async function () {

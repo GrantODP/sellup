@@ -234,14 +234,13 @@ async function displaySeller(uid = '') {
   }
 }
 
-async function deleteListing() {
-  const id = document.getElementById('deleteListingId').value;
+async function deleteListing(id) {
   const result = await Swal.fire({
     title: 'Are you sure?',
     text: 'This action will permanently delete the listing.',
     icon: 'warning',
     showCancelButton: true,
-    confirmButtonText: 'Yes, delete user',
+    confirmButtonText: 'Yes, delete listing',
     cancelButtonText: 'Cancel'
   });
 
@@ -249,6 +248,7 @@ async function deleteListing() {
   try {
     await getResource(`listings?id=${id}`, 'DELETE');
     Swal.fire('Deleted!', 'Listing was successfully deleted.', 'success');
+    searchListing();
   } catch (err) {
     Swal.fire('Error', err.message, 'error');
   }
@@ -344,16 +344,17 @@ async function fillCategory() {
 function applyRoleChange(user_id) {
   const select = document.getElementById(`role-select-${user_id}`);
   const selected = select.value;
-
+  console.log('changeRoles');
   if (!selected) {
     Swal.fire('No Role Selected', 'Please select a role before applying changes.', 'warning');
     return;
   }
 
-  changeRole(user_id, selectedRole);
+  changeRole(user_id, selected);
 }
+
 async function changeRole(user_id, role) {
-  const path = `admin?id=${user_id}`;
+  const path = `?id=${user_id}`;
 
   try {
     if (role === 'admin') {
