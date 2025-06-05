@@ -41,6 +41,10 @@
             <a id="btn-seller" href="/seller"
               class="btn btn-link nav-link text-white text-start p-2 w-100">Seller info</a>
           </li>
+          <li class="nav-item mb-2">
+            <button id="btn-logout" href=""
+              class="btn btn-link nav-link text-white text-start p-2 w-100">Logout</button>
+          </li>
         </ul>
       </nav>
 
