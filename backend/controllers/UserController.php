@@ -387,13 +387,13 @@ class UserController
     $result_cart = Cart::checkout($user);
 
     if ($result_cart->isErr()) {
-      return Responder::error($result_cart->unwrapErr());
+      return Responder::result_error($result_cart);
     }
 
     $order_result = Order::create_order($result_cart->unwrap());
 
     if ($order_result->isErr()) {
-      return Responder::server_error($order_result->unwrapErr());
+      return Responder::result_error($order_result);
     }
 
     return Responder::success();
