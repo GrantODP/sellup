@@ -37,7 +37,11 @@ function has_required_keys(?array $data, array $keys): bool
 
 function gen_slug(string $title): string
 {
-  $slug = strtolower($title);
-  $slug = trim($slug);
-  return str_replace(' ', '-', $slug);
+  $slug = strtolower(trim($title));
+
+  $slug = preg_replace('/[^a-z0-9]+/', '-', $slug);
+
+  $slug = trim($slug, '-');
+
+  return $slug;
 }
