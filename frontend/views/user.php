@@ -20,9 +20,9 @@
 
 
   <div class="container-fluid">
-    <div class="row min-vh-100">
+    <div class="row flex-column flex-md-row min-vh-100">
       <!-- Sidebar -->
-      <nav class="col-3 bg-dark text-white p-3">
+      <nav class="col-12 col-md-3 col-lg-2 bg-dark text-white p-3">
         <h4 class="text-center mb-4">User Panel</h4>
         <ul class="nav nav-pills flex-column w-100 side">
           <li class="nav-item mb-2">
@@ -41,11 +41,15 @@
             <a id="btn-seller" href="/seller"
               class="btn btn-link nav-link text-white text-start p-2 w-100">Seller info</a>
           </li>
+          <li class="nav-item mb-2">
+            <button id="btn-logout" href=""
+              class="btn btn-link nav-link text-white text-start p-2 w-100">Logout</button>
+          </li>
         </ul>
       </nav>
 
       <!-- Main Content -->
-      <main id="main-content" class="col-md-9 ms-sm-auto col-lg-9 px-md-4 py-4">
+      <main id="main-content" class="col-12 col-md-9 col-lg-10 px-3 py-4">
       </main>
     </div>
   </div>

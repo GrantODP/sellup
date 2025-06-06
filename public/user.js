@@ -1,4 +1,4 @@
-import { checkout, getCart, getListing, getLocalData, storeLocalData, getOrder, getOrders, getSessionData, getUrlParams, getUserInfo, isLoggedIn, navigateWindow, removeCartItem, storeSessionData, updatePassword, updateUserInfo } from "./script.js";
+import { checkout, getCart, getListing, getLocalData, storeLocalData, getOrder, getOrders, getSessionData, getUrlParams, getUserInfo, isLoggedIn, navigateWindow, removeCartItem, storeSessionData, updatePassword, updateUserInfo, getResource } from "./script.js";
 import Swal from 'https://cdn.jsdelivr.net/npm/sweetalert2@11/+esm';
 
 async function loadSection(section) {
@@ -376,10 +376,34 @@ async function loadChangePassword() {
     }
   });
 }
+
+async function logout() {
+  const result = await Swal.fire({
+    title: 'Are you sure?',
+    text: 'This action will log you out.',
+    icon: 'info',
+    showCancelButton: true,
+    confirmButtonText: 'Logout',
+    cancelButtonText: 'Cancel'
+  });
+
+  if (!result.isConfirmed) return;
+
+  try {
+    await getResource('logout', 'POST');
+    localStorage.clear();
+    Swal.fire('Logged out!', '', 'success');
+    navigateWindow('browse');;
+  } catch (err) {
+    Swal.fire('Error', err.message, 'error');
+  }
+}
+
 function initPage() {
   document.getElementById('btn-profile').onclick = () => loadSection('user-info');
   document.getElementById('btn-orders').onclick = () => loadSection('orders');
   document.getElementById('btn-cart').onclick = () => loadSection('cart');
+  document.getElementById('btn-logout').onclick = () => logout();
 
   const sec = getUrlParams().get('sec') ?? 'user-info';
 

@@ -60,12 +60,29 @@ async function loadCats() {
 }
 async function searchUser() {
   console.log('searching user');
+  const container = document.getElementById('user-list');
   const query = document.getElementById('user-search').value.toLowerCase().trim();
-  if (query) {
-    await displayUser(query);
-    return;
+  container.innerHTML = '';
+
+  try {
+    if (query) {
+      const user = await getResource(`users?email=${query}`);
+      displayUser(container, user);
+      return;
+    } else {
+      const users = await getResource('users');
+      users.forEach(user => {
+        displayUser(container, user);
+      });
+    }
+  }
+  catch (err) {
+    console.error('Failed to load users:', err);
+    Swal.fire('Error', `Could not load users: ${err.message}`, 'error');
   }
 }
+
+
 async function searchListing() {
   console.log('searching user');
   const query = document.getElementById('list-search').value.toLowerCase().trim();
@@ -122,21 +139,21 @@ async function displayListings(query) {
   }
 }
 
-async function displayUser(email = '') {
-  const container = document.getElementById('user-list');
-  container.innerHTML = '';
-  if (!email)
+async function displayUser(container, user) {
+  console.log(user);
+  if (user === undefined) {
     return;
-  try {
-    const user = await getResource(`users?email=${email}`);
-    if (!user) {
-      Swal.fire('Not found', "User not found", 'info');
-      return;
-    }
+  }
 
-    const card = document.createElement('div');
-    card.className = 'col-md-4';
-    card.innerHTML = `
+  if (!user) {
+    Swal.fire('Not found', "User not found", 'info');
+    return;
+  }
+
+
+  const card = document.createElement('div');
+  card.className = 'col-md-4';
+  card.innerHTML = `
         <div class="card shadow-sm">
           <div class="card-body">
             <h5 class="card-title">${user.name}</h5>
@@ -145,25 +162,40 @@ async function displayUser(email = '') {
               <strong>Email:</strong> ${user.email}<br>
               <strong>Contact:</strong> ${user.contact}
             </p>
+            <div class="mb-2 d-flex align-items-center gap-2">
+              <select class="form-select form-select-sm w-50" id="role-select-${user.id}">
+                <option value="" selected disabled>Select role</option>
+                <option value="user">User</option>
+                <option value="admin">Admin</option>
+              </select>
+              <button class="btn btn-primary btn-sm" onclick="applyRoleChange(${user.id})">Change Role</button>
+            </div>
             <button class="btn btn-danger btn-sm" onclick="deleteUser(${user.id})">Delete</button>
           </div>
         </div>
       `;
 
-    container.appendChild(card);
+  container.appendChild(card);
 
-  } catch (err) {
-    Swal.fire('Error', err.message, 'error');
-  }
 }
 
 
 
 async function deleteUser(id) {
+  const result = await Swal.fire({
+    title: 'Are you sure?',
+    text: 'This action will permanently delete the user.',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, delete user',
+    cancelButtonText: 'Cancel'
+  });
+
+  if (!result.isConfirmed) return;
   try {
     await getResource(`users?id=${id}`, 'DELETE');
     Swal.fire('Deleted!', 'User was successfully deleted.', 'success');
-    displayUser('');
+    displayUser(null, undefined);
   } catch (err) {
     Swal.fire('Error', err.message, 'error');
   }
@@ -202,11 +234,21 @@ async function displaySeller(uid = '') {
   }
 }
 
-async function deleteListing() {
-  const id = document.getElementById('deleteListingId').value;
+async function deleteListing(id) {
+  const result = await Swal.fire({
+    title: 'Are you sure?',
+    text: 'This action will permanently delete the listing.',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, delete listing',
+    cancelButtonText: 'Cancel'
+  });
+
+  if (!result.isConfirmed) return;
   try {
     await getResource(`listings?id=${id}`, 'DELETE');
     Swal.fire('Deleted!', 'Listing was successfully deleted.', 'success');
+    searchListing();
   } catch (err) {
     Swal.fire('Error', err.message, 'error');
   }
@@ -298,6 +340,37 @@ async function fillCategory() {
     console.warn('Category not found for ID:', id);
   }
 }
+
+function applyRoleChange(user_id) {
+  const select = document.getElementById(`role-select-${user_id}`);
+  const selected = select.value;
+  console.log('changeRoles');
+  if (!selected) {
+    Swal.fire('No Role Selected', 'Please select a role before applying changes.', 'warning');
+    return;
+  }
+
+  changeRole(user_id, selected);
+}
+
+async function changeRole(user_id, role) {
+  const path = `?id=${user_id}`;
+
+  try {
+    if (role === 'admin') {
+      await getResource(path, 'POST');
+      Swal.fire('Updated!', `Promoted user ${user_id} to admin`, 'success');
+    } else if (role === 'user') {
+      await getResource(path, 'DELETE');
+      Swal.fire('Updated!', `Demoted user ${user_id} to user`, 'success');
+    } else {
+      Swal.fire('Info', `Unsupported role: ${role}`, 'info');
+    }
+  } catch (err) {
+    Swal.fire('Error', err.message, 'error');
+  }
+}
+
 async function isLoggedIn() {
   const token = await getResource('/api/v1/auth/status', 'GET', null, {}, true);
   return token == 'valid';

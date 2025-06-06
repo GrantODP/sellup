@@ -208,7 +208,7 @@ class SellerController
     $result = Image::save($listing->listing_id);
 
     if ($result->isErr()) {
-      return Responder::server_error('Failed uploading: ' . implode(",", $result->unwrapErr()));
+      return Responder::result_error($result);
     }
 
 
