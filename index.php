@@ -29,7 +29,6 @@ Database::connect();
 
 $router = new Router();
 
-//api/v1/v1
 //UserController
 $router->add_post('/api/v1/user/create', 'UserController::post');
 $router->add_post('/api/v1/user/report', 'UserController::report');

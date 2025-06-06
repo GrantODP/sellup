@@ -128,7 +128,13 @@ export function getUrlParams() {
   return new URLSearchParams(queryString);
 }
 
-export function getAdListings(category = 0, page = 1, limit = 5, sort = 'date', dir = 'desc') {
+export function getAdListings(
+  category = 0,
+  page = 1,
+  limit = 5,
+  sort = 'date',
+  dir = 'desc'
+) {
   const listings = getResource(`listings/category?id=${category}&page=${page}&sort=${sort}&limit=${limit}&dir=${dir}`);
   return listings;
 }

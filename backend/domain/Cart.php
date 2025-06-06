@@ -85,7 +85,7 @@ class Cart
 
       return Result::Ok($cart);
     } catch (PDOException $e) {
-      return Result::Err(new UnauthorizedError($e->getMessage()));
+      return Result::Err(new InternalServerError($e->getMessage()));
     }
   }
 
