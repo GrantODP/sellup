@@ -209,8 +209,8 @@ export function setOnClick(container_id, action) {
   document.getElementById(container_id).addEventListener("click", (e) => action());
 }
 
-export function navigateWindow(page) {
-  return window.location.href = `/${page}`;
+export function navigateWindow(page, new_tab = false) {
+  return new_tab ? window.open(`/${page}`, '_blank') : window.location.href = `/${page}`;
 }
 
 export async function login(email, password) {

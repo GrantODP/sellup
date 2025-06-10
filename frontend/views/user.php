@@ -50,6 +50,74 @@
 
       <!-- Main Content -->
       <main id="main-content" class="col-12 col-md-9 col-lg-10 px-3 py-4">
+        <div id="section-profile" class="content-section d-none">
+        </div>
+
+        <div id="section-orders" class="content-section d-none">
+          <h3 class="mb-4">My Orders</h3>
+          <div id="orders-accordion" class="accordion">
+          </div>
+          <div id="no-orders-message" class="d-none">
+            <div class="alert alert-info text-center mt-4 p-4 shadow-sm">
+              <h3>You have no orders at the moment.</h3>
+              <p>Start exploring our products!</p>
+              <a href="/browse" class="btn btn-primary mt-3">Browse Products</a>
+            </div>
+          </div>
+        </div>
+
+        <div id="section-cart" class="content-section d-none">
+          <h3 class="mb-4">Your Shopping Cart</h3>
+          <div id="cart-items-container" class="row g-3">
+          </div>
+          <div id="cart-summary-checkout" class="mt-4 p-3 bg-light border rounded shadow-sm d-flex justify-content-between align-items-center d-none">
+            <h4 class="mb-0">Cart Total: <span id="cart-total-display" class="text-success">R0.00</span></h4>
+            <button id="checkout-btn" class="btn btn-success btn-lg">
+              <i class="bi bi-credit-card me-2"></i> Proceed to Checkout
+            </button>
+          </div>
+          <div id="empty-cart-message" class="d-none">
+            <div class="text-center my-5 p-4 shadow-sm alert alert-light">
+              <h3 class="mb-3">Your cart is empty 🛒</h3>
+              <p class="lead">Looks like you haven't added anything yet. Let's find some great deals!</p>
+              <a href="/browse" class="btn btn-primary btn-lg mt-3">Start Shopping Now</a>
+            </div>
+          </div>
+        </div>
+
+        <div id="section-edit-profile" class="content-section d-none">
+          <h3>Edit Profile</h3>
+          <form id="edit-profile-form" class="mb-4">
+            <div class="mb-3">
+              <label for="contact" class="form-label">Contact</label>
+              <input type="tel" id="contact" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+          </form>
+        </div>
+
+        <div id="section-change-password" class="content-section d-none">
+          <h3>Change Password</h3>
+          <form id="change-password-form">
+            <div class="mb-3">
+              <label for="current-password" class="form-label">Current Password</label>
+              <input type="password" id="current-password" class="form-control" required>
+            </div>
+            <div class="mb-3">
+              <label for="new-password" class="form-label">New Password</label>
+              <input type="password" id="new-password" class="form-control" required>
+            </div>
+            <div class="mb-3">
+              <label for="confirm-password" class="form-label">Confirm New Password</label>
+              <input type="password" id="confirm-password" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Update Password</button>
+          </form>
+        </div>
+
+        <div id="section-order-detail" class="content-section d-none">
+        </div>
+
       </main>
     </div>
   </div>
