@@ -61,6 +61,7 @@ $router->add_post('/api/v1/listings', 'SellerController::post_listing');
 $router->add_get('/api/v1/sellers/listings', 'SellerController::get_listings');
 $router->add_get('/api/v1/sellers', 'SellerController::get_seller');
 $router->add_get('/api/v1/sellers/rating', 'SellerController::get_rating');
+$router->add_get('/api/v1/sellers/orders', 'SellerController::get_orders');
 $router->add_post('/api/v1/sellers/listings', 'SellerController::update_listing');
 $router->add_delete('/api/v1/sellers/listings', 'SellerController::delete_listing');
 $router->add_post('/api/v1/listings/media', 'SellerController::add_listing_images');
