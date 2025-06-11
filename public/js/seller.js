@@ -416,7 +416,6 @@ function loadListingEdit(listing) {
       });
     }
   });
-
 }
 
 

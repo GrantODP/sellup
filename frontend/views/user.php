@@ -86,14 +86,24 @@
         </div>
 
         <div id="section-edit-profile" class="content-section d-none">
+          <h3>Change Profile Picture</h3>
+          <form id="change-picture-form" class="mb-4" enctype="multipart/form-data">
+            <div class="mb-3">
+              <label for="images" class="form-label">Profile Picture</label>
+              <input type="file" id="profile-picture" name="images" class="form-control" accept="image/*">
+            </div>
+            <button type="submit" class="btn btn-primary">Upload Picture</button>
+          </form>
+
           <h3>Edit Profile</h3>
           <form id="edit-profile-form" class="mb-4">
             <div class="mb-3">
               <label for="contact" class="form-label">Contact</label>
-              <input type="tel" id="contact" class="form-control" required>
+              <input type="tel" id="contact" name="contact" class="form-control" required>
             </div>
             <button type="submit" class="btn btn-primary">Save Changes</button>
           </form>
+
         </div>
 
         <div id="section-change-password" class="content-section d-none">
