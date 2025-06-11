@@ -126,8 +126,11 @@ class Image
 
       $name = basename($original_name);
       $name = $id . '-' . $name;
-      $target = substr(md5($name), 0, 16);
+
+      $extension = pathinfo($original_name, PATHINFO_EXTENSION);
+      $target = substr(md5($name), 0, 16) . '.' . strtolower($extension); // hash + extension
       $target_loc = $target_dir . '/' . $target;
+
       if (move_uploaded_file($tmp_name, $target_loc)) {
         $uploaded[] = $target;
       } else {

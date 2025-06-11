@@ -123,8 +123,8 @@ async function renderPage() {
   // const container = document.getElementById('page-body');
   // await loadTemplates(container, '../frontend/views/ad_listings_template.html');
 
-  renderCategories();
-  renderListings()
+  await renderCategories();
+  await renderListings();
 }
 
 async function initSearch() {
