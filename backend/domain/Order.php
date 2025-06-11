@@ -5,6 +5,13 @@ require_once './backend/core/Result.php';
 require_once './backend/domain/Cart.php';
 require_once './backend/domain/Listing.php';
 
+class SellerOrder
+{
+  public int $order_id;
+  public array $items;
+  public int $seller_id;
+  public float $total;
+}
 
 class Order
 {
@@ -38,8 +45,8 @@ class Order
 
 
       $stmt_order = $db->prepare("
-        INSERT INTO orders (user_id, total_amount) 
-        VALUES (:user_id, :total_amount)
+        INSERT INTO orders (user_id, total_amount, seller_id) 
+        VALUES (:user_id, :total_amount, :seller_id)
       ");
 
       $stmt_order->execute([
@@ -87,6 +94,78 @@ class Order
       $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
       return Result::Ok($orders);
+    } catch (PDOException $e) {
+      return Result::Err(new InternalServerError("Error: " . $e->getMessage()));
+    }
+  }
+
+  public static function get_seller_orders(Seller $seller): Result
+  {
+    try {
+      Database::connect();
+      $db = Database::db();
+
+      $sql =
+        "SELECT 
+    orders.order_id,
+    orders.user_id AS buyer_id,
+    listings.seller_id,
+    listings.listing_id
+FROM 
+    orders
+JOIN 
+    order_items ON orders.order_id = order_items.order_id
+JOIN 
+    listings ON order_items.listing_id = listings.listing_id
+WHERE 
+    listings.seller_id = :id";
+
+      $params = [
+        ':id' => $seller->seller_id,
+      ];
+
+      $stmt = $db->prepare($sql);
+      $stmt->execute($params);
+      $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+      return Result::Ok($orders);
+    } catch (PDOException $e) {
+      return Result::Err(new InternalServerError("Error: " . $e->getMessage()));
+    }
+  }
+  public static function can_get_order(Seller $seller, Order $order): Result
+  {
+    try {
+      Database::connect();
+      $db = Database::db();
+
+      $sql =
+        "SELECT 
+    order_items.*
+FROM 
+    orders
+JOIN 
+    order_items ON orders.order_id = order_items.order_id
+JOIN 
+    listings ON order_items.listing_id = listings.listing_id
+WHERE 
+    listings.seller_id = :id AND order_items.order_id = :oid";
+
+      $params = [
+        ':id' => $seller->seller_id,
+        ':oid' => $order->order_id,
+      ];
+
+      $stmt = $db->prepare($sql);
+      $stmt->execute($params);
+      $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+      if ($stmt->rowCount() == 0) {
+        return Result::Ok(false);
+      } else {
+
+        return Result::Ok(true);
+      }
     } catch (PDOException $e) {
       return Result::Err(new InternalServerError("Error: " . $e->getMessage()));
     }

@@ -214,4 +214,85 @@ class SellerController
 
     return Responder::success($result->unwrap());
   }
+
+  //GET sellers/orders
+  public static function get_orders()
+  {
+
+    $auth_token = Authorizer::validate_token_header();
+
+    if (!$auth_token->is_valid()) {
+      return Responder::unauthorized($auth_token->message());
+    }
+
+    $seller = Seller::get_seller_by_user_id($auth_token->user_id());
+
+    if (empty($seller)) {
+      return Responder::not_found("No seller found matching auth token");
+    }
+
+    //Single order
+    $order_id = (int) ($_GET["id"] ?? 0);
+    if ($order_id) {
+      $order = Order::get_order($order_id);
+
+      if (!$order) {
+        return Responder::not_found("Order not found");
+      }
+
+      $result_bool = Order::can_get_order($seller, $order);
+
+      if ($result_bool->isErr()) {
+        return Responder::result_error($result_bool);
+      }
+
+      if (!$result_bool->unwrap()) {
+        return Responder::forbidden("User not authorized to view order");
+      }
+
+      return Responder::success($order);
+    } else {
+      //get all
+      $result = Order::get_seller_orders($seller);
+
+      if ($result->isErr()) {
+        return Responder::error($result->unwrapErr());
+      }
+
+      return Responder::success($result->unwrap());
+    }
+  }
+  // DELETE sellers/orders
+  public static function delete_order()
+  {
+
+    $auth_token = Authorizer::validate_token_header();
+
+    if (!$auth_token->is_valid()) {
+      return Responder::unauthorized($auth_token->message());
+    }
+
+    $user = User::get_by_id($auth_token->user_id());
+
+    if (empty($user)) {
+      return Responder::not_found("No user found matching auth token");
+    }
+
+    $order_id = $_GET["id"] ?? 0;
+    if (empty($order_id)) {
+      return Responder::not_found("Order for user not found");
+    }
+    $result = Order::delete_order($user, $order_id);
+    if ($result->isErr()) {
+      return Responder::server_error($result->unwrapErr());
+    }
+
+    $changed = $result->unwrap();
+
+    if (!$changed) {
+      return Responder::not_found("User does not have an order matching id");
+    }
+
+    return Responder::success($result->unwrap());
+  }
 }
