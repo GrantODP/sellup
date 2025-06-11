@@ -247,7 +247,6 @@ export async function loadOrderDetail(orderId) {
     card.className = 'col-12';
     card.innerHTML = `
             <div class="card p-3 shadow-sm d-flex flex-row align-items-center">
-                <img src="${listing.image_url || 'https://via.placeholder.com/80'}" class="img-thumbnail me-3" alt="${listing.title}" style="width: 80px; height: 80px; object-fit: cover;">
                 <div class="flex-grow-1">
                     <h5 class="mb-1">${listing.title}</h5>
                     <p class="mb-1 text-muted">Price: R${parseFloat(item.price).toFixed(2)} x ${item.quantity}</p>
@@ -263,6 +262,7 @@ export async function loadOrderDetail(orderId) {
 
   itemListContainer.appendChild(itemList);
   container.appendChild(itemListContainer);
+
 
   const actionButtonsDiv = document.createElement('div');
   actionButtonsDiv.className = 'd-flex justify-content-end gap-2 mt-4';
@@ -294,7 +294,6 @@ async function loadCart() {
   cartItemsContainer.innerHTML = '';
   cartSummaryCheckout.classList.add('d-none');
   emptyCartMessage.classList.add('d-none');
-
   const cart = await getCart();
   const cartItems = cart.cart_items;
 
@@ -316,7 +315,6 @@ async function loadCart() {
 
     itemCol.innerHTML = `
             <div class="card mb-2 p-3 shadow-sm d-flex flex-row align-items-center">
-                <img src="${listing.image_url || 'https://via.placeholder.com/60'}" class="img-thumbnail me-3" alt="${listing.title}" style="width: 60px; height: 60px; object-fit: cover;">
                 <div class="flex-grow-1">
                     <h5 class="mb-1">${listing.title}</h5>
                     <p class="mb-1 text-muted">Price: R${price.toFixed(2)} x ${quantity}</p>
@@ -357,7 +355,32 @@ async function loadCart() {
 async function loadEditProfileForm() {
   const user = await getUserInfo();
   document.getElementById('contact').value = user.contact;
+
+
+  document.getElementById('change-picture-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    try {
+      await getResource("user/profile-pic", "POST", formData);
+      await Swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: 'Images uploaded successfully!',
+        timer: 2000,
+        showConfirmButton: false
+      });
+      loadSection('ads');
+
+    } catch (err) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: err.message,
+      });
+    }
+  });
 }
+
 
 
 async function logout() {

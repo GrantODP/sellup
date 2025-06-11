@@ -328,7 +328,6 @@ class UserController
       return Responder::not_found("No user found matching auth token");
     }
 
-
     $result = Cart::get_cart($user);
 
     if ($result->isErr()) {

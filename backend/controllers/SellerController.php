@@ -214,4 +214,107 @@ class SellerController
 
     return Responder::success($result->unwrap());
   }
+
+  //GET sellers/orders
+  public static function get_orders()
+  {
+
+    $auth_token = Authorizer::validate_token_header();
+
+    if (!$auth_token->is_valid()) {
+      return Responder::unauthorized($auth_token->message());
+    }
+
+    $seller = Seller::get_seller_by_user_id($auth_token->user_id());
+
+    if (empty($seller)) {
+      return Responder::not_found("No seller found matching auth token");
+    }
+
+    //Single order
+    $order_id = (int) ($_GET["id"] ?? 0);
+    if ($order_id) {
+      $order = Order::get_order($order_id);
+
+      if (!$order) {
+        return Responder::not_found("Order not found");
+      }
+
+      $result_bool = Order::can_get_order($seller, $order);
+
+      if ($result_bool->isErr()) {
+        return Responder::result_error($result_bool);
+      }
+
+      if (!$result_bool->unwrap()) {
+        return Responder::forbidden("User not authorized to view order");
+      }
+
+      return Responder::success($order);
+    } else {
+      //get all
+      $result = Order::get_seller_orders($seller);
+
+      if ($result->isErr()) {
+        return Responder::error($result->unwrapErr());
+      }
+
+      return Responder::success($result->unwrap());
+    }
+  }
+  // PUT sellers/orders
+  public static function update_order()
+  {
+
+    $auth_token = Authorizer::validate_token_header();
+
+    if (!$auth_token->is_valid()) {
+      return Responder::unauthorized($auth_token->message());
+    }
+
+    $seller = Seller::get_seller_by_user_id($auth_token->user_id());
+
+    if (empty($seller)) {
+      return Responder::not_found("No seller found matching auth token");
+    }
+
+    $data = get_input_json();
+
+    $order_id = $data["id"] ?? 0;
+    $status = trim($data["status"] ?? "");
+    $accepted = ['paid', 'delivered', 'cancelled'];
+
+    if (!in_array($status, $accepted)) {
+      return Responder::bad_request("Invalid status parameter $status");
+    }
+
+    if ($order_id && $status) {
+      $order = Order::get_order($order_id);
+
+      if (!$order) {
+        return Responder::not_found("Order not found");
+      }
+
+      $result_bool = Order::can_get_order($seller, $order);
+
+      if ($result_bool->isErr()) {
+        return Responder::result_error($result_bool);
+      }
+
+      if (!$result_bool->unwrap()) {
+        return Responder::forbidden("User not authorized to view order");
+      }
+
+
+      $result = Order::update_order_status($status, $order);
+
+      if ($result->isErr()) {
+        return Responder::result_error($result);
+      }
+
+      return Responder::success($result->unwrap());
+    }
+
+    return Responder::bad_request("Missing request parameters");
+  }
 }

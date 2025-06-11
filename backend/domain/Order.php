@@ -5,6 +5,13 @@ require_once './backend/core/Result.php';
 require_once './backend/domain/Cart.php';
 require_once './backend/domain/Listing.php';
 
+class SellerOrder
+{
+  public int $order_id;
+  public array $items;
+  public int $seller_id;
+  public float $total;
+}
 
 class Order
 {
@@ -13,6 +20,7 @@ class Order
   public array $items;
   public int $user_id;
   public float $total;
+  public $status;
 
   public function __construct(array $items, array $order)
   {
@@ -20,6 +28,7 @@ class Order
     $this->items = $items;
     $this->total = $order['total_amount'];
     $this->user_id = $order['user_id'];
+    $this->status = $order['status'];
   }
 
   public static function create_order(Cart $cart): Result
@@ -92,6 +101,79 @@ class Order
     }
   }
 
+  public static function get_seller_orders(Seller $seller): Result
+  {
+    try {
+      Database::connect();
+      $db = Database::db();
+
+      $sql =
+        "SELECT 
+    orders.order_id,
+    orders.user_id AS buyer_id,
+    orders.*,
+    listings.seller_id,
+    listings.listing_id
+FROM 
+    orders
+JOIN 
+    order_items ON orders.order_id = order_items.order_id
+JOIN 
+    listings ON order_items.listing_id = listings.listing_id
+WHERE 
+    listings.seller_id = :id";
+
+      $params = [
+        ':id' => $seller->seller_id,
+      ];
+
+      $stmt = $db->prepare($sql);
+      $stmt->execute($params);
+      $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+      return Result::Ok($orders);
+    } catch (PDOException $e) {
+      return Result::Err(new InternalServerError("Error: " . $e->getMessage()));
+    }
+  }
+  public static function can_get_order(Seller $seller, Order $order): Result
+  {
+    try {
+      Database::connect();
+      $db = Database::db();
+
+      $sql =
+        "SELECT
+    order_items.*
+FROM 
+    orders
+JOIN 
+    order_items ON orders.order_id = order_items.order_id
+JOIN 
+    listings ON order_items.listing_id = listings.listing_id
+WHERE 
+    listings.seller_id = :id AND order_items.order_id = :oid";
+
+      $params = [
+        ':id' => $seller->seller_id,
+        ':oid' => $order->order_id,
+      ];
+
+      $stmt = $db->prepare($sql);
+      $stmt->execute($params);
+      $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+      if ($stmt->rowCount() == 0) {
+        return Result::Ok(false);
+      } else {
+
+        return Result::Ok(true);
+      }
+    } catch (PDOException $e) {
+      return Result::Err(new InternalServerError("Error: " . $e->getMessage()));
+    }
+  }
+
   public static function get_order(int $order_id): ?Order
   {
     try {
@@ -99,7 +181,7 @@ class Order
       $db = Database::db();
 
       $stmt = $db->prepare("SELECT listing_id, quantity, price, subtotal FROM order_items WHERE order_id = :id");
-      $stmt_total = $db->prepare("SELECT total_amount, user_id, order_id FROM orders WHERE order_id = :id");
+      $stmt_total = $db->prepare("SELECT total_amount, user_id,status, order_id FROM orders WHERE order_id = :id");
 
       $stmt->execute([
         ':id' => $order_id,
@@ -149,11 +231,47 @@ class Order
 
   public function pay($db)
   {
-    $stmt = $db->prepare("UPDATE orders SET status = 'paid' WHERE order_id = :id");
+    $this->update_status($db, 'paid');
+  }
+
+  public function update_status($db, $status): bool
+  {
+    $stmt = $db->prepare("UPDATE orders SET status = :status WHERE order_id = :id");
 
     $stmt->execute([
       ':id' => $this->order_id,
+      ':status' => $status,
     ]);
+
+    return $stmt->rowCount() == 0;
+  }
+
+  public static function update_order_status($status, Order $order): Result
+  {
+    if ($order->status === $status) {
+      return Result::Ok(true);
+    }
+    if ($order->status === 'cancelled') {
+      return Result::Err(new ConflictError("Order is cancelled"));
+    }
+
+    if ($order->status === "paid" && !$status === 'delivered') {
+      return Result::Err(new ConflictError("Cant cancel for already paid order"));
+    }
+    if ($order->status === "delivered") {
+      return Result::Err(new ConflictError("Cant update already delivered order"));
+    }
+    if ($order->status === "pending" && !$status === 'paid') {
+      return Result::Err(new ConflictError("Order must be paid before any delivery"));
+    }
+
+    try {
+      Database::connect();
+      $db = Database::db();
+      return Result::Ok($order->update_status($db, $status));
+    } catch (PDOException $e) {
+      return Result::Err(new InternalServerError("Error: " . $e->getMessage()));
+    }
   }
 
   public static function calc_total(Cart $cart, array $listings): float
@@ -177,11 +295,11 @@ class Order
       $db = Database::db();
 
       $stmtOrders = $db->prepare("
-            SELECT order_id 
-            FROM orders 
-            WHERE user_id = :user_id 
-              AND status = 'paid'
-        ");
+    SELECT order_id 
+    FROM orders 
+    WHERE user_id = :user_id 
+      AND status IN ('paid', 'delivered')
+");
       $stmtOrders->execute([':user_id' => $user_id]);
       $paidOrders = $stmtOrders->fetchAll(PDO::FETCH_COLUMN);
 
