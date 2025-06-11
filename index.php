@@ -65,6 +65,7 @@ $router->add_get('/api/v1/sellers/orders', 'SellerController::get_orders');
 $router->add_post('/api/v1/sellers/listings', 'SellerController::update_listing');
 $router->add_delete('/api/v1/sellers/listings', 'SellerController::delete_listing');
 $router->add_post('/api/v1/listings/media', 'SellerController::add_listing_images');
+$router->add_post('/api/v1/sellers/orders', 'SellerController::update_order');
 //Listing controller
 $router->add_get('/api/v1/listings/{slug}', 'ListingController::get_listing');
 $router->add_get('/api/v1/listings', 'ListingController::get_listing_single');

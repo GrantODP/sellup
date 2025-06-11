@@ -20,6 +20,7 @@ class Order
   public array $items;
   public int $user_id;
   public float $total;
+  public $status;
 
   public function __construct(array $items, array $order)
   {
@@ -27,6 +28,7 @@ class Order
     $this->items = $items;
     $this->total = $order['total_amount'];
     $this->user_id = $order['user_id'];
+    $this->status = $order['status'];
   }
 
   public static function create_order(Cart $cart): Result
@@ -45,8 +47,8 @@ class Order
 
 
       $stmt_order = $db->prepare("
-        INSERT INTO orders (user_id, total_amount, seller_id) 
-        VALUES (:user_id, :total_amount, :seller_id)
+        INSERT INTO orders (user_id, total_amount) 
+        VALUES (:user_id, :total_amount)
       ");
 
       $stmt_order->execute([
@@ -179,7 +181,7 @@ WHERE
       $db = Database::db();
 
       $stmt = $db->prepare("SELECT listing_id, quantity, price, subtotal FROM order_items WHERE order_id = :id");
-      $stmt_total = $db->prepare("SELECT total_amount, user_id, order_id FROM orders WHERE order_id = :id");
+      $stmt_total = $db->prepare("SELECT total_amount, user_id,status, order_id FROM orders WHERE order_id = :id");
 
       $stmt->execute([
         ':id' => $order_id,
@@ -229,11 +231,47 @@ WHERE
 
   public function pay($db)
   {
-    $stmt = $db->prepare("UPDATE orders SET status = 'paid' WHERE order_id = :id");
+    $this->update_status($db, 'paid');
+  }
+
+  public function update_status($db, $status): bool
+  {
+    $stmt = $db->prepare("UPDATE orders SET status = :status WHERE order_id = :id");
 
     $stmt->execute([
       ':id' => $this->order_id,
+      ':status' => $status,
     ]);
+
+    return $stmt->rowCount() == 0;
+  }
+
+  public static function update_order_status($status, Order $order): Result
+  {
+    if ($order->status === $status) {
+      return Result::Ok(true);
+    }
+    if ($order->status === 'cancelled') {
+      return Result::Err(new ConflictError("Order is cancelled"));
+    }
+
+    if ($order->status === "paid" && !$status === 'delivered') {
+      return Result::Err(new ConflictError("Cant cancel for already paid order"));
+    }
+    if ($order->status === "delivered") {
+      return Result::Err(new ConflictError("Cant update already delivered order"));
+    }
+    if ($order->status === "pending" && !$status === 'paid') {
+      return Result::Err(new ConflictError("Order must be paid before any delivery"));
+    }
+
+    try {
+      Database::connect();
+      $db = Database::db();
+      return Result::Ok($order->update_status($db, $status));
+    } catch (PDOException $e) {
+      return Result::Err(new InternalServerError("Error: " . $e->getMessage()));
+    }
   }
 
   public static function calc_total(Cart $cart, array $listings): float
@@ -257,11 +295,11 @@ WHERE
       $db = Database::db();
 
       $stmtOrders = $db->prepare("
-            SELECT order_id 
-            FROM orders 
-            WHERE user_id = :user_id 
-              AND status = 'paid'
-        ");
+    SELECT order_id 
+    FROM orders 
+    WHERE user_id = :user_id 
+      AND status IN ('paid', 'delivered')
+");
       $stmtOrders->execute([':user_id' => $user_id]);
       $paidOrders = $stmtOrders->fetchAll(PDO::FETCH_COLUMN);
 

@@ -262,8 +262,8 @@ class SellerController
       return Responder::success($result->unwrap());
     }
   }
-  // DELETE sellers/orders
-  public static function delete_order()
+  // PUT sellers/orders
+  public static function update_order()
   {
 
     $auth_token = Authorizer::validate_token_header();
@@ -272,27 +272,49 @@ class SellerController
       return Responder::unauthorized($auth_token->message());
     }
 
-    $user = User::get_by_id($auth_token->user_id());
+    $seller = Seller::get_seller_by_user_id($auth_token->user_id());
 
-    if (empty($user)) {
-      return Responder::not_found("No user found matching auth token");
+    if (empty($seller)) {
+      return Responder::not_found("No seller found matching auth token");
     }
 
-    $order_id = $_GET["id"] ?? 0;
-    if (empty($order_id)) {
-      return Responder::not_found("Order for user not found");
-    }
-    $result = Order::delete_order($user, $order_id);
-    if ($result->isErr()) {
-      return Responder::server_error($result->unwrapErr());
-    }
+    $data = get_input_json();
 
-    $changed = $result->unwrap();
+    $order_id = $data["id"] ?? 0;
+    $status = trim($data["status"] ?? "");
+    $accepted = ['paid', 'delivered', 'cancelled'];
 
-    if (!$changed) {
-      return Responder::not_found("User does not have an order matching id");
+    if (!in_array($status, $accepted)) {
+      return Responder::bad_request("Invalid status parameter $status");
     }
 
-    return Responder::success($result->unwrap());
+    if ($order_id && $status) {
+      $order = Order::get_order($order_id);
+
+      if (!$order) {
+        return Responder::not_found("Order not found");
+      }
+
+      $result_bool = Order::can_get_order($seller, $order);
+
+      if ($result_bool->isErr()) {
+        return Responder::result_error($result_bool);
+      }
+
+      if (!$result_bool->unwrap()) {
+        return Responder::forbidden("User not authorized to view order");
+      }
+
+
+      $result = Order::update_order_status($status, $order);
+
+      if ($result->isErr()) {
+        return Responder::result_error($result);
+      }
+
+      return Responder::success($result->unwrap());
+    }
+
+    return Responder::bad_request("Missing request parameters");
   }
 }

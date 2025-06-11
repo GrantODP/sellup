@@ -247,7 +247,6 @@ export async function loadOrderDetail(orderId) {
     card.className = 'col-12';
     card.innerHTML = `
             <div class="card p-3 shadow-sm d-flex flex-row align-items-center">
-                <img src="${listing.image_url || 'https://via.placeholder.com/80'}" class="img-thumbnail me-3" alt="${listing.title}" style="width: 80px; height: 80px; object-fit: cover;">
                 <div class="flex-grow-1">
                     <h5 class="mb-1">${listing.title}</h5>
                     <p class="mb-1 text-muted">Price: R${parseFloat(item.price).toFixed(2)} x ${item.quantity}</p>
