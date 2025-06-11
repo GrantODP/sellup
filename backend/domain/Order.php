@@ -141,7 +141,7 @@ WHERE
       $db = Database::db();
 
       $sql =
-        "SELECT,
+        "SELECT
     order_items.*
 FROM 
     orders
