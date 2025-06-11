@@ -109,6 +109,7 @@ class Order
         "SELECT 
     orders.order_id,
     orders.user_id AS buyer_id,
+    orders.*,
     listings.seller_id,
     listings.listing_id
 FROM 
@@ -140,7 +141,7 @@ WHERE
       $db = Database::db();
 
       $sql =
-        "SELECT 
+        "SELECT,
     order_items.*
 FROM 
     orders
