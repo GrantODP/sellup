@@ -263,6 +263,7 @@ export async function loadOrderDetail(orderId) {
   itemListContainer.appendChild(itemList);
   container.appendChild(itemListContainer);
 
+
   const actionButtonsDiv = document.createElement('div');
   actionButtonsDiv.className = 'd-flex justify-content-end gap-2 mt-4';
 
@@ -293,7 +294,6 @@ async function loadCart() {
   cartItemsContainer.innerHTML = '';
   cartSummaryCheckout.classList.add('d-none');
   emptyCartMessage.classList.add('d-none');
-
   const cart = await getCart();
   const cartItems = cart.cart_items;
 
@@ -355,6 +355,7 @@ async function loadCart() {
 async function loadEditProfileForm() {
   const user = await getUserInfo();
   document.getElementById('contact').value = user.contact;
+
 
   document.getElementById('change-picture-form').addEventListener('submit', async (e) => {
     e.preventDefault();

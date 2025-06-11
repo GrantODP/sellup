@@ -103,7 +103,6 @@
             </div>
             <button type="submit" class="btn btn-primary">Save Changes</button>
           </form>
-
         </div>
 
         <div id="section-change-password" class="content-section d-none">
@@ -131,7 +130,6 @@
       </main>
     </div>
   </div>
-
 
   </div>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"
