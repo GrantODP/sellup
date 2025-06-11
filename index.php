@@ -2,7 +2,6 @@
 ob_start();
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
-ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 set_error_handler(function ($errno, $errstr, $errfile, $errline) {
   echo "Error [$errno]: $errstr in $errfile on line $errline\n";
@@ -22,7 +21,7 @@ require_once './backend/core/Result.php';
 
 
 C2Config::load();
-Database::connect();
+/* Database::connect(); */
 
 
 
@@ -109,6 +108,7 @@ $router->add_get('/test', 'TestController::test');
 $router->add_get('/ads/{slug}', 'PageController::get_ad_page');
 $router->add_get('/ads', 'PageController::get_all_ads_page');
 $router->add_get('/browse', 'PageController::get_all_ads_page');
+$router->add_get('', 'PageController::get_all_ads_page');
 $router->add_get('/user', 'PageController::get_user');
 $router->add_get('/login', 'PageController::login');
 $router->add_get('/pay', 'PageController::payment');

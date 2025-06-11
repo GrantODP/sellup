@@ -344,7 +344,7 @@ WHERE la.cat_id = :cat_id
       JOIN location loc ON la.location_id = loc.location_id
     ";
 
-      if ($id !== 0) {
+      if ($id > 0) {
         $sql .= " WHERE $column = :value";
       }
 
@@ -352,7 +352,7 @@ WHERE la.cat_id = :cat_id
 
       $stmt = $db->prepare($sql);
 
-      if ($id !== 0) {
+      if ($id > 0) {
         $stmt->bindValue(':value', $id, PDO::PARAM_INT);
       }
 

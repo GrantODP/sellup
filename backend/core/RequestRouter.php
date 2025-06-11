@@ -83,7 +83,7 @@ class Router
   private static function clean_uri($uri): string
   {
     $uri = rtrim($uri, '/');
-    $uri = $uri === '' ? '/' : $uri;
+    $uri = $uri === '' ? '' : $uri;
     return $uri;
   }
 
@@ -103,7 +103,7 @@ class Router
       $this->delete_op($uri);
     }
 
-    if ($uri === self::clean_uri($default)) {
+    if ($default === self::clean_uri($uri)) {
       call_user_func($controller);
     }
   }
