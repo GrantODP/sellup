@@ -65,8 +65,16 @@ class User
       $stmt = $db->prepare("SELECT * FROM users");
       $stmt->execute();
 
+
       $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
-      return $row;
+      // Rename 'user_id' to 'id' in each user record
+      $renamed = array_map(function ($user) {
+        $user['id'] = $user['user_id'];
+        unset($user['user_id']);
+        return $user;
+      }, $row);
+
+      return $renamed;
     } catch (PDOException $e) {
       echo "Error: " . $e->getMessage();
     }

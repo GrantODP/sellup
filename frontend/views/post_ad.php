@@ -4,6 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <base href="/public/">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Ad listings</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
@@ -15,11 +16,11 @@
   <?php include('navbar.html'); ?>
 
   <main id="main-content" class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
-    <h2>Create New Ad Post</h2>
+    <h2 class="m-2">Create New Ad Post</h2>
     <hr class="mb-4">
 
     <form id="postAdForm">
-      <div class="row g-3">
+      <div class="row g-3 m-2">
         <div class="col-12">
           <label for="title" class="form-label">Title</label>
           <input type="text" class="form-control" id="title" name="title"
@@ -78,10 +79,9 @@
         </div>
       </div>
 
-      <hr class="my-4">
 
-      <button class="btn btn-primary btn-lg" type="submit">Post Ad</button>
-      <button class="btn btn-outline-secondary btn-lg ms-2" type="reset">Clear Form</button>
+      <button class="btn btn-primary btn-lg m-2" type="submit">Post Ad</button>
+      <button class="btn btn-outline-secondary btn-lg m-2" type="reset">Clear Form</button>
     </form>
 
     <script type="module" src="js/post_ad.js"> </script>

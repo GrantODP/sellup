@@ -128,7 +128,13 @@ export function getUrlParams() {
   return new URLSearchParams(queryString);
 }
 
-export function getAdListings(category = 0, page = 1, limit = 5, sort = 'date', dir = 'desc') {
+export function getAdListings(
+  category = 0,
+  page = 1,
+  limit = 5,
+  sort = 'date',
+  dir = 'desc'
+) {
   const listings = getResource(`listings/category?id=${category}&page=${page}&sort=${sort}&limit=${limit}&dir=${dir}`);
   return listings;
 }
@@ -203,8 +209,8 @@ export function setOnClick(container_id, action) {
   document.getElementById(container_id).addEventListener("click", (e) => action());
 }
 
-export function navigateWindow(page) {
-  return window.location.href = `/${page}`;
+export function navigateWindow(page, new_tab = false) {
+  return new_tab ? window.open(`/${page}`, '_blank') : window.location.href = `/${page}`;
 }
 
 export async function login(email, password) {

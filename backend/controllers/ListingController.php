@@ -48,7 +48,6 @@ class ListingController
     if (empty($sort_val) || !in_array($sort_val, $accepted_sort)) {
       $sort_val = 'date';
     }
-
     if (empty($sort_dir)  || !in_array($sort_dir, $accepted_sord_dir)) {
       $sort_dir = 'asc';
     }

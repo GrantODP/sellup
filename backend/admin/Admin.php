@@ -40,6 +40,25 @@ class Admin
     }
   }
 
+  public static function delete_admin(User $user): Result
+  {
+    try {
+      Database::connect();
+      $db = Database::db();
+
+      $check = $db->prepare("DELETE FROM admin WHERE user_id = :uid LIMIT 1");
+      $check->execute([':uid' => $user->id]);
+
+      if ($check->rowCount() === 0) {
+        return Result::Err(new NotFoundError("User is not a admin"));
+      }
+
+      return Result::Ok(true);
+    } catch (PDOException $e) {
+      return Result::Err(new InternalServerError($e->getMessage()));
+    }
+  }
+
   public static function auth_admin(User $user): Result
   {
     try {

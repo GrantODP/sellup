@@ -2,7 +2,6 @@
 ob_start();
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
-ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 set_error_handler(function ($errno, $errstr, $errfile, $errline) {
   echo "Error [$errno]: $errstr in $errfile on line $errline\n";
@@ -29,11 +28,11 @@ Database::connect();
 
 $router = new Router();
 
-//api/v1/v1
 //UserController
 $router->add_post('/api/v1/user/create', 'UserController::post');
 $router->add_post('/api/v1/user/report', 'UserController::report');
 $router->add_post('/api/v1/login', 'UserController::login');
+$router->add_post('/api/v1/logout', 'UserController::logout');
 $router->add_get('/api/v1/user', 'UserController::get_user');
 $router->add_get('/api/v1/auth/status', 'UserController::auth_valid');
 $router->add_post('/api/v1/user/message', 'UserController::send_message');
@@ -61,9 +60,11 @@ $router->add_post('/api/v1/listings', 'SellerController::post_listing');
 $router->add_get('/api/v1/sellers/listings', 'SellerController::get_listings');
 $router->add_get('/api/v1/sellers', 'SellerController::get_seller');
 $router->add_get('/api/v1/sellers/rating', 'SellerController::get_rating');
+$router->add_get('/api/v1/sellers/orders', 'SellerController::get_orders');
 $router->add_post('/api/v1/sellers/listings', 'SellerController::update_listing');
 $router->add_delete('/api/v1/sellers/listings', 'SellerController::delete_listing');
 $router->add_post('/api/v1/listings/media', 'SellerController::add_listing_images');
+$router->add_post('/api/v1/sellers/orders', 'SellerController::update_order');
 //Listing controller
 $router->add_get('/api/v1/listings/{slug}', 'ListingController::get_listing');
 $router->add_get('/api/v1/listings', 'ListingController::get_listing_single');
@@ -86,6 +87,8 @@ $router->add_get('/api/v1/admin/users', 'AdminController::get_users');
 $router->add_get('/api/v1/admin/sellers', 'AdminController::get_sellers');
 $router->add_delete('/api/v1/admin/users', 'AdminController::delete_user');
 $router->add_delete('/api/v1/admin/listings', 'AdminController::delete_listing');
+$router->add_delete('/api/v1/admin', 'AdminController::delete_admin');
+$router->add_post('/api/v1/admin', 'AdminController::create_admin');
 $router->add_post('/api/v1/admin/categories', 'AdminController::category');
 $router->add_post('/api/v1/admin/seller/verification', 'AdminController::update_seller_verification');
 $router->add_post('/api/v1/admin/user/password', 'AdminController::update_user_password');
@@ -105,6 +108,7 @@ $router->add_get('/test', 'TestController::test');
 $router->add_get('/ads/{slug}', 'PageController::get_ad_page');
 $router->add_get('/ads', 'PageController::get_all_ads_page');
 $router->add_get('/browse', 'PageController::get_all_ads_page');
+$router->add_get('', 'PageController::get_all_ads_page');
 $router->add_get('/user', 'PageController::get_user');
 $router->add_get('/login', 'PageController::login');
 $router->add_get('/pay', 'PageController::payment');

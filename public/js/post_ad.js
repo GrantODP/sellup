@@ -31,7 +31,6 @@ async function populateCategoriesDropdown() {
   }
 }
 
-// --- Bootstrap Validation Script (Keep this) ---
 (() => {
   'use strict'
   const forms = document.querySelectorAll('.needs-validation')
@@ -46,8 +45,8 @@ async function populateCategoriesDropdown() {
   })
 })();
 
-// --- Script to capture form data as JSON (Keep this, no changes needed here for category population) ---
 const postAdForm = document.getElementById('postAdForm');
+
 if (postAdForm) {
   postAdForm.addEventListener('submit', function (e) {
     e.preventDefault();

@@ -92,6 +92,23 @@ class UserController
     return Responder::success();
   }
 
+  // POST /logout
+  public static function logout()
+  {
+    setcookie(
+      'auth_token',
+      '',
+      [
+        'expires' => time() - 3600, // 1 hour
+        'path' => '/',
+        'secure' => true,     // Only send over HTTPS
+        'httponly' => true,   // Inaccessible to JavaScript
+        'samesite' => 'Strict' // Prevent CSRF
+      ]
+    );
+    return Responder::success();
+  }
+
   // GET /user
   public static function get_user()
   {
@@ -311,7 +328,6 @@ class UserController
       return Responder::not_found("No user found matching auth token");
     }
 
-
     $result = Cart::get_cart($user);
 
     if ($result->isErr()) {
@@ -370,13 +386,13 @@ class UserController
     $result_cart = Cart::checkout($user);
 
     if ($result_cart->isErr()) {
-      return Responder::error($result_cart->unwrapErr());
+      return Responder::result_error($result_cart);
     }
 
     $order_result = Order::create_order($result_cart->unwrap());
 
     if ($order_result->isErr()) {
-      return Responder::server_error($order_result->unwrapErr());
+      return Responder::result_error($order_result);
     }
 
     return Responder::success();

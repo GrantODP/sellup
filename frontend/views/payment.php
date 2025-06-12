@@ -16,7 +16,7 @@
     <h2 class="mb-4">Complete Your Payment</h2>
 
     <!-- Order Summary Section -->
-    <div id="order-summary" class="mb-4">
+    <div id="order-summary" class="m-4">
       <h4>Order Summary</h4>
       <p><strong>Order ID:</strong> <span id="summary-order-id"></span></p>
       <p><strong>Status:</strong> <span id="summary-status"></span></p>

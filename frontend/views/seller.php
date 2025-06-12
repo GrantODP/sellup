@@ -18,9 +18,9 @@
   <?php include('navbar.html'); ?>
 
   <div class="container-fluid">
-    <div class="row min-vh-100">
-      <!-- Sidebar -->
-      <nav class="col-2 bg-dark text-white p-3">
+
+    <div class="row flex-column flex-md-row min-vh-100">
+      <nav class="col-12 col-md-3 col-lg-2 bg-dark text-white p-3">
         <h4 class="text-center mb-4">Seller Panel</h4>
         <ul class="nav nav-pills flex-column w-100 side">
           <li class="nav-item mb-2">
@@ -36,6 +36,10 @@
             </button>
           </li>
           <li class="nav-item mb-2">
+            <button id="btn-orders" type="button"
+              class="btn btn-link nav-link text-white text-start p-2 w-100">Orders</button>
+          </li>
+          <li class="nav-item mb-2">
             <a id="btn-post-ad" href="/post-ad" target="_blank"
               class="btn btn-link nav-link text-white text-start p-2 w-100">
               Post Ad
@@ -44,8 +48,23 @@
         </ul>
       </nav>
 
-      <!-- Main Content -->
-      <main id="main-content" class="col-10 ms-sm-auto col-lg-9 px-md-4 py-4">
+      <main id="main-content" class="col-12 col-md-9 col-lg-10 px-3 py-4">
+        <div id="seller-info-section" class="content-section">
+        </div>
+
+        <div id="seller-ads-section" class="content-section d-none">
+        </div>
+
+        <div id="seller-orders-section" class="content-section d-none">
+          <div class="accordion" id="ordersAccordion">
+            <p id="no-orders-message" class="text-muted text-center d-none">You have no orders yet.</p>
+          </div>
+        </div>
+
+        <div id="edit-listing-section" class="content-section d-none">
+        </div>
+
+
       </main>
     </div>
   </div>
