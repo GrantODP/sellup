@@ -1,5 +1,7 @@
 
+
 import { Swal, navigateWindow, getSellerListings, getUserSellerInfo, isLoggedIn, getUrlParams, getLocalData, storeLocalData, updateListing, uploadLisingImages, getResource, storeSessionData, getSessionData, deleteListing } from "../script.js";
+
 
 
 async function loadSection(section) {
@@ -95,6 +97,7 @@ async function loadOrders() {
     }
     groupedOrders[order.status].push(order);
   });
+
 
   console.log("grouped");
   // Define custom order for statuses
@@ -281,6 +284,7 @@ async function viewOrderDetails(orderId) {
     });
   }
 }
+
 
 async function loadAds() {
   const container = document.getElementById('seller-ads-section');
