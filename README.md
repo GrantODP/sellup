@@ -35,14 +35,14 @@ Many existing C2C platforms in South Africa offer poor usability. Sellup was bui
    \`\`\`
 
 2. Build Docker image:
-   \`\`\`bash
-   docker build -t sellup-app .
-   \`\`\`
+   
+   docker build -t sellup-app 
+   
 
 3. Run the container:
-   \`\`\`bash
+   
    docker run -d -p 8080:80 sellup-app
-   \`\`\`
+   
 
 4. Access the app at: \`http://localhost:8080\`
 
@@ -55,9 +55,9 @@ Many existing C2C platforms in South Africa offer poor usability. Sellup was bui
 2. Download the \`c2cfinal.sql\` file.
 
 3. Import into your MySQL server:
-   \`\`\`bash
+   
    mysql -u your_user -p your_database < c2cfinal.sql
-   \`\`\`
+   
 
 4. Configure database connection:
    - Open \`backend/config/sys_config.php\`
