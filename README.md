@@ -16,28 +16,6 @@ Many existing C2C platforms in South Africa offer poor usability. Sellup was bui
 - **AI Integration**: Google Gemini API for listing evaluation
 - **Architecture**: 3-tier (frontend, backend, database)
 
-## 📁 Project Structure
-
-\`\`\`
-sellup/
-│
-├── backend/
-│   ├── config/
-│   ├── controllers/
-│   └── models/
-│
-├── frontend/
-│   ├── views/
-│   └── public/
-│
-├── public/
-│   └── assets/
-│
-├── database/
-│   └── c2cfinal.sql (in database branch)
-│
-└── index.php
-\`\`\`
 
 ## 🚀 Getting Started
 
