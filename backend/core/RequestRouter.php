@@ -103,6 +103,7 @@ class Router
       $this->delete_op($uri);
     }
 
+
     if ($default === self::clean_uri($uri) & !empty($controller)) {
       call_user_func($controller);
     }
