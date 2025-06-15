@@ -1,5 +1,6 @@
-import { Swal, navigateWindow, getSellerListings, getUserSellerInfo, isLoggedIn, getUrlParams, getLocalData, storeLocalData, updateListing, uploadLisingImages, getResource, storeSessionData, getSessionData, deleteListing } from "../script.js";
 
+
+import { Swal, navigateWindow, getSellerListings, getUserSellerInfo, isLoggedIn, getUrlParams, getLocalData, storeLocalData, updateListing, uploadLisingImages, getResource, storeSessionData, getSessionData, deleteListing } from "../script.js";
 
 
 
@@ -96,6 +97,7 @@ async function loadOrders() {
     }
     groupedOrders[order.status].push(order);
   });
+
 
 
   console.log("grouped");
@@ -204,6 +206,7 @@ async function updateOrderStatus(orderId, newStatus) {
 async function viewOrderDetails(orderId) {
   let order = getSessionData(`order-${orderId}`); // Try to get from session (from 'all orders' list)
 
+
   // If not found in session, or if the session data is incomplete (e.g., lacks 'items'), fetch the single order
   if (!order || !order.items) {
     try {
@@ -283,7 +286,6 @@ async function viewOrderDetails(orderId) {
     });
   }
 }
-
 
 async function loadAds() {
   const container = document.getElementById('seller-ads-section');
