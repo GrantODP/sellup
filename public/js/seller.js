@@ -1,5 +1,3 @@
-
-
 import { Swal, navigateWindow, getSellerListings, getUserSellerInfo, isLoggedIn, getUrlParams, getLocalData, storeLocalData, updateListing, uploadLisingImages, getResource, storeSessionData, getSessionData, deleteListing } from "../script.js";
 
 
