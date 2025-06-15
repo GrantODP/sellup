@@ -2,6 +2,7 @@ import { Swal, navigateWindow, getSellerListings, getUserSellerInfo, isLoggedIn,
 
 
 
+
 async function loadSection(section) {
   // Hide all content sections first
   document.querySelectorAll('.content-section').forEach(sec => sec.classList.add('d-none'));
