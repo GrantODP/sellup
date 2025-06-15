@@ -4,7 +4,7 @@ $config =  [
     'host' => '',
     'user' => '',
     'password' => '',
-    'port' => ,
+    'port' => '',
     'dbname' => '',
   ],
   'llm' =>
