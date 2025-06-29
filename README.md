@@ -29,10 +29,9 @@ Many existing C2C platforms in South Africa offer poor usability. Sellup was bui
 ### 🔧 Local Setup (Docker)
 
 1. Clone the repository:
-   \`\`\`bash
-   git clone https://github.com/GrantODP/sellup.git
-   cd sellup
-   \`\`\`
+   git clone https://github.com/GrantODP/grant_CON-904957-X9S9_Project.git
+   cd grant_CON-904957-X9S9_Project
+  
 
 2. Build Docker image:
    
@@ -44,7 +43,7 @@ Many existing C2C platforms in South Africa offer poor usability. Sellup was bui
    docker run -d -p 8080:80 sellup-app
    
 
-4. Access the app at: \`http://localhost:8080\`
+4. Access the app at: \http://localhost:8080\
 
 ---
 
@@ -69,7 +68,7 @@ Many existing C2C platforms in South Africa offer poor usability. Sellup was bui
 
 1. Get a Gemini API key from [Google AI Studio](https://makersuite.google.com).
 2. Open \`backend/config/sys_config.php\`
-3. Add your API key like so:
+3. Add your API key
 
 ## ➕ Adding Pages to the Site
 
@@ -79,8 +78,8 @@ There are two ways to add new pages:
 - Add a \`.html\` or \`.php\` file directly in \`public/\`
 
 ### Method 2: Views with Routing
-1. Add your file to \`frontend/views/\` (e.g., \`mypage.php\`)
-2. Add a function to \`AdController.php\`:
+1. Add your file to \frontend\views\ (e.g., \mypage.php\`)
+2. Add a function to \AdController.php\:
    \`\`\`php
    return Views::get_view('mypage.php');
    \`\`\`
